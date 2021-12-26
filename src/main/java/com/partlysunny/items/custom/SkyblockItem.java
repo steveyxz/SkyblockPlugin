@@ -1,6 +1,8 @@
 package com.partlysunny.items.custom;
 
+import com.partlysunny.Skyblock;
 import com.partlysunny.common.Rarity;
+import com.partlysunny.items.additions.AdditionList;
 import com.partlysunny.items.lore.LoreBuilder;
 import com.partlysunny.items.lore.abilities.AbilityList;
 import com.partlysunny.stats.StatList;
@@ -13,13 +15,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public abstract class SkyblockItem implements Listener {
 
     private final String id;
+    private final AdditionList additions = new AdditionList();
 
     protected SkyblockItem(String id) {
         this.id = id;
+        JavaPlugin.getPlugin(Skyblock.class).getServer().getPluginManager().registerEvents(this, JavaPlugin.getPlugin(Skyblock.class));
     }
 
     public static ItemStack addGlow(ItemStack item) {
@@ -78,6 +83,10 @@ public abstract class SkyblockItem implements Listener {
 
         return i;
 
+    }
+
+    public AdditionList getAdditionManager() {
+        return additions;
     }
 
     public String id() {
