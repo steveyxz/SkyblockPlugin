@@ -1,16 +1,13 @@
 package com.partlysunny.stats;
 
 import de.tr7zw.nbtapi.NBTItem;
-import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class StatList {
 
-    private Map<StatType, ItemStat> statList = new HashMap<>();
+    private final Map<StatType, ItemStat> statList = new HashMap<>();
 
     public void addStat(ItemStat stat) {
         statList.put(stat.type(), stat);

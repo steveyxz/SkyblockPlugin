@@ -74,8 +74,7 @@ public enum VanillaEntityHealthAttributes {
     WITHER(300),
     GIANT(100),
     ILLUSIONER(32),
-    ZOMBIE_HORSE(15)
-    ;
+    ZOMBIE_HORSE(15);
 
     private final int value;
 

@@ -1,23 +1,27 @@
 package com.partlysunny.items.lore;
 
 import com.partlysunny.common.Rarity;
+import com.partlysunny.items.lore.abilities.Ability;
 import com.partlysunny.stats.ItemStat;
 import com.partlysunny.stats.StatType;
 import org.bukkit.ChatColor;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.*;
 
 public class LoreBuilder {
 
-    public List<String> lore = new ArrayList<>();
-    public String description = "";
-    public List<String> statLore = new ArrayList<>();
-    public Rarity r = Rarity.COMMON;
+    private final List<String> lore = new ArrayList<>();
+    private final List<String> statLore = new ArrayList<>();
+    private String description = "";
+    private Rarity r = Rarity.COMMON;
 
     public LoreBuilder setDescription(String description) {
         this.description = description;
+        return this;
+    }
+
+    public LoreBuilder addAbilities(Ability... abilities) {
         return this;
     }
 
@@ -59,8 +63,11 @@ public class LoreBuilder {
     }
 
     public List<String> build() {
-        lore.add(ChatColor.GRAY + "" + ChatColor.ITALIC + description);
-        lore.add(ChatColor.RESET + "");
+        lore.add("");
+        if (!Objects.equals(description, "")) {
+            lore.add(ChatColor.GRAY + "" + ChatColor.ITALIC + description);
+            lore.add(ChatColor.RESET + "");
+        }
         lore.addAll(statLore);
         lore.add("");
         lore.add(r.getColor() + "" + ChatColor.BOLD + r);

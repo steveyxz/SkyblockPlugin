@@ -3,5 +3,5 @@ version: '0.0.0'
 main: com.partlysunny.Skyblock
 api-version: 1.17
 authors: [ PartlySunny ]
-depend: [ActionBarAPI, NBTAPI, RedLib]
+depend: [ ActionBarAPI, NBTAPI, RedLib ]
 description: Hypixel Skyblock Remade
