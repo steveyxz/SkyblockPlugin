@@ -1,5 +1,6 @@
 package com.partlysunny.items.lore;
 
+import com.partlysunny.common.Global;
 import com.partlysunny.common.Rarity;
 import com.partlysunny.items.lore.abilities.Ability;
 import com.partlysunny.stats.ItemStat;
@@ -65,12 +66,15 @@ public class LoreBuilder {
     public List<String> build() {
         lore.add("");
         if (!Objects.equals(description, "")) {
-            lore.add(ChatColor.GRAY + "" + ChatColor.ITALIC + description);
+            List<String> desc = Global.wrap(description, 30);
+            for (String s : desc) {
+                lore.add(ChatColor.GRAY + "" + ChatColor.ITALIC + s);
+            }
             lore.add(ChatColor.RESET + "");
         }
         lore.addAll(statLore);
         lore.add("");
-        lore.add(r.getColor() + "" + ChatColor.BOLD + r);
+        lore.add(r.color() + "" + ChatColor.BOLD + r);
         return lore;
     }
 

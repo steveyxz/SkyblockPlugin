@@ -1,11 +1,15 @@
 package com.partlysunny.items.additions;
 
+import com.partlysunny.items.ItemType;
 import com.partlysunny.items.ModifierType;
+import com.partlysunny.items.additions.common.stat.PotatoBook;
+
+import java.util.Objects;
 
 public enum AdditionType {
 
 
-    ;
+    POTATO_BOOK("potato_book", 10, ModifierType.STAT, PotatoBook.class);
 
     private String id;
     private int maxAdditions;
@@ -62,5 +66,14 @@ public enum AdditionType {
 
     public void setType(ModifierType type) {
         this.type = type;
+    }
+
+    public static AdditionType getTypeFromId(String id) {
+        for (AdditionType t : values()) {
+            if (Objects.equals(id, t.id)) {
+                return t;
+            }
+        }
+        return null;
     }
 }

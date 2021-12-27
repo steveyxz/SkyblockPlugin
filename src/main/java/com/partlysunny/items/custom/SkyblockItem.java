@@ -2,10 +2,14 @@ package com.partlysunny.items.custom;
 
 import com.partlysunny.Skyblock;
 import com.partlysunny.common.Rarity;
+import com.partlysunny.items.ItemType;
+import com.partlysunny.items.ModifierType;
 import com.partlysunny.items.additions.AdditionList;
+import com.partlysunny.items.additions.AdditionType;
 import com.partlysunny.items.lore.LoreBuilder;
 import com.partlysunny.items.lore.abilities.AbilityList;
 import com.partlysunny.stats.StatList;
+import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -17,12 +21,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
+
 public abstract class SkyblockItem implements Listener {
 
     private final String id;
-    private final AdditionList statAdditions = new AdditionList();
-    private final AdditionList rarityAdditions = new AdditionList();
-    private final AdditionList abilityAdditions = new AdditionList();
+    private final AdditionList statAdditions = new AdditionList(ModifierType.STAT);
+    private final AdditionList rarityAdditions = new AdditionList(ModifierType.RARITY);
+    private final AdditionList abilityAdditions = new AdditionList(ModifierType.ABILITY);
 
     protected SkyblockItem(String id) {
         this.id = id;
@@ -80,10 +86,12 @@ public abstract class SkyblockItem implements Listener {
         i.setItemMeta(m);
 
         NBTItem nbti = new NBTItem(i);
+        nbti.setString("sb_id", id);
         nbti = getStats().applyStats(nbti);
         nbti = statAdditions.applyAdditions(nbti);
         nbti = rarityAdditions.applyAdditions(nbti);
         nbti = abilityAdditions.applyAdditions(nbti);
+        System.out.println(nbti.toString());
         i = nbti.getItem();
 
         return i;
@@ -104,5 +112,49 @@ public abstract class SkyblockItem implements Listener {
 
     public String id() {
         return id;
+    }
+
+    @Nullable
+    public static SkyblockItem getItemFrom(ItemStack s) {
+        NBTItem nbti = new NBTItem(s);
+        ItemType type = ItemType.getTypeFromId(nbti.getString("sb_id"));
+        if (type == null) {
+            return null;
+        }
+        SkyblockItem item = ItemType.getInstance(type);
+        if (item == null) {
+            return null;
+        }
+        NBTCompound abilityAdditions = nbti.getCompound("abilityAdditions");
+        NBTCompound statAdditions = nbti.getCompound("statAdditions");
+        NBTCompound rarityAdditions = nbti.getCompound("rarityAdditions");
+        if (abilityAdditions != null) {
+            for (String key : abilityAdditions.getKeys()) {
+                Integer amount = abilityAdditions.getInteger(key);
+                if (amount == null) {
+                    continue;
+                }
+                item.abilityAdditions.addAdditions(AdditionType.getTypeFromId(key), amount);
+            }
+        }
+        if (statAdditions != null) {
+            for (String key : statAdditions.getKeys()) {
+                Integer amount = statAdditions.getInteger(key);
+                if (amount == null) {
+                    continue;
+                }
+                item.statAdditions.addAdditions(AdditionType.getTypeFromId(key), amount);
+            }
+        }
+        if (rarityAdditions != null) {
+            for (String key : rarityAdditions.getKeys()) {
+                Integer amount = rarityAdditions.getInteger(key);
+                if (amount == null) {
+                    continue;
+                }
+                item.rarityAdditions.addAdditions(AdditionType.getTypeFromId(key), amount);
+            }
+        }
+        return item;
     }
 }

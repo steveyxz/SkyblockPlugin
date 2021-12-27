@@ -1,5 +1,7 @@
 package com.partlysunny.items.additions;
 
+import com.partlysunny.items.ModifierType;
+import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 
 import java.lang.reflect.InvocationTargetException;
@@ -9,12 +11,23 @@ import java.util.Map;
 public class AdditionList {
 
     private final Map<AdditionType, Addition> additionList = new HashMap<>();
+    private ModifierType accepting = ModifierType.ANY;
+
+    public AdditionList() {
+    }
+
+    public AdditionList(ModifierType accepting) {
+        this.accepting = accepting;
+    }
 
     public void addAdditions(AdditionType addition, int count) {
+        if (accepting != ModifierType.ANY && addition.type() != accepting) {
+            throw new IllegalArgumentException("This list does not accept type " + addition.type());
+        }
         Addition target = additionList.get(addition);
         if (target == null) {
             try {
-                additionList.put(addition, addition.cl().getDeclaredConstructor(addition.getDeclaringClass()).newInstance(addition));
+                additionList.put(addition, addition.cl().getDeclaredConstructor().newInstance());
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
@@ -31,6 +44,9 @@ public class AdditionList {
     }
 
     public void removeAdditions(AdditionType addition, int count) {
+        if (accepting != ModifierType.ANY && addition.type() != accepting) {
+            throw new IllegalArgumentException("This list does not contain type " + addition.type());
+        }
         Addition target = additionList.get(addition);
         if (target == null) {
             return;
@@ -46,12 +62,27 @@ public class AdditionList {
     }
 
     public void completelyRemove(AdditionType addition) {
+        if (accepting != ModifierType.ANY && addition.type() != accepting) {
+            throw new IllegalArgumentException("This list does not contain type " + addition.type());
+        }
         additionList.remove(addition);
     }
 
     public NBTItem applyAdditions(NBTItem item) {
+        NBTCompound c;
+        if (accepting == ModifierType.ANY) {
+            c = item.addCompound("additions");
+        } else if (accepting == ModifierType.STAT) {
+            c = item.addCompound("additions");
+        } else if (accepting == ModifierType.ABILITY) {
+            c = item.addCompound("abilityAdditions");
+        } else if (accepting == ModifierType.RARITY) {
+            c = item.addCompound("rarityAdditions");
+        } else {
+            c = item.addCompound("additions");
+        }
         for (Addition a : additionList.values()) {
-            item.setInteger(a.type().id(), a.amount());
+            c.setInteger(a.type().id(), (c.getInteger(a.type.id()) == null ? 0 : c.getInteger(a.type.id())) + a.amount());
         }
         return item;
     }
@@ -64,6 +95,10 @@ public class AdditionList {
             count++;
         }
         return returned;
+    }
+
+    public ModifierType accepting() {
+        return accepting;
     }
 
     public boolean checkZero(Addition a) {

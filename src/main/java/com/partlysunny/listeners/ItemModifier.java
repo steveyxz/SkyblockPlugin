@@ -1,21 +1,20 @@
 package com.partlysunny.listeners;
 
-import com.partlysunny.common.Rarity;
 import com.partlysunny.common.VanillaArmorAttributes;
 import com.partlysunny.common.VanillaDamageAttributes;
-import com.partlysunny.items.lore.LoreBuilder;
+import com.partlysunny.items.ItemType;
+import com.partlysunny.items.additions.AdditionType;
+import com.partlysunny.items.custom.SkyblockItem;
 import com.partlysunny.stats.ItemStat;
 import com.partlysunny.stats.ItemStats;
 import com.partlysunny.stats.StatType;
 import de.tr7zw.nbtapi.NBTItem;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
-import redempt.redlib.itemutils.ItemBuilder;
 
 import java.util.Objects;
 
@@ -36,7 +35,12 @@ public class ItemModifier implements Listener {
 
     @EventHandler
     public void temp(PlayerJoinEvent e) {
-        e.getPlayer().getInventory().addItem(new ItemBuilder(Material.IRON_SWORD).setName(ChatColor.RESET + "Hyperion").addLore(new LoreBuilder().setDescription("Epik gamer sword").setStats(new ItemStat(StatType.DAMAGE, 1000000000), new ItemStat(StatType.INTELLIGENCE, 1000000000), new ItemStat(StatType.FEROCITY, 1000000000), new ItemStat(StatType.STRENGTH, 1000000000), new ItemStat(StatType.TRUE_DEFENSE, 1000000000)).setRarity(Rarity.DIVINE).build()).toItemStack());
+        SkyblockItem skyblockItem = ItemType.getInstance(ItemType.HYPERION);
+        if (skyblockItem == null) {
+            return;
+        }
+        skyblockItem.statAdditions().addAddition(AdditionType.POTATO_BOOK);
+        e.getPlayer().getInventory().addItem(skyblockItem.getSkyblockItem());
     }
 
     private ItemStack transformNBT(ItemStack i) {
