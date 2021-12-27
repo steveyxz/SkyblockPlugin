@@ -20,7 +20,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 public abstract class SkyblockItem implements Listener {
 
     private final String id;
-    private final AdditionList additions = new AdditionList();
+    private final AdditionList statAdditions = new AdditionList();
+    private final AdditionList rarityAdditions = new AdditionList();
+    private final AdditionList abilityAdditions = new AdditionList();
 
     protected SkyblockItem(String id) {
         this.id = id;
@@ -79,14 +81,25 @@ public abstract class SkyblockItem implements Listener {
 
         NBTItem nbti = new NBTItem(i);
         nbti = getStats().applyStats(nbti);
+        nbti = statAdditions.applyAdditions(nbti);
+        nbti = rarityAdditions.applyAdditions(nbti);
+        nbti = abilityAdditions.applyAdditions(nbti);
         i = nbti.getItem();
 
         return i;
 
     }
 
-    public AdditionList getAdditionManager() {
-        return additions;
+    public AdditionList statAdditions() {
+        return statAdditions;
+    }
+
+    public AdditionList rarityAdditions() {
+        return rarityAdditions;
+    }
+
+    public AdditionList abilityAdditions() {
+        return abilityAdditions;
     }
 
     public String id() {

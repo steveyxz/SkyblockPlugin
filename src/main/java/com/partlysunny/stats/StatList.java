@@ -9,6 +9,14 @@ public class StatList {
 
     private final Map<StatType, ItemStat> statList = new HashMap<>();
 
+    public StatList() {}
+
+    public StatList(ItemStat... stats) {
+        for (ItemStat stat : stats) {
+            statList.put(stat.type(), stat);
+        }
+    }
+
     public void addStat(ItemStat stat) {
         statList.put(stat.type(), stat);
     }
@@ -35,4 +43,8 @@ public class StatList {
         return returned;
     }
 
+    public StatList merge(StatList list) {
+        statList.putAll(list.statList);
+        return this;
+    }
 }
