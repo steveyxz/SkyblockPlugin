@@ -9,8 +9,7 @@ import java.util.Objects;
 
 public enum ItemType {
 
-    HYPERION("hyperion", Hyperion.class)
-    ;
+    HYPERION("hyperion", Hyperion.class);
 
     private final Class<? extends SkyblockItem> itemType;
     private final String id;
@@ -18,14 +17,6 @@ public enum ItemType {
     ItemType(String id, Class<? extends SkyblockItem> itemType) {
         this.itemType = itemType;
         this.id = id;
-    }
-
-    public Class<? extends SkyblockItem> itemType() {
-        return itemType;
-    }
-
-    public String id() {
-        return id;
     }
 
     @Nullable
@@ -45,5 +36,13 @@ public enum ItemType {
             }
         }
         return null;
+    }
+
+    public Class<? extends SkyblockItem> itemType() {
+        return itemType;
+    }
+
+    public String id() {
+        return id;
     }
 }

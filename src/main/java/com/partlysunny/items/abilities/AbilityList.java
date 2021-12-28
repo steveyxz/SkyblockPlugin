@@ -1,4 +1,4 @@
-package com.partlysunny.items.lore.abilities;
+package com.partlysunny.items.abilities;
 
 import com.partlysunny.Skyblock;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -31,6 +31,11 @@ public class AbilityList {
             count++;
         }
         return returned;
+    }
+
+    public AbilityList merge(AbilityList other) {
+        abilityList.putAll(other.abilityList);
+        return this;
     }
 
 }

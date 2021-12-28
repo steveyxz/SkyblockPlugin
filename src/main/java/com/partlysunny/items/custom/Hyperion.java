@@ -1,7 +1,7 @@
 package com.partlysunny.items.custom;
 
 import com.partlysunny.common.Rarity;
-import com.partlysunny.items.lore.abilities.AbilityList;
+import com.partlysunny.items.abilities.AbilityList;
 import com.partlysunny.stats.ItemStat;
 import com.partlysunny.stats.StatList;
 import com.partlysunny.stats.StatType;

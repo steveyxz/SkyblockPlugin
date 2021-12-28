@@ -1,4 +1,4 @@
-package com.partlysunny.items.lore.abilities;
+package com.partlysunny.items.abilities;
 
 public enum AbilityType {
     PASSIVE,

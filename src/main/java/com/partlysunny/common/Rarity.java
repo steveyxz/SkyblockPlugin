@@ -1,5 +1,6 @@
 package com.partlysunny.common;
 
+import com.partlysunny.util.NumberUtils;
 import org.bukkit.ChatColor;
 
 public enum Rarity {
@@ -24,11 +25,7 @@ public enum Rarity {
         this.level = level;
     }
 
-    public int level() {
-        return level;
-    }
-
-    public Rarity add(Rarity start, int levels) {
+    public static Rarity add(Rarity start, int levels) {
         if (levels == 0) {
             return start;
         }
@@ -42,13 +39,17 @@ public enum Rarity {
             return SPECIAL;
         }
         int newLevel = start.level() + levels;
-        newLevel = Global.clamp(newLevel, 1, 7);
+        newLevel = NumberUtils.clamp(newLevel, 1, 7);
         for (Rarity r : Rarity.values()) {
             if (r.level() == newLevel) {
                 return r;
             }
         }
         return Rarity.COMMON;
+    }
+
+    public int level() {
+        return level;
     }
 
     public ChatColor color() {

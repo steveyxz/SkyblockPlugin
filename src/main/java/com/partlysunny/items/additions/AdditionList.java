@@ -1,6 +1,9 @@
 package com.partlysunny.items.additions;
 
 import com.partlysunny.items.ModifierType;
+import com.partlysunny.items.additions.common.ability.IAbilityAddition;
+import com.partlysunny.items.additions.common.rarity.IRarityAddition;
+import com.partlysunny.items.additions.common.stat.IStatAddition;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 
@@ -96,6 +99,46 @@ public class AdditionList {
         }
         return returned;
     }
+
+    public IStatAddition[] asStatList() {
+        if (accepting != ModifierType.STAT) {
+            throw new IllegalArgumentException("This list cannot be converted to a StatList");
+        }
+        IStatAddition[] returned = new IStatAddition[additionList.size()];
+        int count = 0;
+        for (Addition s : additionList.values()) {
+            returned[count] = (IStatAddition) s;
+            count++;
+        }
+        return returned;
+    }
+
+    public IAbilityAddition[] asAbilityList() {
+        if (accepting != ModifierType.ABILITY) {
+            throw new IllegalArgumentException("This list cannot be converted to a StatList");
+        }
+        IAbilityAddition[] returned = new IAbilityAddition[additionList.size()];
+        int count = 0;
+        for (Addition s : additionList.values()) {
+            returned[count] = (IAbilityAddition) s;
+            count++;
+        }
+        return returned;
+    }
+
+    public IRarityAddition[] asRarityList() {
+        if (accepting != ModifierType.RARITY) {
+            throw new IllegalArgumentException("This list cannot be converted to a StatList");
+        }
+        IRarityAddition[] returned = new IRarityAddition[additionList.size()];
+        int count = 0;
+        for (Addition s : additionList.values()) {
+            returned[count] = (IRarityAddition) s;
+            count++;
+        }
+        return returned;
+    }
+
 
     public ModifierType accepting() {
         return accepting;

@@ -9,7 +9,8 @@ public class StatList {
 
     private final Map<StatType, ItemStat> statList = new HashMap<>();
 
-    public StatList() {}
+    public StatList() {
+    }
 
     public StatList(ItemStat... stats) {
         for (ItemStat stat : stats) {
