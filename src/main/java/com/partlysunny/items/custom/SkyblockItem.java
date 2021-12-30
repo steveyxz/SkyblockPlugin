@@ -15,10 +15,8 @@ import com.partlysunny.items.name.NameBuilder;
 import com.partlysunny.stats.StatList;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_17_R1.inventory.CraftItemStack;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -42,19 +40,11 @@ public abstract class SkyblockItem implements Listener {
         updateSkyblockItem();
     }
 
-    public static ItemStack addGlow(ItemStack item) {
-        net.minecraft.world.item.ItemStack nmsStack = CraftItemStack.asNMSCopy(item);
-        NBTTagCompound tag = null;
-        if (!nmsStack.hasTag()) {
-            tag = new NBTTagCompound();
-            nmsStack.setTag(tag);
-        }
-        if (tag == null) tag = nmsStack.getTag();
-        NBTTagList ench = new NBTTagList();
-        assert tag != null;
-        tag.set("ench", ench);
-        nmsStack.setTag(tag);
-        return CraftItemStack.asCraftMirror(nmsStack);
+    public ItemStack addGlow(ItemStack itemStack) {
+        // adds protection to bows and infinity to every other item as infinity is only useful on bows and protection is only useful on armor
+        itemStack.addEnchantment((itemStack.getType() == Material.BOW) ? Enchantment.PROTECTION_ENVIRONMENTAL : Enchantment.ARROW_INFINITE, 1);
+        // returns the new itemstack
+        return itemStack;
     }
 
     @Nullable
