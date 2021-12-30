@@ -159,8 +159,8 @@ public abstract class SkyblockItem implements Listener {
         m.setLore(new LoreBuilder()
                 .setDescription(getDescription() != null ? getDescription() : "")
                 .setRarity(getFinalRarity())
-                .setStats(getCombinedStats().asList())
-                .addAbilities(getCombinedAbilities().asList())
+                .setStats(getStats())
+                .addAbilities(getCombinedAbilities())
                 .build()
         );
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON);

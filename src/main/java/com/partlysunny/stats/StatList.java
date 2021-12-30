@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class StatList {
 
-    private final Map<StatType, ItemStat> statList = new HashMap<>();
+    public final Map<StatType, ItemStat> statList = new HashMap<>();
 
     public StatList() {
     }
@@ -45,7 +45,12 @@ public class StatList {
     }
 
     public StatList merge(StatList list) {
-        statList.putAll(list.statList);
+        for (StatType t : list.statList.keySet()) {
+            statList.merge(t, list.statList.get(t), (oldVal, newVal) -> {
+                oldVal.setValue(oldVal.value() + newVal.value());
+                return oldVal;
+            });
+        }
         return this;
     }
 }

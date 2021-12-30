@@ -24,7 +24,7 @@ public class DataUtils {
         m.setLore(new LoreBuilder()
                 .setDescription("")
                 .setRarity(Rarity.COMMON)
-                .setStats(readStats(i).asList())
+                .setStats(readStats(i))
                 .build()
         );
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON);

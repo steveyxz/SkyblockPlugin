@@ -2,13 +2,18 @@ package com.partlysunny.items.lore;
 
 import com.partlysunny.enums.Rarity;
 import com.partlysunny.items.abilities.Ability;
+import com.partlysunny.items.abilities.AbilityList;
 import com.partlysunny.stats.ItemStat;
+import com.partlysunny.stats.StatList;
 import com.partlysunny.stats.StatType;
 import com.partlysunny.util.TextUtils;
 import org.bukkit.ChatColor;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
 public class LoreBuilder {
 
@@ -23,8 +28,8 @@ public class LoreBuilder {
         return this;
     }
 
-    public LoreBuilder addAbilities(Ability... abilities) {
-        for (Ability a : abilities) {
+    public LoreBuilder addAbilities(AbilityList abilities) {
+        for (Ability a : abilities.asList()) {
             String desc = a.description();
             List<String> split = new ArrayList<>(TextUtils.wrap(desc, 30));
             abilityLore.add("");
@@ -44,8 +49,9 @@ public class LoreBuilder {
         return this;
     }
 
-    public LoreBuilder setStats(ItemStat... stats) {
-        List<ItemStat> listed = new LinkedList<>(Arrays.asList(stats));
+    public LoreBuilder setStats(StatList stats) {
+        //TODO add stat lore addition markings (like the text after each stat)
+        List<ItemStat> listed = new ArrayList<>(stats.statList.values());
         Comparator<ItemStat> compareByType = Comparator.comparingInt(o -> (o.type().level()));
         listed.sort(compareByType);
         boolean greened = false;
