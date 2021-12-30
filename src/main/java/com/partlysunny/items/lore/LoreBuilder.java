@@ -27,11 +27,19 @@ public class LoreBuilder {
         for (Ability a : abilities) {
             String desc = a.description();
             List<String> split = new ArrayList<>(TextUtils.wrap(desc, 30));
-            if (!Objects.equals(a.type().toString(), "")) {
-                split.add(0, ChatColor.GOLD + "Ability: " + a.name() + " " + ChatColor.YELLOW + ChatColor.BOLD + a.type());
-            }
             abilityLore.add("");
-            abilityLore.addAll(split);
+            if (!Objects.equals(a.type().toString(), "")) {
+                abilityLore.add(ChatColor.GOLD + "Ability: " + a.name() + " " + ChatColor.YELLOW + ChatColor.BOLD + a);
+            }
+            if (split.size() > 1) {
+                for (String s : split) {
+                    abilityLore.add(ChatColor.GRAY + s.substring(2));
+                }
+            } else {
+                for (String s : split) {
+                    abilityLore.add(ChatColor.GRAY + s);
+                }
+            }
         }
         return this;
     }
@@ -74,17 +82,26 @@ public class LoreBuilder {
     }
 
     public List<String> build() {
+        lore.addAll(statLore);
         lore.add("");
         if (!Objects.equals(description, "")) {
             List<String> desc = TextUtils.wrap(description, 30);
-            for (String s : desc) {
-                lore.add(ChatColor.GRAY + "" + ChatColor.ITALIC + s);
+            if (desc.size() > 1) {
+                for (String s : desc) {
+                    lore.add(ChatColor.GRAY + s.substring(2));
+                }
+            } else {
+                for (String s : desc) {
+                    lore.add(ChatColor.GRAY + s);
+                }
             }
-            lore.add(ChatColor.RESET + "");
+            lore.add("");
         }
-        lore.addAll(statLore);
-        lore.addAll(abilityLore);
-        lore.add("");
+        lore.remove(lore.size() - 1);
+        if (abilityLore.size() > 0) {
+            lore.addAll(abilityLore);
+            lore.add("");
+        }
         lore.add(r.color() + "" + ChatColor.BOLD + r);
         return lore;
     }

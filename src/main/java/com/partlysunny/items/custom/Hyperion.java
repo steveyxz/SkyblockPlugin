@@ -5,7 +5,6 @@ import com.partlysunny.items.abilities.AbilityList;
 import com.partlysunny.stats.ItemStat;
 import com.partlysunny.stats.StatList;
 import com.partlysunny.stats.StatType;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
 public class Hyperion extends SkyblockItem {
@@ -21,7 +20,7 @@ public class Hyperion extends SkyblockItem {
 
     @Override
     public String getDisplayName() {
-        return ChatColor.RESET + "Hyperion";
+        return "Hyperion";
     }
 
     @Override
@@ -52,6 +51,6 @@ public class Hyperion extends SkyblockItem {
 
     @Override
     public Rarity getRarity() {
-        return Rarity.DIVINE;
+        return Rarity.MYTHIC;
     }
 }

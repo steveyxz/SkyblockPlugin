@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -30,13 +31,24 @@ public class ItemUpdater implements Listener {
         updateInventory(e.getInventory());
     }
 
+    @EventHandler(priority = EventPriority.LOW)
+    public void onPlayerClick(PlayerInteractEvent e) {
+        updateInventory(e.getPlayer().getInventory());
+    }
+
     private void updateInventory(Inventory inv) {
         for (ItemStack i : inv.getContents()) {
             if (i != null && i.getType() != Material.AIR) {
                 NBTItem nbti = new NBTItem(i);
+                if (!nbti.hasKey("sb_unique_id")) {
+                    continue;
+                }
                 UUID sb_unique_id = nbti.getUUID("sb_unique_id");
                 if (sb_unique_id == null) {
                     return;
+                }
+                if (!items.containsKey(sb_unique_id)) {
+                    ItemTracker.registerItem(i);
                 }
                 AdditionList statAdditions = update(items.get(sb_unique_id).getSkyblockItem(), i, "statAdditions", ModifierType.STAT);
                 AdditionList abilityAdditions = update(items.get(sb_unique_id).getSkyblockItem(), i, "abilityAdditions", ModifierType.ABILITY);
@@ -45,10 +57,10 @@ public class ItemUpdater implements Listener {
                     items.get(sb_unique_id).statAdditions().setList(statAdditions);
                 }
                 if (abilityAdditions != null) {
-                    items.get(sb_unique_id).statAdditions().setList(abilityAdditions);
+                    items.get(sb_unique_id).abilityAdditions().setList(abilityAdditions);
                 }
                 if (rarityAdditions != null) {
-                    items.get(sb_unique_id).statAdditions().setList(rarityAdditions);
+                    items.get(sb_unique_id).rarityAdditions().setList(rarityAdditions);
                 }
             }
         }
@@ -69,8 +81,6 @@ public class ItemUpdater implements Listener {
         }
         return null;
     }
-
-
 
 
 }

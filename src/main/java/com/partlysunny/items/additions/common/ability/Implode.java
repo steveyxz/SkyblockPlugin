@@ -6,8 +6,8 @@ import com.partlysunny.items.additions.Addition;
 import com.partlysunny.items.additions.AdditionType;
 
 public class Implode extends Addition implements IAbilityAddition {
-    public Implode(AdditionType type) {
-        super(type);
+    public Implode() {
+        super(AdditionType.IMPLODE);
     }
 
     @Override

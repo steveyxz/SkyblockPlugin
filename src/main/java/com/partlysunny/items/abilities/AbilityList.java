@@ -38,4 +38,12 @@ public class AbilityList {
         return this;
     }
 
+    public boolean contains(AbilityType type) {
+        for (AbilityType t : abilityList.keySet()) {
+            if (t == type) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

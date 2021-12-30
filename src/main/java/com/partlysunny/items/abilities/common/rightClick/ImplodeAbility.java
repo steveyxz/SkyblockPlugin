@@ -8,7 +8,7 @@ import org.bukkit.util.Vector;
 
 public class ImplodeAbility extends Ability {
     public ImplodeAbility() {
-        super("Implode", "Implode and die", 10, 1, 5, AbilityType.RIGHT_CLICK);
+        super("Implode", "Implode, somehow causing you to launch like 50 feet into the air and die of fall damage lmao :)", 10, 1, 5, AbilityType.RIGHT_CLICK);
     }
 
     @Override

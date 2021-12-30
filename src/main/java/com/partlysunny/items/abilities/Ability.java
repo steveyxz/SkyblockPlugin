@@ -1,7 +1,9 @@
 package com.partlysunny.items.abilities;
 
+import com.partlysunny.util.AbilityUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -59,20 +61,22 @@ public abstract class Ability implements Listener {
         return "";
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerInteract(PlayerInteractEvent e) {
-        if ((e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK)) {
-            if (e.getPlayer().isSneaking() && type == AbilityType.SHIFT_LEFT_CLICK) {
-                trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
-            } else if (type == AbilityType.LEFT_CLICK) {
-                trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
+        if (AbilityUtils.hasAbility(e.getPlayer().getInventory().getItemInMainHand(), this.type)) {
+            if ((e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK)) {
+                if (e.getPlayer().isSneaking() && type == AbilityType.SHIFT_LEFT_CLICK) {
+                    trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
+                } else if (type == AbilityType.LEFT_CLICK) {
+                    trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
+                }
             }
-        }
-        if ((e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)) {
-            if (e.getPlayer().isSneaking() && type == AbilityType.SHIFT_RIGHT_CLICK) {
-                trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
-            } else if (type == AbilityType.RIGHT_CLICK) {
-                trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
+            if ((e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)) {
+                if (e.getPlayer().isSneaking() && type == AbilityType.SHIFT_RIGHT_CLICK) {
+                    trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
+                } else if (type == AbilityType.RIGHT_CLICK) {
+                    trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
+                }
             }
         }
     }

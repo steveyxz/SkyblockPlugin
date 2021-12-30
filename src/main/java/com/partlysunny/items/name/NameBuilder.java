@@ -3,8 +3,6 @@ package com.partlysunny.items.name;
 import com.partlysunny.enums.Rarity;
 import org.bukkit.ChatColor;
 
-import java.util.Objects;
-
 public class NameBuilder {
 
     private String name;
@@ -35,7 +33,7 @@ public class NameBuilder {
     }
 
     public String build() {
-        return rarity + "" + ChatColor.RESET + (frag ? "⚚ " : "") + (Objects.equals(reforgeName, "") ? "" : reforgeName + " ") + displayName + " " + getStars();
+        return rarity + (frag ? "⚚ " : "") + (reforgeName == null ? "" : reforgeName + " ") + displayName + " " + getStars();
     }
 
     private String getStars() {

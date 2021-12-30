@@ -100,7 +100,7 @@ public class AdditionList {
         if (accepting == ModifierType.ANY) {
             c = item.addCompound("additions");
         } else if (accepting == ModifierType.STAT) {
-            c = item.addCompound("additions");
+            c = item.addCompound("statAdditions");
         } else if (accepting == ModifierType.ABILITY) {
             c = item.addCompound("abilityAdditions");
         } else if (accepting == ModifierType.RARITY) {

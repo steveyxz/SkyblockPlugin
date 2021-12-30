@@ -11,6 +11,7 @@ import com.partlysunny.items.additions.common.ability.IAbilityAddition;
 import com.partlysunny.items.additions.common.rarity.IRarityAddition;
 import com.partlysunny.items.additions.common.stat.IStatAddition;
 import com.partlysunny.items.lore.LoreBuilder;
+import com.partlysunny.items.name.NameBuilder;
 import com.partlysunny.stats.StatList;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
@@ -38,6 +39,7 @@ public abstract class SkyblockItem implements Listener {
     protected SkyblockItem(String id) {
         this.id = id;
         JavaPlugin.getPlugin(Skyblock.class).getServer().getPluginManager().registerEvents(this, JavaPlugin.getPlugin(Skyblock.class));
+        updateSkyblockItem();
     }
 
     public static ItemStack addGlow(ItemStack item) {
@@ -139,6 +141,7 @@ public abstract class SkyblockItem implements Listener {
 
 
     public ItemStack getSkyblockItem() {
+        updateSkyblockItem();
         return asSkyblockItem;
     }
 
@@ -151,7 +154,8 @@ public abstract class SkyblockItem implements Listener {
         if (m == null) {
             return;
         }
-        m.setDisplayName(getDisplayName());
+        //TODO add real item stats for these
+        m.setDisplayName(new NameBuilder().setName(getDisplayName()).setReforge("Withered").setRarity(getRarity()).setFragged(true).setStars(9).build());
         m.setLore(new LoreBuilder()
                 .setDescription(getDescription() != null ? getDescription() : "")
                 .setRarity(getFinalRarity())
@@ -166,14 +170,14 @@ public abstract class SkyblockItem implements Listener {
         NBTItem nbti = new NBTItem(i);
         nbti.setString("sb_id", id);
         nbti.setBoolean("vanilla", false);
-        if (nbti.getUUID("sb_unique_id") == null) {
+        if (!nbti.hasKey("sb_unique_id")) {
             nbti.setUUID("sb_unique_id", UUID.randomUUID());
         }
         nbti = getStats().applyStats(nbti);
         nbti = statAdditions.applyAdditions(nbti);
         nbti = rarityAdditions.applyAdditions(nbti);
         nbti = abilityAdditions.applyAdditions(nbti);
-        System.out.println(nbti.toString());
+        //System.out.println(nbti.toString());
         i = nbti.getItem();
         asSkyblockItem = i;
     }
