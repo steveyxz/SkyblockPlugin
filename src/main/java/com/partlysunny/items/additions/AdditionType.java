@@ -1,6 +1,7 @@
 package com.partlysunny.items.additions;
 
 import com.partlysunny.items.ModifierType;
+import com.partlysunny.items.additions.common.ability.Implode;
 import com.partlysunny.items.additions.common.stat.PotatoBook;
 
 import java.util.Objects;
@@ -8,7 +9,8 @@ import java.util.Objects;
 public enum AdditionType {
 
 
-    POTATO_BOOK("potato_book", 10, ModifierType.STAT, PotatoBook.class);
+    POTATO_BOOK("potato_book", 10, ModifierType.STAT, PotatoBook.class),
+    IMPLODE("implode", 1, ModifierType.ABILITY, Implode.class);
 
     private final Class<? extends Addition> cl;
     private String id;

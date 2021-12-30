@@ -1,4 +1,4 @@
-package com.partlysunny.common;
+package com.partlysunny.enums;
 
 public enum VanillaEntityDamageAttributes {
 

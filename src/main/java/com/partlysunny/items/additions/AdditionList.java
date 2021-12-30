@@ -4,6 +4,7 @@ import com.partlysunny.items.ModifierType;
 import com.partlysunny.items.additions.common.ability.IAbilityAddition;
 import com.partlysunny.items.additions.common.rarity.IRarityAddition;
 import com.partlysunny.items.additions.common.stat.IStatAddition;
+import com.partlysunny.items.custom.SkyblockItem;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 
@@ -15,12 +16,18 @@ public class AdditionList {
 
     private final Map<AdditionType, Addition> additionList = new HashMap<>();
     private ModifierType accepting = ModifierType.ANY;
+    private SkyblockItem parent;
 
     public AdditionList() {
     }
 
     public AdditionList(ModifierType accepting) {
         this.accepting = accepting;
+    }
+
+    public AdditionList(ModifierType accepting, SkyblockItem parent) {
+        this.accepting = accepting;
+        this.parent = parent;
     }
 
     public void addAdditions(AdditionType addition, int count) {
@@ -40,6 +47,17 @@ public class AdditionList {
         if (checkZero(target)) {
             additionList.remove(addition);
         }
+        if (parent != null) {
+            parent.updateSkyblockItem();
+        }
+    }
+
+    public void setList(AdditionList newList) {
+        if (newList.accepting() != accepting()) {
+            throw new IllegalArgumentException("Lists do not match types");
+        }
+        additionList.clear();
+        additionList.putAll(newList.additionList);
     }
 
     public void addAddition(AdditionType type) {
@@ -58,6 +76,9 @@ public class AdditionList {
         if (checkZero(target)) {
             additionList.remove(addition);
         }
+        if (parent != null) {
+            parent.updateSkyblockItem();
+        }
     }
 
     public void removeAddition(AdditionType type) {
@@ -69,6 +90,9 @@ public class AdditionList {
             throw new IllegalArgumentException("This list does not contain type " + addition.type());
         }
         additionList.remove(addition);
+        if (parent != null) {
+            parent.updateSkyblockItem();
+        }
     }
 
     public NBTItem applyAdditions(NBTItem item) {

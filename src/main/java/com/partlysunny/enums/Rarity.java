@@ -1,4 +1,4 @@
-package com.partlysunny.common;
+package com.partlysunny.enums;
 
 import com.partlysunny.util.NumberUtils;
 import org.bukkit.ChatColor;

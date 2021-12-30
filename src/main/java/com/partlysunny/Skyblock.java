@@ -1,6 +1,8 @@
 package com.partlysunny;
 
 import com.partlysunny.listeners.ItemModifier;
+import com.partlysunny.listeners.ItemTracker;
+import com.partlysunny.listeners.ItemUpdater;
 import de.tr7zw.nbtinjector.NBTInjector;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,6 +20,8 @@ public final class Skyblock extends JavaPlugin {
 
     private void registerListeners() {
         this.getServer().getPluginManager().registerEvents(new ItemModifier(), this);
+        this.getServer().getPluginManager().registerEvents(new ItemTracker(), this);
+        this.getServer().getPluginManager().registerEvents(new ItemUpdater(), this);
     }
 
     @Override

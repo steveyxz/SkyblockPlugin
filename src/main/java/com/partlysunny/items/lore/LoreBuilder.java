@@ -1,6 +1,6 @@
 package com.partlysunny.items.lore;
 
-import com.partlysunny.common.Rarity;
+import com.partlysunny.enums.Rarity;
 import com.partlysunny.items.abilities.Ability;
 import com.partlysunny.stats.ItemStat;
 import com.partlysunny.stats.StatType;
@@ -27,7 +27,11 @@ public class LoreBuilder {
         for (Ability a : abilities) {
             String desc = a.description();
             List<String> split = new ArrayList<>(TextUtils.wrap(desc, 30));
-            split.add(0, ChatColor.GOLD + "Ability: " + a.name() + " " + ChatColor.YELLOW + ChatColor.BOLD + a.type());
+            if (!Objects.equals(a.type().toString(), "")) {
+                split.add(0, ChatColor.GOLD + "Ability: " + a.name() + " " + ChatColor.YELLOW + ChatColor.BOLD + a.type());
+            }
+            abilityLore.add("");
+            abilityLore.addAll(split);
         }
         return this;
     }
@@ -79,6 +83,7 @@ public class LoreBuilder {
             lore.add(ChatColor.RESET + "");
         }
         lore.addAll(statLore);
+        lore.addAll(abilityLore);
         lore.add("");
         lore.add(r.color() + "" + ChatColor.BOLD + r);
         return lore;

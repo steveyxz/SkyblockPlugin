@@ -1,6 +1,6 @@
 package com.partlysunny.items.custom;
 
-import com.partlysunny.common.Rarity;
+import com.partlysunny.enums.Rarity;
 import com.partlysunny.items.abilities.AbilityList;
 import com.partlysunny.stats.ItemStat;
 import com.partlysunny.stats.StatList;

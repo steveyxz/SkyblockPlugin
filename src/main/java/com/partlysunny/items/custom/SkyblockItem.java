@@ -1,7 +1,7 @@
 package com.partlysunny.items.custom;
 
 import com.partlysunny.Skyblock;
-import com.partlysunny.common.Rarity;
+import com.partlysunny.enums.Rarity;
 import com.partlysunny.items.ItemType;
 import com.partlysunny.items.ModifierType;
 import com.partlysunny.items.abilities.AbilityList;
@@ -25,6 +25,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
 public abstract class SkyblockItem implements Listener {
 
@@ -32,6 +33,7 @@ public abstract class SkyblockItem implements Listener {
     private final AdditionList statAdditions = new AdditionList(ModifierType.STAT);
     private final AdditionList rarityAdditions = new AdditionList(ModifierType.RARITY);
     private final AdditionList abilityAdditions = new AdditionList(ModifierType.ABILITY);
+    private ItemStack asSkyblockItem;
 
     protected SkyblockItem(String id) {
         this.id = id;
@@ -122,7 +124,7 @@ public abstract class SkyblockItem implements Listener {
     public AbilityList getCombinedAbilities() {
         AbilityList base = getAbilities();
         for (IAbilityAddition a : abilityAdditions.asAbilityList()) {
-            base = base.merge(a.getAbilities());
+            base.addAbility(a.getAbilities());
         }
         return base;
     }
@@ -130,19 +132,24 @@ public abstract class SkyblockItem implements Listener {
     public Rarity getFinalRarity() {
         Rarity base = getRarity();
         for (IRarityAddition a : rarityAdditions.asRarityList()) {
-            Rarity.add(base, a.getLevelChange());
+            base = Rarity.add(base, a.getLevelChange());
         }
         return base;
     }
 
+
     public ItemStack getSkyblockItem() {
+        return asSkyblockItem;
+    }
+
+    public void updateSkyblockItem() {
         ItemStack i = new ItemStack(getDefaultItem());
         if (isEnchanted()) {
             i = addGlow(i);
         }
         ItemMeta m = i.getItemMeta();
         if (m == null) {
-            return i;
+            return;
         }
         m.setDisplayName(getDisplayName());
         m.setLore(new LoreBuilder()
@@ -158,15 +165,17 @@ public abstract class SkyblockItem implements Listener {
 
         NBTItem nbti = new NBTItem(i);
         nbti.setString("sb_id", id);
+        nbti.setBoolean("vanilla", false);
+        if (nbti.getUUID("sb_unique_id") == null) {
+            nbti.setUUID("sb_unique_id", UUID.randomUUID());
+        }
         nbti = getStats().applyStats(nbti);
         nbti = statAdditions.applyAdditions(nbti);
         nbti = rarityAdditions.applyAdditions(nbti);
         nbti = abilityAdditions.applyAdditions(nbti);
         System.out.println(nbti.toString());
         i = nbti.getItem();
-
-        return i;
-
+        asSkyblockItem = i;
     }
 
     public AdditionList statAdditions() {
