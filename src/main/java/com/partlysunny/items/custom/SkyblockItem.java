@@ -42,7 +42,7 @@ public abstract class SkyblockItem implements Listener {
 
     public ItemStack addGlow(ItemStack itemStack) {
         // adds protection to bows and infinity to every other item as infinity is only useful on bows and protection is only useful on armor
-        itemStack.addEnchantment((itemStack.getType() == Material.BOW) ? Enchantment.PROTECTION_ENVIRONMENTAL : Enchantment.ARROW_INFINITE, 1);
+        itemStack.addUnsafeEnchantment((itemStack.getType() == Material.BOW) ? Enchantment.PROTECTION_ENVIRONMENTAL : Enchantment.ARROW_INFINITE, 1);
         // returns the new itemstack
         return itemStack;
     }
