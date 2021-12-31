@@ -1,6 +1,8 @@
 package com.partlysunny.util;
 
 import com.partlysunny.enums.Rarity;
+import com.partlysunny.items.ModifierType;
+import com.partlysunny.items.additions.AdditionList;
 import com.partlysunny.items.lore.LoreBuilder;
 import com.partlysunny.items.name.NameBuilder;
 import com.partlysunny.stats.ItemStat;
@@ -24,7 +26,7 @@ public class DataUtils {
         m.setLore(new LoreBuilder()
                 .setDescription("")
                 .setRarity(Rarity.COMMON)
-                .setStats(readStats(i))
+                .setStats(readStats(i), new AdditionList(ModifierType.STAT))
                 .build()
         );
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON);

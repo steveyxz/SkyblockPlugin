@@ -2,9 +2,6 @@ package com.partlysunny.listeners;
 
 import com.partlysunny.enums.VanillaArmorAttributes;
 import com.partlysunny.enums.VanillaDamageAttributes;
-import com.partlysunny.items.ItemType;
-import com.partlysunny.items.additions.AdditionType;
-import com.partlysunny.items.custom.SkyblockItem;
 import com.partlysunny.stats.ItemStat;
 import com.partlysunny.stats.ItemStats;
 import com.partlysunny.stats.StatType;
@@ -51,13 +48,7 @@ public class ItemModifier implements Listener {
 
     @EventHandler
     public void temp(PlayerJoinEvent e) {
-        SkyblockItem skyblockItem = ItemType.getInstance(ItemType.HYPERION);
-        if (skyblockItem == null) {
-            return;
-        }
-        skyblockItem.statAdditions().addAddition(AdditionType.POTATO_BOOK);
-        skyblockItem.abilityAdditions().addAddition(AdditionType.IMPLODE);
-        e.getPlayer().getInventory().addItem(skyblockItem.getSkyblockItem());
+
     }
 
     private ItemStack transformNBT(ItemStack i) {

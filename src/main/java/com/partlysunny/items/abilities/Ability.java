@@ -3,7 +3,6 @@ package com.partlysunny.items.abilities;
 import com.partlysunny.util.AbilityUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -61,7 +60,7 @@ public abstract class Ability implements Listener {
         return "";
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler
     public void onPlayerInteract(PlayerInteractEvent e) {
         if (AbilityUtils.hasAbility(e.getPlayer().getInventory().getItemInMainHand(), this.type)) {
             if ((e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK)) {

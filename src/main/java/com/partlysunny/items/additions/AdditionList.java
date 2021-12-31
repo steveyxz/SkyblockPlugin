@@ -9,6 +9,7 @@ import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -122,6 +123,14 @@ public class AdditionList {
             count++;
         }
         return returned;
+    }
+
+    public Map<AdditionType, Addition> additionList() {
+        return additionList;
+    }
+
+    public ArrayList<Addition> asArrayList() {
+        return new ArrayList<>(additionList.values());
     }
 
     public IStatAddition[] asStatList() {

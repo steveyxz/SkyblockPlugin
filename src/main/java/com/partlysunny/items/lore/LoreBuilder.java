@@ -1,8 +1,13 @@
 package com.partlysunny.items.lore;
 
 import com.partlysunny.enums.Rarity;
+import com.partlysunny.items.ModifierType;
 import com.partlysunny.items.abilities.Ability;
 import com.partlysunny.items.abilities.AbilityList;
+import com.partlysunny.items.additions.Addition;
+import com.partlysunny.items.additions.AdditionList;
+import com.partlysunny.items.additions.AdditionType;
+import com.partlysunny.items.additions.common.stat.IStatAddition;
 import com.partlysunny.stats.ItemStat;
 import com.partlysunny.stats.StatList;
 import com.partlysunny.stats.StatType;
@@ -10,10 +15,7 @@ import com.partlysunny.util.TextUtils;
 import org.bukkit.ChatColor;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class LoreBuilder {
 
@@ -49,24 +51,48 @@ public class LoreBuilder {
         return this;
     }
 
-    public LoreBuilder setStats(StatList stats) {
-        //TODO add stat lore addition markings (like the text after each stat)
+    public LoreBuilder setStats(StatList stats, AdditionList additions) {
+        if (additions.accepting() != ModifierType.STAT) {
+            throw new IllegalArgumentException("Additions argument is of wrong type (not of type STAT)");
+        }
         List<ItemStat> listed = new ArrayList<>(stats.statList.values());
         Comparator<ItemStat> compareByType = Comparator.comparingInt(o -> (o.type().level()));
         listed.sort(compareByType);
         boolean greened = false;
         statLore.clear();
+        List<Addition> additionList = additions.asArrayList();
+        HashMap<StatType, HashMap<AdditionType, Double>> sorted = new HashMap<>();
+        for (Addition a : additionList) {
+            IStatAddition isa = (IStatAddition) a;
+            for (ItemStat s : isa.getStats().asList()) {
+                if (sorted.containsKey(s.type())) {
+                    sorted.get(s.type()).put(a.type(), s.value());
+                } else {
+                    sorted.put(s.type(), new HashMap<>());
+                    sorted.get(s.type()).put(a.type(), s.value());
+                }
+            }
+        }
         for (ItemStat s : listed) {
             StatType type = s.type();
             if (!greened && type.isGreen()) {
                 statLore.add("");
                 greened = true;
             }
+            StringBuilder stat = new StringBuilder();
             if (type.isGreen()) {
-                statLore.add(ChatColor.GRAY + type.displayName() + ": " + ChatColor.GREEN + "+" + trim(s.value()) + (type.percent() ? "%" : ""));
+                stat.append(ChatColor.GRAY).append(type.displayName()).append(": ").append(ChatColor.GREEN).append("+").append(trim(s.value())).append(type.percent() ? "%" : "");
             } else {
-                statLore.add(ChatColor.GRAY + type.displayName() + ": " + ChatColor.RED + "+" + trim(s.value()) + (type.percent() ? "%" : ""));
+                stat.append(ChatColor.GRAY).append(type.displayName()).append(": ").append(ChatColor.RED).append("+").append(trim(s.value())).append(type.percent() ? "%" : "");
             }
+            if (sorted.containsKey(s.type())) {
+                HashMap<AdditionType, Double> sortedValue = sorted.get(s.type());
+                for (AdditionType t : sortedValue.keySet()) {
+                    Double amount = sortedValue.get(t);
+                    stat.append(" ").append(t.color()).append(t.bt().start()).append(amount > -1 ? "+" : "-").append(trim(amount)).append(type.percent() ? "%" : "").append(t.bt().end());
+                }
+            }
+            statLore.add(String.valueOf(stat));
         }
         return this;
     }

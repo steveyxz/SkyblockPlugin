@@ -21,8 +21,9 @@ public class ItemTracker implements Listener {
 
     public static void registerItem(ItemStack i) {
         NBTItem nbti = new NBTItem(i);
-        if (!nbti.getBoolean("vanilla") && !items.containsKey(nbti.getUUID("sb_unique_id"))) {
-            items.put(nbti.getUUID("sb_unique_id"), SkyblockItem.getItemFrom(i));
+        UUID sb_unique_id = nbti.getUUID("sb_unique_id");
+        if (!nbti.getBoolean("vanilla") && !items.containsKey(sb_unique_id)) {
+            items.put(sb_unique_id, SkyblockItem.getItemFrom(i));
         }
     }
 

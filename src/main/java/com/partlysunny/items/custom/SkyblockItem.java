@@ -149,7 +149,7 @@ public abstract class SkyblockItem implements Listener {
         m.setLore(new LoreBuilder()
                 .setDescription(getDescription() != null ? getDescription() : "")
                 .setRarity(getFinalRarity())
-                .setStats(getStats())
+                .setStats(getCombinedStats(), statAdditions())
                 .addAbilities(getCombinedAbilities())
                 .build()
         );

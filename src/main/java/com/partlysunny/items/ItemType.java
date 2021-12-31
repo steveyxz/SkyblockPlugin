@@ -1,6 +1,5 @@
 package com.partlysunny.items;
 
-import com.partlysunny.items.custom.Hyperion;
 import com.partlysunny.items.custom.SkyblockItem;
 
 import javax.annotation.Nullable;
@@ -9,7 +8,7 @@ import java.util.Objects;
 
 public enum ItemType {
 
-    HYPERION("hyperion", Hyperion.class);
+    ;
 
     private final Class<? extends SkyblockItem> itemType;
     private final String id;

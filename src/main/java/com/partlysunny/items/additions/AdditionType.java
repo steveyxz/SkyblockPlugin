@@ -1,28 +1,45 @@
 package com.partlysunny.items.additions;
 
+import com.partlysunny.enums.BracketType;
 import com.partlysunny.items.ModifierType;
-import com.partlysunny.items.additions.common.ability.Implode;
-import com.partlysunny.items.additions.common.stat.PotatoBook;
+import org.bukkit.ChatColor;
 
 import java.util.Objects;
 
 public enum AdditionType {
 
 
-    POTATO_BOOK("potato_book", 10, ModifierType.STAT, PotatoBook.class),
-    IMPLODE("implode", 1, ModifierType.ABILITY, Implode.class);
+    ;
 
     private final Class<? extends Addition> cl;
     private String id;
     private int maxAdditions;
     private ModifierType type;
     private AdditionType depends = null;
+    //Lower equals shown first
+    private int shownLevel;
+    private ChatColor color;
+    private BracketType bt;
 
     AdditionType(String id, int maxAdditions, ModifierType type, Class<? extends Addition> cl) {
         this.id = id;
         this.maxAdditions = maxAdditions;
         this.type = type;
         this.cl = cl;
+    }
+
+    //Only for stat additions
+    AdditionType(String id, int maxAdditions, ModifierType type, Class<? extends Addition> cl, int shownLevel, ChatColor color, BracketType bt) {
+        if (type != ModifierType.STAT) {
+            throw new IllegalArgumentException("This constructor only accepts stat modifier additions");
+        }
+        this.id = id;
+        this.maxAdditions = maxAdditions;
+        this.type = type;
+        this.cl = cl;
+        this.color = color;
+        this.shownLevel = shownLevel;
+        this.bt = bt;
     }
 
     AdditionType(String id, int maxAdditions, ModifierType type, Class<? extends Addition> cl, AdditionType depends) {
@@ -40,6 +57,18 @@ public enum AdditionType {
             }
         }
         return null;
+    }
+
+    public int shownLevel() {
+        return shownLevel;
+    }
+
+    public ChatColor color() {
+        return color;
+    }
+
+    public BracketType bt() {
+        return bt;
     }
 
     public Class<? extends Addition> cl() {
@@ -77,4 +106,5 @@ public enum AdditionType {
     public void setType(ModifierType type) {
         this.type = type;
     }
+
 }
