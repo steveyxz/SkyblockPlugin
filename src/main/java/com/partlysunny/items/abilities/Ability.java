@@ -80,5 +80,7 @@ public abstract class Ability implements Listener {
         }
     }
 
-    public abstract void trigger(Player player, ItemStack parent);
+    public void trigger(Player player, ItemStack parent) {
+        //TODO Implement cooldowns
+    }
 }

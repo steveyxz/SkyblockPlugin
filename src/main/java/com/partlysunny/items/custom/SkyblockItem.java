@@ -29,9 +29,9 @@ import java.util.UUID;
 public abstract class SkyblockItem implements Listener {
 
     private final String id;
-    private final AdditionList statAdditions = new AdditionList(ModifierType.STAT);
-    private final AdditionList rarityAdditions = new AdditionList(ModifierType.RARITY);
-    private final AdditionList abilityAdditions = new AdditionList(ModifierType.ABILITY);
+    private final AdditionList statAdditions = new AdditionList(ModifierType.STAT, this);
+    private final AdditionList rarityAdditions = new AdditionList(ModifierType.RARITY, this);
+    private final AdditionList abilityAdditions = new AdditionList(ModifierType.ABILITY, this);
     private ItemStack asSkyblockItem;
 
     protected SkyblockItem(String id) {
@@ -131,7 +131,6 @@ public abstract class SkyblockItem implements Listener {
 
 
     public ItemStack getSkyblockItem() {
-        updateSkyblockItem();
         return asSkyblockItem;
     }
 
@@ -167,7 +166,7 @@ public abstract class SkyblockItem implements Listener {
         nbti = statAdditions.applyAdditions(nbti);
         nbti = rarityAdditions.applyAdditions(nbti);
         nbti = abilityAdditions.applyAdditions(nbti);
-        //System.out.println(nbti.toString());
+        System.out.println(nbti.toString());
         i = nbti.getItem();
         asSkyblockItem = i;
     }

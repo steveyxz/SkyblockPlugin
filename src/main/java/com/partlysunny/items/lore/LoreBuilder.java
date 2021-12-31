@@ -88,6 +88,9 @@ public class LoreBuilder {
             if (sorted.containsKey(s.type())) {
                 HashMap<AdditionType, Double> sortedValue = sorted.get(s.type());
                 for (AdditionType t : sortedValue.keySet()) {
+                    if (t.bt() == null || t.shownLevel() == null || t.color() == null) {
+                        continue;
+                    }
                     Double amount = sortedValue.get(t);
                     stat.append(" ").append(t.color()).append(t.bt().start()).append(amount > -1 ? "+" : "-").append(trim(amount)).append(type.percent() ? "%" : "").append(t.bt().end());
                 }
@@ -120,11 +123,11 @@ public class LoreBuilder {
             List<String> desc = TextUtils.wrap(description, 30);
             if (desc.size() > 1) {
                 for (String s : desc) {
-                    lore.add(ChatColor.GRAY + s.substring(2));
+                    lore.add(ChatColor.GRAY + "" + ChatColor.ITALIC + s.substring(2));
                 }
             } else {
                 for (String s : desc) {
-                    lore.add(ChatColor.GRAY + s);
+                    lore.add(ChatColor.GRAY + "" + ChatColor.ITALIC + s);
                 }
             }
             lore.add("");

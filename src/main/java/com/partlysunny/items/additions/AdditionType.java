@@ -2,13 +2,16 @@ package com.partlysunny.items.additions;
 
 import com.partlysunny.enums.BracketType;
 import com.partlysunny.items.ModifierType;
+import com.partlysunny.items.additions.common.ability.Destroy;
+import com.partlysunny.items.additions.common.stat.PowerInfusion;
 import org.bukkit.ChatColor;
 
 import java.util.Objects;
 
 public enum AdditionType {
 
-
+    DESTROY("destroy", 1, ModifierType.ABILITY, Destroy.class),
+    POWER_INFUSION("power_infusion", 10, ModifierType.STAT, PowerInfusion.class, 1, ChatColor.AQUA, BracketType.SQUARE)
     ;
 
     private final Class<? extends Addition> cl;
@@ -59,7 +62,7 @@ public enum AdditionType {
         return null;
     }
 
-    public int shownLevel() {
+    public Integer shownLevel() {
         return shownLevel;
     }
 

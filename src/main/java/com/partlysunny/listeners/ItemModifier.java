@@ -2,6 +2,9 @@ package com.partlysunny.listeners;
 
 import com.partlysunny.enums.VanillaArmorAttributes;
 import com.partlysunny.enums.VanillaDamageAttributes;
+import com.partlysunny.items.ItemType;
+import com.partlysunny.items.additions.AdditionType;
+import com.partlysunny.items.custom.SkyblockItem;
 import com.partlysunny.stats.ItemStat;
 import com.partlysunny.stats.ItemStats;
 import com.partlysunny.stats.StatType;
@@ -48,7 +51,10 @@ public class ItemModifier implements Listener {
 
     @EventHandler
     public void temp(PlayerJoinEvent e) {
-
+        SkyblockItem i = ItemType.getInstance(ItemType.ULTRA_BLADE);
+        i.statAdditions().addAdditions(AdditionType.POWER_INFUSION, 10);
+        i.abilityAdditions().addAdditions(AdditionType.DESTROY, 1);
+        e.getPlayer().getInventory().addItem(i.getSkyblockItem());
     }
 
     private ItemStack transformNBT(ItemStack i) {

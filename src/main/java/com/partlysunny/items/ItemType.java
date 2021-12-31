@@ -1,6 +1,7 @@
 package com.partlysunny.items;
 
 import com.partlysunny.items.custom.SkyblockItem;
+import com.partlysunny.items.custom.UltraBlade;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.InvocationTargetException;
@@ -8,6 +9,7 @@ import java.util.Objects;
 
 public enum ItemType {
 
+    ULTRA_BLADE("ultra_blade", UltraBlade.class)
     ;
 
     private final Class<? extends SkyblockItem> itemType;

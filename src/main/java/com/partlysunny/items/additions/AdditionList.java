@@ -42,6 +42,9 @@ public class AdditionList {
             } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
+            if (parent != null) {
+                parent.updateSkyblockItem();
+            }
             return;
         }
         target.setAmount(target.amount() + count);

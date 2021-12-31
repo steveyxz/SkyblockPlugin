@@ -6,6 +6,8 @@ import com.partlysunny.listeners.ItemTracker;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.UUID;
+
 import static com.partlysunny.listeners.ItemTracker.items;
 
 public class AbilityUtils {
@@ -15,12 +17,13 @@ public class AbilityUtils {
         if (nbti.getBoolean("vanilla") || !nbti.hasKey("sb_unique_id")) {
             return false;
         }
-        if (items.containsKey(nbti.getUUID("sb_unique_id"))) {
-            SkyblockItem sbi = items.get(nbti.getUUID("sb_unique_id"));
+        UUID sb_unique_id = nbti.getUUID("sb_unique_id");
+        if (items.containsKey(sb_unique_id)) {
+            SkyblockItem sbi = items.get(sb_unique_id);
             return sbi.getCombinedAbilities().contains(type);
         } else {
             ItemTracker.registerItem(i);
-            SkyblockItem sbi = items.get(nbti.getUUID("sb_unique_id"));
+            SkyblockItem sbi = items.get(sb_unique_id);
             return sbi.getCombinedAbilities().contains(type);
         }
     }
