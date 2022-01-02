@@ -2,12 +2,12 @@ package com.partlysunny.core.listeners;
 
 import com.partlysunny.core.enums.VanillaArmorAttributes;
 import com.partlysunny.core.enums.VanillaDamageAttributes;
-import com.partlysunny.additions.ability.Test;
 import com.partlysunny.core.items.SkyblockItem;
 import com.partlysunny.core.stats.ItemStat;
 import com.partlysunny.core.stats.ItemStats;
 import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.util.DataUtils;
+import com.partlysunny.items.Blood;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -18,6 +18,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -47,51 +48,81 @@ public class ItemUpdater implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerClick(PlayerInteractEvent e) {
-        idify(e.getPlayer().getInventory());
-        updateVanilla(e.getPlayer().getInventory());
-        updateInventory(e.getPlayer().getInventory());
+        if (e.getHand() == EquipmentSlot.HAND) {
+            idify(e.getPlayer().getInventory());
+            updateVanilla(e.getPlayer().getInventory());
+            updateInventory(e.getPlayer().getInventory());
+        }
     }
 
     @EventHandler
     public void temp(EntityDamageByEntityEvent e) {
         if (e.getDamager() instanceof Player) {
-            SkyblockItem i = new com.partlysunny.items.Test();
-            i.abilityAdditions().addAddition(new Test().type());
-            ((Player) e.getDamager()).getInventory().addItem(i.getSkyblockItem());
+            ((Player) e.getDamager()).getInventory().addItem(new Blood().getSkyblockItem());
         }
     }
 
-    private void updateInventory(Inventory inv) {
+    private void updateUniques(Inventory inv) {
         int count = 0;
+        ItemStack[] newInv = new ItemStack[inv.getSize()];
         for (ItemStack i : inv.getContents()) {
+            newInv[count] = i;
             if (i != null && i.getType() != Material.AIR) {
                 NBTItem nbti = new NBTItem(i);
-                if (!nbti.hasKey("sb_unique_id")) {
-                    continue;
-                }
-                UUID sb_unique_id = nbti.getUUID("sb_unique_id");
-                if (sb_unique_id == null) {
-                    continue;
-                }
-                if (!items.containsKey(sb_unique_id)) {
-                    registerItem(i);
-                    continue;
-                }
-                ItemStack skyblockItem = items.get(sb_unique_id).getSkyblockItem();
-                if (skyblockItem.getItemMeta() == null || i.getItemMeta() == null) {
-                    continue;
-                }
-                if (
-                        !new NBTItem(skyblockItem).equals(new NBTItem(i))
-                        || skyblockItem.getType() != i.getType()
-                        || !Objects.equals(skyblockItem.getItemMeta().getLore(), i.getItemMeta().getLore())
-                        || !skyblockItem.getItemMeta().getDisplayName().equals(i.getItemMeta().getDisplayName())
-                ) {
-                    inv.setItem(count, skyblockItem);
+                if (nbti.getBoolean("sb_unique")) {
+                    SkyblockItem sbi = SkyblockItem.getItemFrom(i);
+                    if (sbi == null) {
+                        System.out.println("sbi is null wth");
+                        count++;
+                        continue;
+                    }
+                    sbi.updateSkyblockItem();
+                    newInv[count] = sbi.getSkyblockItem();
                 }
             }
             count++;
         }
+        inv.setContents(newInv);
+    }
+
+    private void updateInventory(Inventory inv) {
+        updateUniques(inv);
+        int count = 0;
+        ItemStack[] newInv = new ItemStack[inv.getSize()];
+        for (ItemStack i : inv.getContents()) {
+            newInv[count] = i;
+            if (i != null && i.getType() != Material.AIR) {
+                NBTItem nbti = new NBTItem(i);
+                if (!nbti.hasKey("sb_unique_id")) {
+                    count++;
+                    continue;
+                }
+                ItemStack skyblockItem;
+                UUID sb_unique_id;
+                sb_unique_id = nbti.getUUID("sb_unique_id");
+                if (!items.containsKey(sb_unique_id)) {
+                    registerItem(i);
+                    count++;
+                    continue;
+                }
+                skyblockItem = items.get(sb_unique_id).getSkyblockItem();
+                skyblockItem.setAmount(i.getAmount());
+                if (skyblockItem.getItemMeta() == null || i.getItemMeta() == null) {
+                    count++;
+                    continue;
+                }
+                if (
+                        !new NBTItem(skyblockItem).equals(new NBTItem(i))
+                                || skyblockItem.getType() != i.getType()
+                                || !Objects.equals(skyblockItem.getItemMeta().getLore(), i.getItemMeta().getLore())
+                                || !skyblockItem.getItemMeta().getDisplayName().equals(i.getItemMeta().getDisplayName())
+                ) {
+                    newInv[count] = skyblockItem;
+                }
+            }
+            count++;
+        }
+        inv.setContents(newInv);
     }
 
     private ItemStack transformNBT(ItemStack i) {
@@ -124,6 +155,10 @@ public class ItemUpdater implements Listener {
         for (ItemStack i : inv.getContents()) {
             if (i != null && i.getType() != Material.AIR) {
                 NBTItem nbti = new NBTItem(i);
+                if (nbti.getBoolean("sb_unique")) {
+                    count++;
+                    continue;
+                }
                 ItemStack ided = addID(i);
                 NBTItem nbtided = new NBTItem(ided);
                 if (!nbti.hasKey("sb_unique_id")) {
@@ -140,7 +175,7 @@ public class ItemUpdater implements Listener {
 
     private ItemStack addID(ItemStack item) {
         NBTItem i = new NBTItem(item);
-        if (!i.hasKey("sb_unique_id")) {
+        if (!i.hasKey("sb_unique_id") && !i.getBoolean("sb_unique")) {
             i.setUUID("sb_unique_id", UUID.randomUUID());
         }
         return i.getItem();

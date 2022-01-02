@@ -5,8 +5,8 @@ import com.partlysunny.core.listeners.ItemUpdater;
 import de.tr7zw.nbtinjector.NBTInjector;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import static com.partlysunny.core.registers.AbilityRegister.registerAbilities;
-import static com.partlysunny.core.registers.ItemRegister.registerItems;
+import static com.partlysunny.abilities.AbilityRegister.registerAbilities;
+import static com.partlysunny.items.ItemRegister.registerItems;
 
 public final class Skyblock extends JavaPlugin {
 

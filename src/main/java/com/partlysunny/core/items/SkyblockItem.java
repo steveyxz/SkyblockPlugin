@@ -23,13 +23,18 @@ import java.util.UUID;
 public abstract class SkyblockItem implements Listener {
 
     private final String id;
+    private int stackCount = 1;
+    //If this is true, it means it will be generated an uuid. Also if this is true the item cannot stack so yeah
+    private boolean unique;
+    private UUID uniqueId;
     private final AdditionList statAdditions = new AdditionList(ModifierType.STAT, this);
     private final AdditionList rarityAdditions = new AdditionList(ModifierType.RARITY, this);
     private final AdditionList abilityAdditions = new AdditionList(ModifierType.ABILITY, this);
     private ItemStack asSkyblockItem;
 
-    protected SkyblockItem(String id) {
+    protected SkyblockItem(String id, boolean unique) {
         this.id = id;
+        this.unique = unique;
         Skyblock plugin = JavaPlugin.getPlugin(Skyblock.class);
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         ItemManager.addItem(new ItemInfo(id, getClass()));
@@ -56,10 +61,21 @@ public abstract class SkyblockItem implements Listener {
             System.out.println("Bad Instance");
             return null;
         }
+        if (nbti.hasKey("sb_unique_id")) {
+            item.setUniqueId(nbti.getUUID("sb_unique_id"));
+        }
+        if (nbti.hasKey("sb_unique")) {
+            item.setUnique(nbti.getBoolean("sb_unique"));
+        }
+        item.stackCount = s.getAmount();
         NBTCompound abilityAdditions = nbti.getCompound("abilityAdditions");
         NBTCompound statAdditions = nbti.getCompound("statAdditions");
         NBTCompound rarityAdditions = nbti.getCompound("rarityAdditions");
         if (abilityAdditions != null) {
+            if (!item.unique) {
+                item.unique = true;
+                item.uniqueId = UUID.randomUUID();
+            }
             for (String key : abilityAdditions.getKeys()) {
                 Integer amount = abilityAdditions.getInteger(key);
                 if (amount == null) {
@@ -69,6 +85,10 @@ public abstract class SkyblockItem implements Listener {
             }
         }
         if (statAdditions != null) {
+            if (!item.unique) {
+                item.unique = true;
+                item.uniqueId = UUID.randomUUID();
+            }
             for (String key : statAdditions.getKeys()) {
                 Integer amount = statAdditions.getInteger(key);
                 if (amount == null) {
@@ -78,6 +98,10 @@ public abstract class SkyblockItem implements Listener {
             }
         }
         if (rarityAdditions != null) {
+            if (!item.unique) {
+                item.unique = true;
+                item.uniqueId = UUID.randomUUID();
+            }
             for (String key : rarityAdditions.getKeys()) {
                 Integer amount = rarityAdditions.getInteger(key);
                 if (amount == null) {
@@ -132,8 +156,25 @@ public abstract class SkyblockItem implements Listener {
         return asSkyblockItem;
     }
 
+    public boolean unique() {
+        return unique;
+    }
+
+    public void setUnique(boolean unique) {
+        this.unique = unique;
+    }
+
+    public UUID uniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(UUID uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
     public void updateSkyblockItem() {
         ItemStack i = new ItemStack(getDefaultItem());
+        i.setAmount(stackCount);
         if (isEnchanted()) {
             i = addGlow(i);
         }
@@ -156,14 +197,26 @@ public abstract class SkyblockItem implements Listener {
 
         NBTItem nbti = new NBTItem(i);
         nbti.setString("sb_id", id);
+        nbti.setBoolean("sb_unique", unique);
         nbti.setBoolean("vanilla", false);
-        if (!nbti.hasKey("sb_unique_id")) {
-            nbti.setUUID("sb_unique_id", UUID.randomUUID());
+        if (uniqueId == null) {
+            if (unique) {
+                UUID value = UUID.randomUUID();
+                this.uniqueId = value;
+                nbti.setUUID("sb_unique_id", value);
+            }
+        } else {
+            if (unique) {
+                nbti.setUUID("sb_unique_id", uniqueId);
+            } else {
+                nbti.removeKey("sb_unique_id");
+            }
         }
         nbti = getStats().applyStats(nbti);
         nbti = statAdditions.applyAdditions(nbti);
         nbti = rarityAdditions.applyAdditions(nbti);
         nbti = abilityAdditions.applyAdditions(nbti);
+        this.unique = nbti.getBoolean("sb_unique");
         //System.out.println(nbti.toString());
         i = nbti.getItem();
         asSkyblockItem = i;

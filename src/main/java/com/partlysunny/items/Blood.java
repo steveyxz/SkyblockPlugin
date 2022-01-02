@@ -6,9 +6,9 @@ import com.partlysunny.core.items.abilities.AbilityList;
 import com.partlysunny.core.stats.StatList;
 import org.bukkit.Material;
 
-public class Test extends SkyblockItem {
-    public Test() {
-        super("test");
+public class Blood extends SkyblockItem  {
+    public Blood() {
+        super("blood", false);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class Test extends SkyblockItem {
 
     @Override
     public boolean isEnchanted() {
-        return true;
+        return false;
     }
 
     @Override
@@ -38,11 +38,11 @@ public class Test extends SkyblockItem {
 
     @Override
     public String getDescription() {
-        return "You suck man";
+        return "Eww wth is this";
     }
 
     @Override
     public Rarity getRarity() {
-        return Rarity.SPECIAL;
+        return Rarity.RARE;
     }
 }

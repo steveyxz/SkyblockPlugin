@@ -1,19 +1,17 @@
 package com.partlysunny.core.util;
 
 import com.partlysunny.core.enums.Rarity;
-import com.partlysunny.core.stats.ItemStat;
-import com.partlysunny.core.stats.StatList;
 import com.partlysunny.core.items.ModifierType;
 import com.partlysunny.core.items.additions.AdditionList;
 import com.partlysunny.core.items.lore.LoreBuilder;
 import com.partlysunny.core.items.name.NameBuilder;
+import com.partlysunny.core.stats.ItemStat;
+import com.partlysunny.core.stats.StatList;
 import com.partlysunny.core.stats.StatType;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.UUID;
 
 public class DataUtils {
 
@@ -41,10 +39,8 @@ public class DataUtils {
 
         NBTItem nbti = new NBTItem(i);
         nbti.setString("sb_id", i.getType().toString().toLowerCase());
+        nbti.setBoolean("sb_unique", false);
         nbti.setBoolean("vanilla", true);
-        if (nbti.getUUID("sb_unique_id") == null) {
-            nbti.setUUID("sb_unique_id", UUID.randomUUID());
-        }
         i = nbti.getItem();
         return i;
 
