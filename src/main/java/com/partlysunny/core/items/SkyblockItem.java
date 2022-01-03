@@ -18,18 +18,21 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
+import java.util.Objects;
 import java.util.UUID;
 
 public abstract class SkyblockItem implements Listener {
 
     private final String id;
-    private int stackCount = 1;
-    //If this is true, it means it will be generated an uuid. Also if this is true the item cannot stack so yeah
-    private boolean unique;
-    private UUID uniqueId;
     private final AdditionList statAdditions = new AdditionList(ModifierType.STAT, this);
     private final AdditionList rarityAdditions = new AdditionList(ModifierType.RARITY, this);
     private final AdditionList abilityAdditions = new AdditionList(ModifierType.ABILITY, this);
+    private int stackCount = 1;
+    private Material baseMaterial = getDefaultItem();
+    //If this is true, it means it will be generated an uuid. Also if this is true the item cannot stack so yeah
+    private boolean unique;
+    private boolean vanilla = false;
+    private UUID uniqueId;
     private ItemStack asSkyblockItem;
 
     protected SkyblockItem(String id, boolean unique) {
@@ -39,13 +42,6 @@ public abstract class SkyblockItem implements Listener {
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         ItemManager.addItem(new ItemInfo(id, getClass()));
         updateSkyblockItem();
-    }
-
-    public ItemStack addGlow(ItemStack itemStack) {
-        // adds protection to bows and infinity to every other item as infinity is only useful on bows and protection is only useful on armor
-        itemStack.addUnsafeEnchantment((itemStack.getType() == Material.BOW) ? Enchantment.PROTECTION_ENVIRONMENTAL : Enchantment.ARROW_INFINITE, 1);
-        // returns the new itemstack
-        return itemStack;
     }
 
     @Nullable
@@ -61,22 +57,26 @@ public abstract class SkyblockItem implements Listener {
             System.out.println("Bad Instance");
             return null;
         }
+        item.baseMaterial = s.getType();
         if (nbti.hasKey("sb_unique_id")) {
             item.setUniqueId(nbti.getUUID("sb_unique_id"));
         }
         if (nbti.hasKey("sb_unique")) {
             item.setUnique(nbti.getBoolean("sb_unique"));
         }
+        if (nbti.hasKey("sb_vanilla")) {
+            item.setVanilla(nbti.getBoolean("sb_vanilla"));
+        }
         item.stackCount = s.getAmount();
         NBTCompound abilityAdditions = nbti.getCompound("abilityAdditions");
         NBTCompound statAdditions = nbti.getCompound("statAdditions");
         NBTCompound rarityAdditions = nbti.getCompound("rarityAdditions");
         if (abilityAdditions != null) {
-            if (!item.unique) {
-                item.unique = true;
-                item.uniqueId = UUID.randomUUID();
-            }
             for (String key : abilityAdditions.getKeys()) {
+                if (!item.unique) {
+                    item.unique = true;
+                    item.uniqueId = UUID.randomUUID();
+                }
                 Integer amount = abilityAdditions.getInteger(key);
                 if (amount == null) {
                     continue;
@@ -85,11 +85,11 @@ public abstract class SkyblockItem implements Listener {
             }
         }
         if (statAdditions != null) {
-            if (!item.unique) {
-                item.unique = true;
-                item.uniqueId = UUID.randomUUID();
-            }
             for (String key : statAdditions.getKeys()) {
+                if (!item.unique) {
+                    item.unique = true;
+                    item.uniqueId = UUID.randomUUID();
+                }
                 Integer amount = statAdditions.getInteger(key);
                 if (amount == null) {
                     continue;
@@ -98,11 +98,11 @@ public abstract class SkyblockItem implements Listener {
             }
         }
         if (rarityAdditions != null) {
-            if (!item.unique) {
-                item.unique = true;
-                item.uniqueId = UUID.randomUUID();
-            }
             for (String key : rarityAdditions.getKeys()) {
+                if (!item.unique) {
+                    item.unique = true;
+                    item.uniqueId = UUID.randomUUID();
+                }
                 Integer amount = rarityAdditions.getInteger(key);
                 if (amount == null) {
                     continue;
@@ -111,6 +111,21 @@ public abstract class SkyblockItem implements Listener {
             }
         }
         return item;
+    }
+
+    public ItemStack addGlow(ItemStack itemStack) {
+        // adds protection to bows and infinity to every other item as infinity is only useful on bows and protection is only useful on armor
+        itemStack.addUnsafeEnchantment((itemStack.getType() == Material.BOW) ? Enchantment.PROTECTION_ENVIRONMENTAL : Enchantment.ARROW_INFINITE, 1);
+        // returns the new itemstack
+        return itemStack;
+    }
+
+    public boolean vanilla() {
+        return vanilla;
+    }
+
+    public void setVanilla(boolean vanilla) {
+        this.vanilla = vanilla;
     }
 
     public abstract Material getDefaultItem();
@@ -128,7 +143,9 @@ public abstract class SkyblockItem implements Listener {
     public abstract Rarity getRarity();
 
     public StatList getCombinedStats() {
-        StatList base = getStats();
+        StatList stats = getStats();
+        StatList base;
+        base = Objects.requireNonNullElseGet(stats, StatList::new);
         for (IStatAddition a : statAdditions.asStatList()) {
             base = base.merge(a.getStats());
         }
@@ -136,7 +153,9 @@ public abstract class SkyblockItem implements Listener {
     }
 
     public AbilityList getCombinedAbilities() {
-        AbilityList base = getAbilities();
+        AbilityList abilities = getAbilities();
+        AbilityList base;
+        base = Objects.requireNonNullElseGet(abilities, AbilityList::new);
         for (IAbilityAddition a : abilityAdditions.asAbilityList()) {
             base.addAbility(a.getAbilities());
         }
@@ -173,8 +192,12 @@ public abstract class SkyblockItem implements Listener {
     }
 
     public void updateSkyblockItem() {
-        ItemStack i = new ItemStack(getDefaultItem());
-        i.setAmount(stackCount);
+        ItemStack i = new ItemStack(baseMaterial);
+        if (stackCount > 0) {
+            i.setAmount(stackCount);
+        } else {
+            System.out.println(stackCount);
+        }
         if (isEnchanted()) {
             i = addGlow(i);
         }
@@ -198,7 +221,7 @@ public abstract class SkyblockItem implements Listener {
         NBTItem nbti = new NBTItem(i);
         nbti.setString("sb_id", id);
         nbti.setBoolean("sb_unique", unique);
-        nbti.setBoolean("vanilla", false);
+        nbti.setBoolean("vanilla", vanilla);
         if (uniqueId == null) {
             if (unique) {
                 UUID value = UUID.randomUUID();

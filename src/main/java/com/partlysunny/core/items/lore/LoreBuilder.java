@@ -52,32 +52,37 @@ public class LoreBuilder {
     }
 
     public LoreBuilder setStats(StatList stats, AdditionList additions) {
-        if (additions.accepting() != ModifierType.STAT) {
-            throw new IllegalArgumentException("Additions argument is of wrong type (not of type STAT)");
+        HashMap<StatType, HashMap<AdditionInfo, Double>> sorted = null;
+        if (additions != null) {
+            if (additions.accepting() != ModifierType.STAT) {
+                throw new IllegalArgumentException("Additions argument is of wrong type (not of type STAT)");
+            }
+            List<Addition> additionList = additions.asArrayList();
+            sorted = new HashMap<>();
+            for (Addition a : additionList) {
+                //TODO actually sort based on the level
+                IStatAddition isa = (IStatAddition) a;
+                for (ItemStat s : isa.getStats().asList()) {
+                    if (sorted.containsKey(s.type())) {
+                        sorted.get(s.type()).put(a.type(), s.value());
+                    } else {
+                        sorted.put(s.type(), new HashMap<>());
+                        sorted.get(s.type()).put(a.type(), s.value());
+                    }
+                }
+            }
         }
         List<ItemStat> listed = new ArrayList<>(stats.statList.values());
         Comparator<ItemStat> compareByType = Comparator.comparingInt(o -> (o.type().level()));
         listed.sort(compareByType);
         boolean greened = false;
         statLore.clear();
-        List<Addition> additionList = additions.asArrayList();
-        HashMap<StatType, HashMap<AdditionInfo, Double>> sorted = new HashMap<>();
-        for (Addition a : additionList) {
-            //TODO actually sort based on the level
-            IStatAddition isa = (IStatAddition) a;
-            for (ItemStat s : isa.getStats().asList()) {
-                if (sorted.containsKey(s.type())) {
-                    sorted.get(s.type()).put(a.type(), s.value());
-                } else {
-                    sorted.put(s.type(), new HashMap<>());
-                    sorted.get(s.type()).put(a.type(), s.value());
-                }
-            }
-        }
         for (ItemStat s : listed) {
             StatType type = s.type();
             if (!greened && type.isGreen()) {
-                statLore.add("");
+                if (statLore.size() > 0) {
+                    statLore.add("");
+                }
                 greened = true;
             }
             StringBuilder stat = new StringBuilder();
@@ -86,14 +91,16 @@ public class LoreBuilder {
             } else {
                 stat.append(ChatColor.GRAY).append(type.displayName()).append(": ").append(ChatColor.RED).append("+").append(trim(s.value())).append(type.percent() ? "%" : "");
             }
-            if (sorted.containsKey(s.type())) {
-                HashMap<AdditionInfo, Double> sortedValue = sorted.get(s.type());
-                for (AdditionInfo t : sortedValue.keySet()) {
-                    if (t.bt() == null || t.shownLevel() == null || t.color() == null) {
-                        continue;
+            if (additions != null) {
+                if (sorted.containsKey(s.type())) {
+                    HashMap<AdditionInfo, Double> sortedValue = sorted.get(s.type());
+                    for (AdditionInfo t : sortedValue.keySet()) {
+                        if (t.bt() == null || t.shownLevel() == null || t.color() == null) {
+                            continue;
+                        }
+                        Double amount = sortedValue.get(t);
+                        stat.append(" ").append(t.color()).append(t.bt().start()).append(amount > -1 ? "+" : "-").append(trim(amount)).append(type.percent() ? "%" : "").append(t.bt().end());
                     }
-                    Double amount = sortedValue.get(t);
-                    stat.append(" ").append(t.color()).append(t.bt().start()).append(amount > -1 ? "+" : "-").append(trim(amount)).append(type.percent() ? "%" : "").append(t.bt().end());
                 }
             }
             statLore.add(String.valueOf(stat));
@@ -118,9 +125,13 @@ public class LoreBuilder {
     }
 
     public List<String> build() {
-        lore.addAll(statLore);
-        lore.add("");
+        if (statLore.size() > 0) {
+            lore.addAll(statLore);
+            lore.add("");
+        }
+        boolean hasDescription = false;
         if (!Objects.equals(description, "")) {
+            hasDescription = true;
             List<String> desc = TextUtils.wrap(description, 30);
             if (desc.size() > 1) {
                 for (String s : desc) {
@@ -131,12 +142,14 @@ public class LoreBuilder {
                     lore.add(ChatColor.GRAY + "" + ChatColor.ITALIC + s);
                 }
             }
-            lore.add("");
         }
-        lore.remove(lore.size() - 1);
         if (abilityLore.size() > 0) {
             lore.addAll(abilityLore);
             lore.add("");
+        } else {
+            if (lore.size() > 0 && hasDescription) {
+                lore.add("");
+            }
         }
         lore.add(r.color() + "" + ChatColor.BOLD + r);
         return lore;

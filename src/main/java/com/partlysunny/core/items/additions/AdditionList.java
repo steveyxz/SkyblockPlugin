@@ -1,7 +1,7 @@
 package com.partlysunny.core.items.additions;
 
-import com.partlysunny.core.items.SkyblockItem;
 import com.partlysunny.core.items.ModifierType;
+import com.partlysunny.core.items.SkyblockItem;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 
@@ -69,6 +69,30 @@ public class AdditionList {
 
     public void addAddition(AdditionInfo type) {
         addAdditions(type, 1);
+    }
+
+    public void addAddition(Addition addition) {
+        if (accepting != ModifierType.ANY && addition.type().type() != accepting) {
+            throw new IllegalArgumentException("This list does not accept type " + addition.type());
+        }
+        Addition target = additionList.get(addition.type);
+        if (target == null) {
+            additionList.put(addition.type, addition);
+            if (parent != null) {
+                parent.updateSkyblockItem();
+            }
+            return;
+        }
+        target.setAmount(target.amount() + addition.amount());
+        if (target.amount() > target.type().maxAdditions()) {
+            target.setAmount(target.type().maxAdditions());
+        }
+        if (checkZero(target)) {
+            additionList.remove(addition.type);
+        }
+        if (parent != null) {
+            parent.updateSkyblockItem();
+        }
     }
 
     public void removeAdditions(AdditionInfo addition, int count) {

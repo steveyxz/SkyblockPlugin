@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 public abstract class Ability implements Listener {
 
+    public static ArrayList<String> registered = new ArrayList<>();
     protected final String name;
     protected final String description;
     protected final int manaCost;
@@ -24,12 +25,9 @@ public abstract class Ability implements Listener {
     protected final int cooldown;
     protected final AbilityType type;
     protected final String id;
-
     protected boolean onCooldown = false;
     private String cooldownMessage = ChatColor.RED + "This ability is on cooldown!";
     private int cooldownRemaining = 0;
-
-    public static ArrayList<String> registered = new ArrayList<>();
 
     public Ability(String id, String name, String description, int manaCost, int soulflowCost, int cooldown, AbilityType type) {
         this.name = name;

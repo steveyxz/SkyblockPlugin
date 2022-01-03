@@ -1,7 +1,7 @@
 package com.partlysunny.core.util;
 
-import com.partlysunny.core.items.abilities.AbilityType;
 import com.partlysunny.core.items.SkyblockItem;
+import com.partlysunny.core.items.abilities.AbilityType;
 import com.partlysunny.core.listeners.ItemUpdater;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;

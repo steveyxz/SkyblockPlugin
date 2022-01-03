@@ -5,7 +5,6 @@ import org.bukkit.ChatColor;
 
 public class NameBuilder {
 
-    private String name;
     private String displayName;
     private String reforgeName;
     private boolean frag;

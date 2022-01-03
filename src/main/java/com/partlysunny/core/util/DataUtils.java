@@ -1,8 +1,6 @@
 package com.partlysunny.core.util;
 
 import com.partlysunny.core.enums.Rarity;
-import com.partlysunny.core.items.ModifierType;
-import com.partlysunny.core.items.additions.AdditionList;
 import com.partlysunny.core.items.lore.LoreBuilder;
 import com.partlysunny.core.items.name.NameBuilder;
 import com.partlysunny.core.stats.ItemStat;
@@ -26,11 +24,11 @@ public class DataUtils {
         if (m == null) {
             return i;
         }
-        m.setDisplayName(new NameBuilder().setName(i.getItemMeta().getDisplayName()).setRarity(Rarity.COMMON).build());
+        m.setDisplayName(new NameBuilder().setName(TextUtils.capitalizeWord(i.getType().toString().toLowerCase().replace("_", " "))).setRarity(Rarity.COMMON).build());
         m.setLore(new LoreBuilder()
                 .setDescription("")
                 .setRarity(Rarity.COMMON)
-                .setStats(readStats(i), new AdditionList(ModifierType.STAT))
+                .setStats(readStats(i), null)
                 .build()
         );
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON);

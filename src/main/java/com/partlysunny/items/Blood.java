@@ -6,7 +6,7 @@ import com.partlysunny.core.items.abilities.AbilityList;
 import com.partlysunny.core.stats.StatList;
 import org.bukkit.Material;
 
-public class Blood extends SkyblockItem  {
+public class Blood extends SkyblockItem {
     public Blood() {
         super("blood", false);
     }
@@ -38,7 +38,7 @@ public class Blood extends SkyblockItem  {
 
     @Override
     public String getDescription() {
-        return "Eww wth is this";
+        return "Mysterious red liquid...";
     }
 
     @Override
