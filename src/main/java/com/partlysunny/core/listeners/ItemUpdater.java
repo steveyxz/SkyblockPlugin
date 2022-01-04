@@ -1,5 +1,6 @@
 package com.partlysunny.core.listeners;
 
+import com.partlysunny.additions.stat.Infusion;
 import com.partlysunny.core.ConsoleLogger;
 import com.partlysunny.core.enums.VanillaArmorAttributes;
 import com.partlysunny.core.enums.VanillaDamageAttributes;
@@ -10,22 +11,22 @@ import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.util.DataUtils;
 import com.partlysunny.items.Blood;
 import de.tr7zw.nbtapi.NBTItem;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 
 public class ItemUpdater implements Listener {
@@ -45,29 +46,42 @@ public class ItemUpdater implements Listener {
     @EventHandler(priority = EventPriority.LOW)
     public void onInventoryOpen(InventoryOpenEvent e) {
         updateVanilla(e.getInventory());
-        if (idify(e.getInventory())) {
+        for (Integer i : idify(e.getInventory())) {
             e.setCancelled(true);
-            e.getPlayer().sendMessage(ChatColor.RED + "The inventory you opened contained illegal items, so they were removed :)");
         }
         updateInventory(e.getInventory());
     }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onInventoryInteract(InventoryClickEvent e) {
-        updateVanilla(e.getInventory());
-        if (idify(e.getInventory())) {
-            e.setCancelled(true);
-            e.getWhoClicked().sendMessage(ChatColor.RED + "The inventory you opened contained illegal items, so they were removed :)");
+        if (e.getClickedInventory() == null) {
+            return;
         }
-        updateInventory(e.getInventory());
+        updateVanilla(e.getClickedInventory());
+        for (Integer i : idify(e.getInventory())) {
+            e.setCancelled(true);
+        }
+        updateInventory(e.getClickedInventory());
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onItemPickup(EntityPickupItemEvent e) {
+        if (e.getEntity() instanceof Player) {
+            updateVanilla(((Player) e.getEntity()).getInventory());
+            for (Integer i : idify(((Player) e.getEntity()).getInventory())) {
+                //TODO add delete items without triggering assertionerror: trap
+                e.setCancelled(true);
+            }
+            updateInventory(((Player) e.getEntity()).getInventory());
+        }
     }
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerClick(PlayerInteractEvent e) {
         updateVanilla(e.getPlayer().getInventory());
-        if (idify(e.getPlayer().getInventory())) {
+        for (Integer i : idify(e.getPlayer().getInventory())) {
+            //TODO add delete items without triggering assertionerror: trap
             e.setCancelled(true);
-            e.getPlayer().sendMessage(ChatColor.RED + "Your inventory contained illegal items, so they were removed :)");
         }
         updateInventory(e.getPlayer().getInventory());
     }
@@ -87,7 +101,9 @@ public class ItemUpdater implements Listener {
 
     private void updateVanilla(Inventory inv) {
         int count = 0;
+        ItemStack[] updated = new ItemStack[inv.getSize()];
         for (ItemStack i : inv.getContents()) {
+            updated[count] = i;
             if (i != null && i.getType() != Material.AIR) {
                 NBTItem nbtItem = new NBTItem(i);
                 if (nbtItem.hasKey("vanilla") && nbtItem.getBoolean("vanilla")) {
@@ -95,21 +111,25 @@ public class ItemUpdater implements Listener {
                 }
                 if (!nbtItem.hasKey("sb_id")) {
                     System.out.println("item vanillafied: " + i.getType());
-                    inv.setItem(count, transformNBT(i));
+                    ItemStack transformed = transformNBT(i);
+                    if (transformed != null) {
+                        updated[count] = transformed;
+                    }
                 }
             }
             count++;
         }
+        inv.setContents(updated);
     }
 
-    private boolean idify(Inventory inventory) {
+    private List<Integer> idify(Inventory inventory) {
         int count = 0;
-        boolean shouldCancel = false;
+        List<Integer> toDelete = new ArrayList<>();
         ItemStack[] updated = new ItemStack[inventory.getSize()];
         for (ItemStack s : inventory.getContents()) {
             updated[count] = s;
             if (s != null && s.getType() != Material.AIR) {
-                NBTItem nbti = new NBTItem(s, true);
+                NBTItem nbti = new NBTItem(s);
                 if (!nbti.hasKey("sb_unique") || !nbti.hasKey("sb_id") || !nbti.hasKey("vanilla")) {
                     ConsoleLogger.console("Item has been found with missing information");
                     count++;
@@ -130,7 +150,7 @@ public class ItemUpdater implements Listener {
                     ItemStack withid = addId(s);
                     if (withid.getAmount() > 1) {
                         updated[count] = null;
-                        shouldCancel = true;
+                        toDelete.add(count);
                         count++;
                         continue;
                     }
@@ -140,7 +160,7 @@ public class ItemUpdater implements Listener {
             count++;
         }
         inventory.setContents(updated);
-        return shouldCancel;
+        return toDelete;
     }
 
     private ItemStack addId(ItemStack i) {
@@ -162,7 +182,7 @@ public class ItemUpdater implements Listener {
                     count++;
                     continue;
                 }
-                if (items.containsKey(nbti.getUUID("sb_unique_id"))) {
+                if (items.containsKey(nbti.getUUID("sb_unique_id")) && !nbti.getBoolean("vanilla")) {
                     SkyblockItem i = items.get(nbti.getUUID("sb_unique_id"));
                     ItemStack skyblockItem = i.getSkyblockItem();
                     if (!skyblockItem.isSimilar(s)) {
@@ -178,6 +198,20 @@ public class ItemUpdater implements Listener {
     public void temp(EntityDamageByEntityEvent e) {
         if (e.getDamager() instanceof Player) {
             ((Player) e.getDamager()).getInventory().addItem(new Blood().getSkyblockItem());
+        }
+    }
+
+    @EventHandler
+    public void temp2(PlayerDropItemEvent e) {
+        Player p = e.getPlayer();
+        ItemStack itemInMainHand = p.getInventory().getItemInMainHand();
+        if (itemInMainHand.getAmount() == 1) {
+            NBTItem i = new NBTItem(itemInMainHand);
+            if (!i.getBoolean("vanilla")) {
+                SkyblockItem sbi = SkyblockItem.getItemFrom(itemInMainHand);
+                sbi.statAdditions().addAddition(new Infusion());
+                p.getInventory().setItem(EquipmentSlot.HAND, sbi.getSkyblockItem());
+            }
         }
     }
 

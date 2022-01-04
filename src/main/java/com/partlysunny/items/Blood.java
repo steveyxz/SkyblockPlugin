@@ -43,6 +43,6 @@ public class Blood extends SkyblockItem {
 
     @Override
     public Rarity getRarity() {
-        return Rarity.RARE;
+        return Rarity.UNCOMMON;
     }
 }

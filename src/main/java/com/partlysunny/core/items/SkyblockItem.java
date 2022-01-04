@@ -44,6 +44,11 @@ public abstract class SkyblockItem implements Listener {
         updateSkyblockItem();
     }
 
+    protected SkyblockItem(String id, boolean unique, boolean vanilla) {
+        this(id, unique);
+        this.vanilla = vanilla;
+    }
+
     @Nullable
     public static SkyblockItem getItemFrom(ItemStack s) {
         NBTItem nbti = new NBTItem(s);
@@ -233,6 +238,7 @@ public abstract class SkyblockItem implements Listener {
                 nbti.setUUID("sb_unique_id", uniqueId);
             } else {
                 nbti.removeKey("sb_unique_id");
+                uniqueId = null;
             }
         }
         nbti = getStats().applyStats(nbti);
@@ -240,7 +246,7 @@ public abstract class SkyblockItem implements Listener {
         nbti = rarityAdditions.applyAdditions(nbti);
         nbti = abilityAdditions.applyAdditions(nbti);
         this.unique = nbti.getBoolean("sb_unique");
-        //System.out.println(nbti.toString());
+        System.out.println(nbti);
         i = nbti.getItem();
         asSkyblockItem = i;
     }

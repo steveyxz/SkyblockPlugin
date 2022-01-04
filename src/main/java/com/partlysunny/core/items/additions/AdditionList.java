@@ -59,6 +59,12 @@ public class AdditionList {
         }
     }
 
+    public void addAdditions(NBTCompound additions) {
+        for (String s : additions.getKeys()) {
+            addAdditions(AdditionManager.getAddition(s), additions.getInteger(s));
+        }
+    }
+
     public void setList(AdditionList newList) {
         if (newList.accepting() != accepting()) {
             throw new IllegalArgumentException("Lists do not match types");
@@ -213,5 +219,4 @@ public class AdditionList {
     public boolean checkZero(Addition a) {
         return a.amount < 1;
     }
-
 }
