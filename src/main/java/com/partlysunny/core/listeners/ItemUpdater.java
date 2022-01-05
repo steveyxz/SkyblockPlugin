@@ -101,9 +101,7 @@ public class ItemUpdater implements Listener {
 
     private void updateVanilla(Inventory inv) {
         int count = 0;
-        ItemStack[] updated = new ItemStack[inv.getSize()];
         for (ItemStack i : inv.getContents()) {
-            updated[count] = i;
             if (i != null && i.getType() != Material.AIR) {
                 NBTItem nbtItem = new NBTItem(i);
                 if (nbtItem.hasKey("vanilla") && nbtItem.getBoolean("vanilla")) {
@@ -113,21 +111,18 @@ public class ItemUpdater implements Listener {
                     System.out.println("item vanillafied: " + i.getType());
                     ItemStack transformed = transformNBT(i);
                     if (transformed != null) {
-                        updated[count] = transformed;
+                        inv.setItem(count, transformed);
                     }
                 }
             }
             count++;
         }
-        inv.setContents(updated);
     }
 
     private List<Integer> idify(Inventory inventory) {
         int count = 0;
         List<Integer> toDelete = new ArrayList<>();
-        ItemStack[] updated = new ItemStack[inventory.getSize()];
         for (ItemStack s : inventory.getContents()) {
-            updated[count] = s;
             if (s != null && s.getType() != Material.AIR) {
                 NBTItem nbti = new NBTItem(s);
                 if (!nbti.hasKey("sb_unique") || !nbti.hasKey("sb_id") || !nbti.hasKey("vanilla")) {
@@ -144,12 +139,12 @@ public class ItemUpdater implements Listener {
                             continue;
                         }
                         i.updateSkyblockItem();
-                        updated[count] = i.getSkyblockItem();
+                        inventory.setItem(count, i.getSkyblockItem());
                     }
                 } else {
                     ItemStack withid = addId(s);
                     if (withid.getAmount() > 1) {
-                        updated[count] = null;
+                        inventory.setItem(count, null);
                         toDelete.add(count);
                         count++;
                         continue;
@@ -159,7 +154,6 @@ public class ItemUpdater implements Listener {
             }
             count++;
         }
-        inventory.setContents(updated);
         return toDelete;
     }
 
@@ -173,9 +167,7 @@ public class ItemUpdater implements Listener {
 
     private void updateInventory(Inventory inventory) {
         int count = 0;
-        ItemStack[] updated = new ItemStack[inventory.getSize()];
         for (ItemStack s : inventory.getContents()) {
-            updated[count] = s;
             if (s != null && s.getType() != Material.AIR) {
                 NBTItem nbti = new NBTItem(s);
                 if (!nbti.getBoolean("unique")) {
@@ -186,12 +178,11 @@ public class ItemUpdater implements Listener {
                     SkyblockItem i = items.get(nbti.getUUID("sb_unique_id"));
                     ItemStack skyblockItem = i.getSkyblockItem();
                     if (!skyblockItem.isSimilar(s)) {
-                        updated[count] = skyblockItem;
+                        inventory.setItem(count, skyblockItem);
                     }
                 }
             }
         }
-        inventory.setContents(updated);
     }
 
     @EventHandler
