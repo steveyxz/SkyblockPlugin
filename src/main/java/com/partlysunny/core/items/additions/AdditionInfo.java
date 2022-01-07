@@ -96,4 +96,11 @@ public class AdditionInfo {
         this.type = type;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof AdditionInfo addObj)) {
+            return false;
+        }
+        return id.equals(addObj.id);
+    }
 }

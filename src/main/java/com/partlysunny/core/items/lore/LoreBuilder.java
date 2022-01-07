@@ -1,6 +1,7 @@
 package com.partlysunny.core.items.lore;
 
 import com.partlysunny.core.enums.Rarity;
+import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.ModifierType;
 import com.partlysunny.core.items.abilities.Ability;
 import com.partlysunny.core.items.abilities.AbilityList;
@@ -24,6 +25,7 @@ public class LoreBuilder {
     private final List<String> abilityLore = new ArrayList<>();
     private String description = "";
     private Rarity r = Rarity.COMMON;
+    private ItemType type = ItemType.ITEM;
 
     public LoreBuilder setDescription(String description) {
         this.description = description;
@@ -46,6 +48,15 @@ public class LoreBuilder {
                 for (String s : split) {
                     abilityLore.add(ChatColor.GRAY + s);
                 }
+            }
+            if (a.manaCost() > 0) {
+                abilityLore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + a.manaCost());
+            }
+            if (a.soulflowCost() > 0) {
+                abilityLore.add(ChatColor.DARK_GRAY + "Soulflow Cost: " + ChatColor.DARK_AQUA + a.soulflowCost());
+            }
+            if (a.cooldown() > 0) {
+                abilityLore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + a.cooldown() + "s");
             }
         }
         return this;
@@ -75,16 +86,9 @@ public class LoreBuilder {
         List<ItemStat> listed = new ArrayList<>(stats.statList.values());
         Comparator<ItemStat> compareByType = Comparator.comparingInt(o -> (o.type().level()));
         listed.sort(compareByType);
-        boolean greened = false;
         statLore.clear();
         for (ItemStat s : listed) {
             StatType type = s.type();
-            if (!greened && type.isGreen()) {
-                if (statLore.size() > 0) {
-                    statLore.add("");
-                }
-                greened = true;
-            }
             StringBuilder stat = new StringBuilder();
             if (type.isGreen()) {
                 stat.append(ChatColor.GRAY).append(type.displayName()).append(": ").append(ChatColor.GREEN).append("+").append(trim(s.value())).append(type.percent() ? "%" : "");
@@ -124,6 +128,11 @@ public class LoreBuilder {
         return this;
     }
 
+    public LoreBuilder setType(ItemType type) {
+        this.type = type;
+        return this;
+    }
+
     public List<String> build() {
         if (statLore.size() > 0) {
             lore.addAll(statLore);
@@ -135,11 +144,11 @@ public class LoreBuilder {
             List<String> desc = TextUtils.wrap(description, 30);
             if (desc.size() > 1) {
                 for (String s : desc) {
-                    lore.add(ChatColor.GRAY + "" + ChatColor.ITALIC + s.substring(2));
+                    lore.add(ChatColor.GRAY + s.substring(2));
                 }
             } else {
                 for (String s : desc) {
-                    lore.add(ChatColor.GRAY + "" + ChatColor.ITALIC + s);
+                    lore.add(ChatColor.GRAY + s);
                 }
             }
         }
@@ -151,7 +160,10 @@ public class LoreBuilder {
                 lore.add("");
             }
         }
-        lore.add(r.color() + "" + ChatColor.BOLD + r);
+        if (type.reforgable()) {
+            lore.add(ChatColor.DARK_GRAY + "This item can be reforged!");
+        }
+        lore.add(r.color() + "" + ChatColor.BOLD + r + " " + type.display().toUpperCase());
         return lore;
     }
 

@@ -3,6 +3,7 @@ package com.partlysunny.core.items.abilities;
 import com.partlysunny.Skyblock;
 import com.partlysunny.core.util.AbilityUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 
 public abstract class Ability implements Listener {
 
-    public static ArrayList<String> registered = new ArrayList<>();
+    private static final ArrayList<String> registered = new ArrayList<>();
     protected final String name;
     protected final String description;
     protected final int manaCost;
@@ -27,7 +28,7 @@ public abstract class Ability implements Listener {
     protected final String id;
     protected boolean onCooldown = false;
     private String cooldownMessage = ChatColor.RED + "This ability is on cooldown!";
-    private int cooldownRemaining = 0;
+    private int cooldownRemaining = -1;
 
     public Ability(String id, String name, String description, int manaCost, int soulflowCost, int cooldown, AbilityType type) {
         this.name = name;
@@ -115,6 +116,7 @@ public abstract class Ability implements Listener {
         if (AbilityUtils.hasAbility(e.getPlayer().getInventory().getItemInMainHand(), this.type)) {
             if (onCooldown()) {
                 e.getPlayer().sendMessage(cooldownMessage);
+                e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);
                 return;
             }
             if ((e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK)) {
@@ -148,7 +150,7 @@ public abstract class Ability implements Listener {
             @Override
             public void run() {
                 cooldownRemaining--;
-                if (cooldownRemaining == 0) {
+                if (cooldownRemaining == -1) {
                     onCooldown = false;
                     cancel();
                 }

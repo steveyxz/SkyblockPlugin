@@ -33,6 +33,11 @@ public class AdditionList {
             throw new IllegalArgumentException("This list does not accept type " + addition.type());
         }
         Addition target = additionList.get(addition);
+        for (AdditionInfo a : additionList.keySet()) {
+            if (a.id().equals(addition.id())) {
+                target = additionList.get(a);
+            }
+        }
         if (target == null) {
             try {
                 Addition value;

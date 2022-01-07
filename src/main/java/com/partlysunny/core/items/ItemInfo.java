@@ -1,5 +1,6 @@
 package com.partlysunny.core.items;
 
 public record ItemInfo(String id,
-                       Class<? extends SkyblockItem> itemType) {
+                       Class<? extends SkyblockItem> itemType,
+                       ItemType type) {
 }

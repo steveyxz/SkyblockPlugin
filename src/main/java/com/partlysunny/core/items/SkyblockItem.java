@@ -24,9 +24,13 @@ import java.util.UUID;
 public abstract class SkyblockItem implements Listener {
 
     private final String id;
+    private final ItemType type;
     private final AdditionList statAdditions = new AdditionList(ModifierType.STAT, this);
     private final AdditionList rarityAdditions = new AdditionList(ModifierType.RARITY, this);
     private final AdditionList abilityAdditions = new AdditionList(ModifierType.ABILITY, this);
+    private boolean fragged = false;
+    private int stars = 0;
+    private String reforge = null;
     private int stackCount = 1;
     private Material baseMaterial = getDefaultItem();
     //If this is true, it means it will be generated an uuid. Also if this is true the item cannot stack so yeah
@@ -35,17 +39,18 @@ public abstract class SkyblockItem implements Listener {
     private UUID uniqueId;
     private ItemStack asSkyblockItem;
 
-    protected SkyblockItem(String id, boolean unique) {
+    protected SkyblockItem(String id, boolean unique, ItemType type) {
         this.id = id;
         this.unique = unique;
+        this.type = type;
         Skyblock plugin = JavaPlugin.getPlugin(Skyblock.class);
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
-        ItemManager.addItem(new ItemInfo(id, getClass()));
+        ItemManager.addItem(new ItemInfo(id, getClass(), type));
         updateSkyblockItem();
     }
 
-    protected SkyblockItem(String id, boolean unique, boolean vanilla) {
-        this(id, unique);
+    protected SkyblockItem(String id, boolean unique, ItemType type, boolean vanilla) {
+        this(id, unique, type);
         this.vanilla = vanilla;
     }
 
@@ -71,6 +76,15 @@ public abstract class SkyblockItem implements Listener {
         }
         if (nbti.hasKey("sb_vanilla")) {
             item.setVanilla(nbti.getBoolean("sb_vanilla"));
+        }
+        if (nbti.hasKey("fragged")) {
+            item.setFragged(nbti.getBoolean("fragged"));
+        }
+        if (nbti.hasKey("stars")) {
+            item.setStars(nbti.getInteger("stars"));
+        }
+        if (nbti.hasKey("reforge")) {
+            item.setReforge(nbti.getString("reforge"));
         }
         item.stackCount = s.getAmount();
         NBTCompound abilityAdditions = nbti.getCompound("abilityAdditions");
@@ -147,6 +161,30 @@ public abstract class SkyblockItem implements Listener {
 
     public abstract Rarity getRarity();
 
+    public void setFragged(boolean fragged) {
+        this.fragged = fragged;
+    }
+
+    public void setStars(int stars) {
+        this.stars = stars;
+    }
+
+    public void setReforge(String reforge) {
+        this.reforge = reforge;
+    }
+
+    public boolean fragged() {
+        return fragged;
+    }
+
+    public int stars() {
+        return stars;
+    }
+
+    public String reforge() {
+        return reforge;
+    }
+
     public StatList getCombinedStats() {
         StatList stats = getStats();
         StatList base;
@@ -210,13 +248,13 @@ public abstract class SkyblockItem implements Listener {
         if (m == null) {
             return;
         }
-        //TODO add real item stats for these
-        m.setDisplayName(new NameBuilder().setName(getDisplayName()).setReforge("Withered").setRarity(getRarity()).setFragged(true).setStars(9).build());
+        m.setDisplayName(new NameBuilder().setName(getDisplayName()).setRarity(getRarity()).setFragged(fragged).setStars(stars).setReforge(reforge).build());
         m.setLore(new LoreBuilder()
                 .setDescription(getDescription() != null ? getDescription() : "")
                 .setRarity(getFinalRarity())
                 .setStats(getCombinedStats(), statAdditions())
                 .addAbilities(getCombinedAbilities())
+                .setType(type)
                 .build()
         );
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON);
@@ -227,6 +265,17 @@ public abstract class SkyblockItem implements Listener {
         nbti.setString("sb_id", id);
         nbti.setBoolean("sb_unique", unique);
         nbti.setBoolean("vanilla", vanilla);
+        nbti.setBoolean("fragged", fragged);
+        nbti.setInteger("stars", stars);
+        nbti.setString("reforge", reforge);
+        if ((fragged || stars > 0 || (reforge != null && !reforge.equals(""))) && !unique) {
+            unique = true;
+            if (uniqueId == null) {
+                this.uniqueId = UUID.randomUUID();
+            }
+            nbti.setBoolean("sb_unique", true);
+            nbti.setUUID("sb_unique_id", uniqueId);
+        }
         if (uniqueId == null) {
             if (unique) {
                 UUID value = UUID.randomUUID();
@@ -246,7 +295,6 @@ public abstract class SkyblockItem implements Listener {
         nbti = rarityAdditions.applyAdditions(nbti);
         nbti = abilityAdditions.applyAdditions(nbti);
         this.unique = nbti.getBoolean("sb_unique");
-        System.out.println(nbti);
         i = nbti.getItem();
         asSkyblockItem = i;
     }

@@ -1,6 +1,8 @@
 package com.partlysunny.core.items.name;
 
 import com.partlysunny.core.enums.Rarity;
+import com.partlysunny.core.items.additions.reforges.Reforge;
+import com.partlysunny.core.items.additions.reforges.ReforgeManager;
 import org.bukkit.ChatColor;
 
 public class NameBuilder {
@@ -17,7 +19,10 @@ public class NameBuilder {
     }
 
     public NameBuilder setReforge(String name) {
-        this.reforgeName = name;
+        Reforge reforge = ReforgeManager.getReforge(name);
+        if (reforge != null) {
+            this.reforgeName = reforge.displayName();
+        }
         return this;
     }
 
@@ -32,7 +37,7 @@ public class NameBuilder {
     }
 
     public String build() {
-        return rarity + (frag ? "⚚ " : "") + (reforgeName == null ? "" : reforgeName + " ") + displayName + " " + getStars();
+        return rarity + (frag ? "⚚ " : "") + ((reforgeName == null || reforgeName.equals("")) ? "" : reforgeName + " ") + displayName + " " + getStars();
     }
 
     private String getStars() {

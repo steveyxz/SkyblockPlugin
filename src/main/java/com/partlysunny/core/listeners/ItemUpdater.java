@@ -1,6 +1,5 @@
 package com.partlysunny.core.listeners;
 
-import com.partlysunny.additions.stat.Infusion;
 import com.partlysunny.core.ConsoleLogger;
 import com.partlysunny.core.enums.VanillaArmorAttributes;
 import com.partlysunny.core.enums.VanillaDamageAttributes;
@@ -9,20 +8,17 @@ import com.partlysunny.core.stats.ItemStat;
 import com.partlysunny.core.stats.ItemStats;
 import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.util.DataUtils;
-import com.partlysunny.items.Blood;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -67,12 +63,14 @@ public class ItemUpdater implements Listener {
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemPickup(EntityPickupItemEvent e) {
         if (e.getEntity() instanceof Player) {
-            updateVanilla(((Player) e.getEntity()).getInventory());
-            for (Integer i : idify(((Player) e.getEntity()).getInventory())) {
-                //TODO add delete items without triggering assertionerror: trap
-                e.setCancelled(true);
-            }
-            updateInventory(((Player) e.getEntity()).getInventory());
+            ItemStack i = e.getItem().getItemStack();
+            i = getVanilla(i);
+            i = getIded(i);
+            i = getUpdated(i);
+            e.setCancelled(true);
+            e.getItem().remove();
+            ((Player) e.getEntity()).getInventory().addItem(i);
+            e.getEntity().getWorld().playSound(e.getEntity().getLocation(), Sound.ENTITY_ITEM_PICKUP, 1F, 1F);
         }
     }
 
@@ -80,7 +78,6 @@ public class ItemUpdater implements Listener {
     public void onPlayerClick(PlayerInteractEvent e) {
         updateVanilla(e.getPlayer().getInventory());
         for (Integer i : idify(e.getPlayer().getInventory())) {
-            //TODO add delete items without triggering assertionerror: trap
             e.setCancelled(true);
         }
         updateInventory(e.getPlayer().getInventory());
@@ -103,20 +100,27 @@ public class ItemUpdater implements Listener {
         int count = 0;
         for (ItemStack i : inv.getContents()) {
             if (i != null && i.getType() != Material.AIR) {
-                NBTItem nbtItem = new NBTItem(i);
-                if (nbtItem.hasKey("vanilla") && nbtItem.getBoolean("vanilla")) {
-                    //TODO update vanilla items
-                }
-                if (!nbtItem.hasKey("sb_id")) {
-                    System.out.println("item vanillafied: " + i.getType());
-                    ItemStack transformed = transformNBT(i);
-                    if (transformed != null) {
-                        inv.setItem(count, transformed);
-                    }
+                ItemStack vanilla = getVanilla(i);
+                if (vanilla != i) {
+                    inv.setItem(count, vanilla);
                 }
             }
             count++;
         }
+    }
+
+    private ItemStack getVanilla(ItemStack s) {
+        NBTItem nbtItem = new NBTItem(s);
+        if (nbtItem.hasKey("vanilla") && nbtItem.getBoolean("vanilla")) {
+            //TODO update vanilla items
+        }
+        if (!nbtItem.hasKey("sb_id")) {
+            ItemStack transformed = transformNBT(s);
+            if (transformed != null) {
+                return transformed;
+            }
+        }
+        return s;
     }
 
     private List<Integer> idify(Inventory inventory) {
@@ -124,37 +128,40 @@ public class ItemUpdater implements Listener {
         List<Integer> toDelete = new ArrayList<>();
         for (ItemStack s : inventory.getContents()) {
             if (s != null && s.getType() != Material.AIR) {
-                NBTItem nbti = new NBTItem(s);
-                if (!nbti.hasKey("sb_unique") || !nbti.hasKey("sb_id") || !nbti.hasKey("vanilla")) {
-                    ConsoleLogger.console("Item has been found with missing information");
-                    count++;
-                    continue;
-                }
-                if (!nbti.getBoolean("sb_unique")) {
-                    if (!nbti.getBoolean("vanilla")) {
-                        SkyblockItem i = SkyblockItem.getItemFrom(s);
-                        if (i == null) {
-                            ConsoleLogger.console("Null skyblock item obtained?");
-                            count++;
-                            continue;
-                        }
-                        i.updateSkyblockItem();
-                        inventory.setItem(count, i.getSkyblockItem());
-                    }
-                } else {
-                    ItemStack withid = addId(s);
-                    if (withid.getAmount() > 1) {
-                        inventory.setItem(count, null);
-                        toDelete.add(count);
-                        count++;
-                        continue;
-                    }
-                    registerItem(withid);
+                ItemStack ided = getIded(s);
+                if (!Objects.equals(ided, s)) {
+                    inventory.setItem(count, ided);
                 }
             }
             count++;
         }
         return toDelete;
+    }
+
+    private ItemStack getIded(ItemStack s) {
+        NBTItem nbti = new NBTItem(s);
+        if (!nbti.hasKey("sb_unique") || !nbti.hasKey("sb_id") || !nbti.hasKey("vanilla")) {
+            ConsoleLogger.console("Item has been found with missing information");
+            return s;
+        }
+        if (!nbti.getBoolean("sb_unique")) {
+            if (!nbti.getBoolean("vanilla")) {
+                SkyblockItem i = SkyblockItem.getItemFrom(s);
+                if (i == null) {
+                    ConsoleLogger.console("Null skyblock item obtained?");
+                    return s;
+                }
+                i.updateSkyblockItem();
+                return i.getSkyblockItem();
+            }
+        } else {
+            ItemStack withid = addId(s);
+            if (withid.getAmount() > 1) {
+                return null;
+            }
+            registerItem(withid);
+        }
+        return s;
     }
 
     private ItemStack addId(ItemStack i) {
@@ -169,41 +176,36 @@ public class ItemUpdater implements Listener {
         int count = 0;
         for (ItemStack s : inventory.getContents()) {
             if (s != null && s.getType() != Material.AIR) {
-                NBTItem nbti = new NBTItem(s);
-                if (!nbti.getBoolean("unique")) {
-                    count++;
-                    continue;
-                }
-                if (items.containsKey(nbti.getUUID("sb_unique_id")) && !nbti.getBoolean("vanilla")) {
-                    SkyblockItem i = items.get(nbti.getUUID("sb_unique_id"));
-                    ItemStack skyblockItem = i.getSkyblockItem();
-                    if (!skyblockItem.isSimilar(s)) {
-                        inventory.setItem(count, skyblockItem);
-                    }
+                ItemStack updated = getUpdated(s);
+                if (!updated.equals(s)) {
+                    inventory.setItem(count, updated);
                 }
             }
+            count++;
         }
     }
 
-    @EventHandler
-    public void temp(EntityDamageByEntityEvent e) {
-        if (e.getDamager() instanceof Player) {
-            ((Player) e.getDamager()).getInventory().addItem(new Blood().getSkyblockItem());
+    private ItemStack getUpdated(ItemStack i) {
+        NBTItem nbti = new NBTItem(i);
+        if (!nbti.getBoolean("sb_unique")) {
+            return i;
         }
-    }
-
-    @EventHandler
-    public void temp2(PlayerDropItemEvent e) {
-        Player p = e.getPlayer();
-        ItemStack itemInMainHand = p.getInventory().getItemInMainHand();
-        if (itemInMainHand.getAmount() == 1) {
-            NBTItem i = new NBTItem(itemInMainHand);
-            if (!i.getBoolean("vanilla")) {
-                SkyblockItem sbi = SkyblockItem.getItemFrom(itemInMainHand);
-                sbi.statAdditions().addAddition(new Infusion());
-                p.getInventory().setItem(EquipmentSlot.HAND, sbi.getSkyblockItem());
+        if (items.containsKey(nbti.getUUID("sb_unique_id")) && !nbti.getBoolean("vanilla")) {
+            SkyblockItem sbi = items.get(nbti.getUUID("sb_unique_id"));
+            sbi.updateSkyblockItem();
+            ItemStack skyblockItem = sbi.getSkyblockItem();
+            if (skyblockItem != null && skyblockItem.getItemMeta() != null && i.getItemMeta() != null) {
+                if (
+                        !new NBTItem(skyblockItem).equals(nbti)
+                                || skyblockItem.getType() != i.getType()
+                                || !Objects.equals(skyblockItem.getItemMeta().getLore(), i.getItemMeta().getLore())
+                                || !skyblockItem.getItemMeta().getDisplayName().equals(i.getItemMeta().getDisplayName())
+                ) {
+                    return skyblockItem;
+                }
             }
         }
+        return i;
     }
 
 

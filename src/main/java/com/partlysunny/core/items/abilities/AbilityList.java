@@ -7,6 +7,15 @@ public class AbilityList {
 
     private final Map<AbilityType, Ability> abilityList = new HashMap<>();
 
+    public AbilityList() {
+    }
+
+    public AbilityList(Ability... abilities) {
+        for (Ability a : abilities) {
+            abilityList.put(a.type, a);
+        }
+    }
+
     public void addAbility(Ability ability) {
         abilityList.put(ability.type(), ability);
     }
