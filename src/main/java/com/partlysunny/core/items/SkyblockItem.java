@@ -7,6 +7,7 @@ import com.partlysunny.core.items.additions.*;
 import com.partlysunny.core.items.lore.LoreBuilder;
 import com.partlysunny.core.items.name.NameBuilder;
 import com.partlysunny.core.stats.StatList;
+import com.partlysunny.core.util.DataUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
@@ -192,6 +193,12 @@ public abstract class SkyblockItem implements Listener {
         for (IStatAddition a : statAdditions.asStatList()) {
             base = base.merge(a.getStats());
         }
+        if (reforge != null) {
+            StatList addition = DataUtils.getStatsOfBest(reforge, getRarity());
+            if (addition != null) {
+                base = base.merge(addition);
+            }
+        }
         return base;
     }
 
@@ -250,9 +257,10 @@ public abstract class SkyblockItem implements Listener {
         }
         m.setDisplayName(new NameBuilder().setName(getDisplayName()).setRarity(getRarity()).setFragged(fragged).setStars(stars).setReforge(reforge).build());
         m.setLore(new LoreBuilder()
+                .setReforge(reforge)
                 .setDescription(getDescription() != null ? getDescription() : "")
                 .setRarity(getFinalRarity())
-                .setStats(getCombinedStats(), statAdditions())
+                .setStats(getCombinedStats(), statAdditions(), getRarity())
                 .addAbilities(getCombinedAbilities())
                 .setType(type)
                 .build()

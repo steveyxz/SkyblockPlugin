@@ -1,9 +1,12 @@
 package com.partlysunny.core.util;
 
+import com.partlysunny.core.ConsoleLogger;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.SkyblockItem;
 import com.partlysunny.core.items.abilities.AbilityList;
+import com.partlysunny.core.items.additions.reforges.Reforge;
+import com.partlysunny.core.items.additions.reforges.ReforgeManager;
 import com.partlysunny.core.items.lore.LoreBuilder;
 import com.partlysunny.core.items.name.NameBuilder;
 import com.partlysunny.core.stats.ItemStat;
@@ -139,6 +142,27 @@ public class DataUtils {
         };
     }
 
+    public static StatList getStatsOfBest(String reforge, Rarity ra) {
+        StatList addition;
+        Reforge r = ReforgeManager.getReforge(reforge);
+        if (r == null) {
+            ConsoleLogger.console("Illegal reforge " + reforge + " found on item");
+            return null;
+        }
+        if (r.statBonuses().containsKey(ra)) {
+            addition = r.statBonuses().get(ra);
+        } else {
+            Rarity bestRarity = Rarity.COMMON;
+            for (Rarity rarity : r.statBonuses().keySet()) {
+                if (rarity.level() > bestRarity.level() && rarity.level() <= ra.level()) {
+                    bestRarity = rarity;
+                }
+            }
+            addition = r.statBonuses().get(bestRarity);
+        }
+        return addition;
+    }
+
     public static ItemStack convertVanilla(ItemStack i) {
         ItemMeta m = i.getItemMeta();
         if (m == null) {
@@ -148,7 +172,7 @@ public class DataUtils {
         m.setLore(new LoreBuilder()
                 .setDescription("")
                 .setRarity(Rarity.COMMON)
-                .setStats(readStats(i), null)
+                .setStats(readStats(i), null, null, null)
                 .build()
         );
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON);

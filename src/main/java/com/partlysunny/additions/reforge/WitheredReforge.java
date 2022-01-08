@@ -10,7 +10,7 @@ import com.partlysunny.core.util.classes.Pair;
 
 public class WitheredReforge extends Reforge {
     public WitheredReforge() {
-        super("withered", "Withered", null, DataUtils.getStatModifiersFrom(
+        super("withered", "Withered", "Increases your Crit Damage by @@2@@ for every @@Catacombs@@ level", DataUtils.getStatModifiersFrom(
                 new Pair<>(Rarity.COMMON, new StatList(new ItemStat(StatType.STRENGTH, 10))),
                 new Pair<>(Rarity.UNCOMMON, new StatList(new ItemStat(StatType.STRENGTH, 20))),
                 new Pair<>(Rarity.RARE, new StatList(new ItemStat(StatType.STRENGTH, 50))),
