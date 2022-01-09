@@ -1,3 +1,4 @@
-Hypixel skyblock remake made with java. Work in progress ok don't judge.
+Hypixel skyblock remake made with java. 
+Has features like entities and items right now.
 
-Libraries used are RedLib, NBTAPI and ActionBarAPI (cuz im lazy ok)
+Libraries used are: Citizens, NBTAPI, RedLib and SidebarAPI.
