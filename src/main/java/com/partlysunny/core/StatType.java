@@ -1,4 +1,4 @@
-package com.partlysunny.core.stats;
+package com.partlysunny.core;
 
 import org.bukkit.ChatColor;
 

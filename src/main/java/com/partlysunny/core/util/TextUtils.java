@@ -1,6 +1,6 @@
 package com.partlysunny.core.util;
 
-import com.partlysunny.core.stats.StatType;
+import com.partlysunny.core.StatType;
 import org.bukkit.ChatColor;
 import org.bukkit.util.ChatPaginator;
 
@@ -27,6 +27,7 @@ public class TextUtils {
      * Updates text, replacing stat names with their color and adding their
      * symbol in front. Also will highlight text green if surrounded with %%
      * and red if surrounded by @@.
+     *
      * @param text The description / ability text to update
      * @return New text
      */

@@ -1,12 +1,12 @@
 package com.partlysunny.core.items;
 
 import com.partlysunny.Skyblock;
+import com.partlysunny.core.StatList;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.abilities.AbilityList;
 import com.partlysunny.core.items.additions.*;
 import com.partlysunny.core.items.lore.LoreBuilder;
 import com.partlysunny.core.items.name.NameBuilder;
-import com.partlysunny.core.stats.StatList;
 import com.partlysunny.core.util.DataUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;

@@ -20,6 +20,39 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>net.md-5</groupId>
+                <artifactId>specialsource-maven-plugin</artifactId>
+                <version>1.2.2</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>remap</goal>
+                        </goals>
+                        <id>remap-obf</id>
+                        <configuration>
+                            <srgIn>org.spigotmc:minecraft-server:1.17.1-R0.1-SNAPSHOT:txt:maps-mojang</srgIn>
+                            <reverse>true</reverse>
+                            <remappedDependencies>org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT:jar:remapped-mojang</remappedDependencies>
+                            <remappedArtifactAttached>true</remappedArtifactAttached>
+                            <remappedClassifierName>remapped-obf</remappedClassifierName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>remap</goal>
+                        </goals>
+                        <id>remap-spigot</id>
+                        <configuration>
+                            <inputFile>${project.build.directory}/${project.artifactId}-${project.version}-remapped-obf.jar</inputFile>
+                            <srgIn>org.spigotmc:minecraft-server:1.17.1-R0.1-SNAPSHOT:csrg:maps-spigot</srgIn>
+                            <remappedDependencies>org.spigotmc:spigot:1.17.1-R0.1-SNAPSHOT:jar:remapped-obf</remappedDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
@@ -74,9 +107,42 @@
         </dependency>
 
         <dependency>
+            <groupId>net.citizennpcs</groupId>
+            <artifactId>citizennpcs</artifactId>
+            <version>2.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/Citizens-2.0.29-b2443.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>de.tr7zw</groupId>
+            <artifactId>nbtapi</artifactId>
+            <version>2.8.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/item-nbt-api-plugin-2.8.0.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>redempt.redlib</groupId>
+            <artifactId>redlib</artifactId>
+            <version>2.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/RedLib.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>com.coloredcarrot</groupId>
+            <artifactId>sidebarapi</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${basedir}/libs/SidebarAPI.jar</systemPath>
+        </dependency>
+
+        <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot</artifactId>
             <version>1.17.1-R0.1-SNAPSHOT</version>
+            <classifier>remapped-mojang</classifier>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -1,16 +1,15 @@
-package com.partlysunny.core.stats;
+package com.partlysunny.core.entities.stats;
 
-public class ItemStat {
-
-    private final StatType type;
+public class EntityStat {
+    private final EntityStatType type;
     private double value;
 
-    public ItemStat(StatType type, double value) {
+    public EntityStat(EntityStatType type, double value) {
         this.type = type;
         this.value = value;
     }
 
-    public StatType type() {
+    public EntityStatType type() {
         return type;
     }
 

@@ -1,5 +1,7 @@
-package com.partlysunny.core.stats;
+package com.partlysunny.core;
 
+import com.partlysunny.core.items.stats.ItemStat;
+import com.partlysunny.core.items.stats.ItemStats;
 import de.tr7zw.nbtapi.NBTItem;
 
 import java.util.HashMap;

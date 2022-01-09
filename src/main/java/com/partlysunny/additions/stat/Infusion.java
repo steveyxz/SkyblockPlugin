@@ -1,13 +1,13 @@
 package com.partlysunny.additions.stat;
 
+import com.partlysunny.core.StatList;
+import com.partlysunny.core.StatType;
 import com.partlysunny.core.enums.BracketType;
 import com.partlysunny.core.items.ModifierType;
 import com.partlysunny.core.items.additions.Addition;
 import com.partlysunny.core.items.additions.AdditionInfo;
 import com.partlysunny.core.items.additions.IStatAddition;
-import com.partlysunny.core.stats.ItemStat;
-import com.partlysunny.core.stats.StatList;
-import com.partlysunny.core.stats.StatType;
+import com.partlysunny.core.items.stats.ItemStat;
 import org.bukkit.ChatColor;
 
 public class Infusion extends Addition implements IStatAddition {

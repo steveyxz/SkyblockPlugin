@@ -1,13 +1,13 @@
 package com.partlysunny.items;
 
 import com.partlysunny.abilities.rightClick.SmiteAbility;
+import com.partlysunny.core.StatList;
+import com.partlysunny.core.StatType;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.SkyblockItem;
 import com.partlysunny.core.items.abilities.AbilityList;
-import com.partlysunny.core.stats.ItemStat;
-import com.partlysunny.core.stats.StatList;
-import com.partlysunny.core.stats.StatType;
+import com.partlysunny.core.items.stats.ItemStat;
 import org.bukkit.Material;
 
 public class UltraBlade extends SkyblockItem {

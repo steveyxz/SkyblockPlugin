@@ -1,9 +1,9 @@
 package com.partlysunny.core.items.additions.reforges;
 
 import com.partlysunny.Skyblock;
+import com.partlysunny.core.StatList;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.SkyblockItem;
-import com.partlysunny.core.stats.StatList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 

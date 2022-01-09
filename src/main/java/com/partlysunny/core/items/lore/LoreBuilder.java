@@ -1,5 +1,7 @@
 package com.partlysunny.core.items.lore;
 
+import com.partlysunny.core.StatList;
+import com.partlysunny.core.StatType;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.ModifierType;
@@ -11,9 +13,7 @@ import com.partlysunny.core.items.additions.AdditionList;
 import com.partlysunny.core.items.additions.IStatAddition;
 import com.partlysunny.core.items.additions.reforges.Reforge;
 import com.partlysunny.core.items.additions.reforges.ReforgeManager;
-import com.partlysunny.core.stats.ItemStat;
-import com.partlysunny.core.stats.StatList;
-import com.partlysunny.core.stats.StatType;
+import com.partlysunny.core.items.stats.ItemStat;
 import com.partlysunny.core.util.DataUtils;
 import com.partlysunny.core.util.TextUtils;
 import org.bukkit.ChatColor;

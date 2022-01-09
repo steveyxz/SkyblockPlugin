@@ -1,6 +1,9 @@
 package com.partlysunny.core.util;
 
+import com.partlysunny.Skyblock;
 import com.partlysunny.core.ConsoleLogger;
+import com.partlysunny.core.StatList;
+import com.partlysunny.core.StatType;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.SkyblockItem;
@@ -9,15 +12,17 @@ import com.partlysunny.core.items.additions.reforges.Reforge;
 import com.partlysunny.core.items.additions.reforges.ReforgeManager;
 import com.partlysunny.core.items.lore.LoreBuilder;
 import com.partlysunny.core.items.name.NameBuilder;
-import com.partlysunny.core.stats.ItemStat;
-import com.partlysunny.core.stats.StatList;
-import com.partlysunny.core.stats.StatType;
+import com.partlysunny.core.items.stats.ItemStat;
 import com.partlysunny.core.util.classes.Pair;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
 
@@ -206,6 +211,16 @@ public class DataUtils {
             r.put(s.a(), s.b());
         }
         return r;
+    }
+
+    @SuppressWarnings("all")
+    public static Object getData(String key, PersistentDataType type, Entity e) {
+        return e.getPersistentDataContainer().get(new NamespacedKey(JavaPlugin.getPlugin(Skyblock.class), key), type);
+    }
+
+    @SuppressWarnings("all")
+    public static void setData(String key, Object value, PersistentDataType type, Entity e) {
+        e.getPersistentDataContainer().set(new NamespacedKey(JavaPlugin.getPlugin(Skyblock.class), key), type, value);
     }
 
 }
