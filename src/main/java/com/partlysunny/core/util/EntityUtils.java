@@ -129,7 +129,12 @@ public class EntityUtils {
     public static String getHealthText(Double num) {
         NumberFormat fmt = NumberFormat.getCompactNumberInstance(
                 new Locale("en", "US"), NumberFormat.Style.SHORT);
-        return fmt.format(num);
+        fmt.setMinimumFractionDigits(1);
+        String format = fmt.format(num);
+        if (format.contains(".0")) {
+            format = format.replace(".0", "");
+        }
+        return format;
     }
 
     public static void setEntityInfo(Entity e, String id) {

@@ -140,6 +140,14 @@ public abstract class SkyblockItem implements Listener {
         return itemStack;
     }
 
+    public int stackCount() {
+        return stackCount;
+    }
+
+    public void setStackCount(int stackCount) {
+        this.stackCount = stackCount;
+    }
+
     public boolean vanilla() {
         return vanilla;
     }

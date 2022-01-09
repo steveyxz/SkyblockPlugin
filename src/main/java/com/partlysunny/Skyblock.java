@@ -1,10 +1,11 @@
 package com.partlysunny;
 
 import com.partlysunny.core.ConsoleLogger;
+import com.partlysunny.core.commands.SkyblockGive;
+import com.partlysunny.core.commands.SkyblockSummon;
 import com.partlysunny.core.entities.DamageManager;
 import com.partlysunny.core.entities.EntityUpdater;
 import com.partlysunny.core.items.ItemUpdater;
-import com.partlysunny.testing.TestListener;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -22,6 +23,7 @@ public final class Skyblock extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        registerCommands();
         registerListeners();
         registerItems();
         registerAbilities();
@@ -50,11 +52,15 @@ public final class Skyblock extends JavaPlugin {
         }
     }
 
+    private void registerCommands() {
+        getCommand("sbgive").setExecutor(new SkyblockGive());
+        getCommand("sbsummon").setExecutor(new SkyblockSummon());
+    }
+
     private void registerListeners() {
         this.getServer().getPluginManager().registerEvents(new ItemUpdater(), this);
         this.getServer().getPluginManager().registerEvents(new EntityUpdater(getServer()), this);
         this.getServer().getPluginManager().registerEvents(new DamageManager(), this);
-        this.getServer().getPluginManager().registerEvents(new TestListener(), this);
     }
 
     @Override

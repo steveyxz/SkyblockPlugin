@@ -5,3 +5,17 @@ api-version: 1.17
 authors: [ PartlySunny ]
 depend: [ Citizens, NBTAPI, RedLib, SidebarAPI ]
 description: Hypixel Skyblock Remade
+commands:
+  sbgive:
+    description: Gives an skyblock item
+    usage: /sbgive <item-id>
+    permission: skyblock.op
+  sbsummon:
+    description: Summons a skyblock entity
+    usage: /sbsummon <entity-id>
+    permission: skyblock.op
+
+permissions:
+  skyblock.op:
+    description: Gives you access to commands like sbgive and sbsummon
+    default: op
