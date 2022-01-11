@@ -16,7 +16,7 @@ public class UltraLeggings extends SkyblockItem {
     }
 
     public UltraLeggings() {
-        super("ultraleggings", true, ItemType.LEGGINGS, null, new String[] {null, "ultrachestplate", "ultraleggings", null});
+        super("ultraleggings", true, ItemType.LEGGINGS, null, new String[]{null, "ultrachestplate", "ultraleggings", null});
     }
 
     @Override

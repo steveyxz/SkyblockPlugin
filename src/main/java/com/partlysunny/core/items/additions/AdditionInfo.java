@@ -11,6 +11,7 @@ import java.util.Arrays;
 
 public class AdditionInfo {
 
+    protected final ItemType[] appliableTypes;
     private final Class<? extends Addition> cl;
     private String id;
     private int maxAdditions;
@@ -20,7 +21,6 @@ public class AdditionInfo {
     private int shownLevel;
     private ChatColor color;
     private BracketType bt;
-    protected final ItemType[] appliableTypes;
 
     public AdditionInfo(String id, int maxAdditions, ModifierType type, Class<? extends Addition> cl, ItemType... appliableTypes) {
         this.id = id;

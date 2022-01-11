@@ -12,11 +12,11 @@ import org.bukkit.inventory.ItemStack;
 public class SmiteAbility extends Ability {
 
     public SmiteAbility() {
-        super("smite", "Smite", "Strike down enemies around you with the power infused inside the ultra blade", AbilityType.RIGHT_CLICK, null,  AppliableTypeDefaults.meleeWeapons);
+        super("smite", "Smite", "Strike down enemies around you with the power infused inside the ultra blade", AbilityType.RIGHT_CLICK, null, AppliableTypeDefaults.meleeWeapons);
     }
 
     public SmiteAbility(SkyblockItem parent) {
-        super("smite", "Smite", "Strike down enemies around you with the power infused inside the ultra blade", AbilityType.RIGHT_CLICK, parent,  AppliableTypeDefaults.meleeWeapons);
+        super("smite", "Smite", "Strike down enemies around you with the power infused inside the ultra blade", AbilityType.RIGHT_CLICK, parent, AppliableTypeDefaults.meleeWeapons);
     }
 
     @Override

@@ -21,7 +21,7 @@ public class Infusion extends Addition implements IStatAddition {
     }
 
     public Infusion(SkyblockItem parent) {
-        super(new AdditionInfo("infusion", 1, ModifierType.STAT, Infusion.class, 1, ChatColor.GOLD, BracketType.SQUARE,  AppliableTypeDefaults.armor), parent);
+        super(new AdditionInfo("infusion", 1, ModifierType.STAT, Infusion.class, 1, ChatColor.GOLD, BracketType.SQUARE, AppliableTypeDefaults.armor), parent);
     }
 
     @Nullable

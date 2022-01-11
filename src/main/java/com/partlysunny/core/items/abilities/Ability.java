@@ -33,11 +33,11 @@ public abstract class Ability implements Listener {
     protected final int cooldown;
     protected final AbilityType type;
     protected final String id;
+    private final ItemType[] appliableTypes;
+    private final SkyblockItem parent;
     protected boolean onCooldown = false;
     private String cooldownMessage = ChatColor.RED + "This ability is on cooldown!";
     private int cooldownRemaining = -1;
-    private final ItemType[] appliableTypes;
-    private final SkyblockItem parent;
 
     public Ability(String id, String name, String description, AbilityType type, @Nullable SkyblockItem parent, ItemType... appliableTypes) {
         this.name = name;

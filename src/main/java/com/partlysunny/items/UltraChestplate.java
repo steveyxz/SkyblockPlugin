@@ -16,7 +16,7 @@ public class UltraChestplate extends SkyblockItem {
     }
 
     public UltraChestplate() {
-        super("ultrachestplate", true, ItemType.CHESTPLATE, null, new String[] {null, "ultrachestplate", "ultraleggings", null});
+        super("ultrachestplate", true, ItemType.CHESTPLATE, null, new String[]{null, "ultrachestplate", "ultraleggings", null});
     }
 
     @Override

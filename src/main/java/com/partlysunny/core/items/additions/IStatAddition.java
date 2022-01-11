@@ -10,6 +10,7 @@ public interface IStatAddition {
     //CALCULATE THE FINAL STATS, NOT JUST FOR ONE ADDITION (include amount)
     @Nullable
     String getLore(Player player);
+
     StatList getStats(@Nullable Player player);
 
 }
