@@ -68,7 +68,6 @@ public class DataUtils {
 
     public static SkyblockItem getSkyblockItem(ItemStack stack, Player p) {
         if (stack == null || stack.getType() == Material.AIR) {
-            ConsoleLogger.console("null");
             return null;
         }
         NBTItem i = new NBTItem(stack);
@@ -78,7 +77,6 @@ public class DataUtils {
             }
             return items.get(i.getUUID("sb_unique_id"));
         }
-        ConsoleLogger.console(i.getBoolean("vanilla") + " " + i.getBoolean("sb_unique"));
         return null;
     }
 
