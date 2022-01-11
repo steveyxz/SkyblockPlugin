@@ -1,7 +1,10 @@
 package com.partlysunny.core.items.abilities;
 
 import com.partlysunny.Skyblock;
+import com.partlysunny.core.items.ItemType;
+import com.partlysunny.core.items.SkyblockItem;
 import com.partlysunny.core.util.AbilityUtils;
+import com.partlysunny.core.util.DataUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -11,10 +14,14 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+
+import static com.partlysunny.core.util.AbilityUtils.hasAbility;
 
 public abstract class Ability implements Listener {
 
@@ -29,15 +36,19 @@ public abstract class Ability implements Listener {
     protected boolean onCooldown = false;
     private String cooldownMessage = ChatColor.RED + "This ability is on cooldown!";
     private int cooldownRemaining = -1;
+    private final ItemType[] appliableTypes;
+    private final SkyblockItem parent;
 
-    public Ability(String id, String name, String description, int manaCost, int soulflowCost, int cooldown, AbilityType type) {
+    public Ability(String id, String name, String description, AbilityType type, @Nullable SkyblockItem parent, ItemType... appliableTypes) {
         this.name = name;
         this.id = id;
         this.description = description;
-        this.manaCost = manaCost;
-        this.soulflowCost = soulflowCost;
-        this.cooldown = cooldown;
+        this.manaCost = 0;
+        this.soulflowCost = 0;
+        this.cooldown = 0;
         this.type = type;
+        this.appliableTypes = appliableTypes;
+        this.parent = parent;
         if (!registered.contains(id)) {
             Skyblock plugin = JavaPlugin.getPlugin(Skyblock.class);
             plugin.getServer().getPluginManager().registerEvents(this, plugin);
@@ -45,8 +56,25 @@ public abstract class Ability implements Listener {
         }
     }
 
-    public Ability(String id, String name, String description, int manaCost, int soulflowCost, int cooldown, AbilityType type, String cooldownMessage) {
-        this(id, name, description, manaCost, soulflowCost, cooldown, type);
+    public Ability(String id, String name, String description, int manaCost, int soulflowCost, int cooldown, AbilityType type, @Nullable SkyblockItem parent, ItemType... appliableTypes) {
+        this.name = name;
+        this.id = id;
+        this.description = description;
+        this.manaCost = manaCost;
+        this.soulflowCost = soulflowCost;
+        this.cooldown = cooldown;
+        this.type = type;
+        this.appliableTypes = appliableTypes;
+        this.parent = parent;
+        if (!registered.contains(id)) {
+            Skyblock plugin = JavaPlugin.getPlugin(Skyblock.class);
+            plugin.getServer().getPluginManager().registerEvents(this, plugin);
+            registered.add(id);
+        }
+    }
+
+    public Ability(String id, String name, String description, int manaCost, int soulflowCost, int cooldown, AbilityType type, @Nullable SkyblockItem parent, String cooldownMessage, ItemType... appliableTypes) {
+        this(id, name, description, manaCost, soulflowCost, cooldown, type, parent, appliableTypes);
         this.cooldownMessage = cooldownMessage;
     }
 
@@ -86,6 +114,51 @@ public abstract class Ability implements Listener {
         return type;
     }
 
+    public ItemType[] appliableTypes() {
+        return appliableTypes;
+    }
+
+    public boolean fullSet(ItemStack stack, Player player) {
+        SkyblockItem i = DataUtils.getSkyblockItem(stack, player);
+        if (i != null && AbilityUtils.hasAbility(stack, id)) {
+            return i.hasFullSet();
+        }
+        return false;
+    }
+
+    public boolean pieceBonus(ItemStack stack, Player player) {
+        SkyblockItem i = DataUtils.getSkyblockItem(stack, player);
+        if (i != null && AbilityUtils.hasAbility(stack, id)) {
+            return i.pieceBonusActive();
+        }
+        return false;
+    }
+
+    protected boolean active(Player player) {
+        ItemStack pieceWithAbility = playerHasArmorWithAbility(player.getInventory());
+        if (type == AbilityType.FULL_SET_BONUS) {
+            return fullSet(pieceWithAbility, player);
+        } else if (type == AbilityType.PIECE_BONUS) {
+            return pieceBonus(pieceWithAbility, player);
+        } else {
+            return false;
+        }
+    }
+
+    public ItemStack playerHasArmorWithAbility(PlayerInventory inventory) {
+        ItemStack pieceWithAbility = null;
+        if (hasAbility(inventory.getBoots(), id)) {
+            pieceWithAbility = inventory.getBoots();
+        } else if (hasAbility(inventory.getHelmet(), id)) {
+            pieceWithAbility = inventory.getHelmet();
+        } else if (hasAbility(inventory.getChestplate(), id)) {
+            pieceWithAbility = inventory.getChestplate();
+        } else if (hasAbility(inventory.getLeggings(), id)) {
+            pieceWithAbility = inventory.getLeggings();
+        }
+        return pieceWithAbility;
+    }
+
     @Override
     public String toString() {
         switch (type) {
@@ -113,7 +186,7 @@ public abstract class Ability implements Listener {
         if (e.getHand() == EquipmentSlot.OFF_HAND) {
             return;
         }
-        if (AbilityUtils.hasAbility(e.getPlayer().getInventory().getItemInMainHand(), this.type)) {
+        if (AbilityUtils.hasAbility(e.getPlayer().getInventory().getItemInMainHand(), this.id)) {
             if (onCooldown()) {
                 e.getPlayer().sendMessage(cooldownMessage);
                 e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);

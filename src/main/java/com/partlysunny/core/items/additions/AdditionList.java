@@ -32,6 +32,9 @@ public class AdditionList {
         if (accepting != ModifierType.ANY && addition.type() != accepting) {
             throw new IllegalArgumentException("This list does not accept type " + addition.type());
         }
+        if (parent != null && addition.cannotApply(parent)) {
+            return;
+        }
         Addition target = additionList.get(addition);
         for (AdditionInfo a : additionList.keySet()) {
             if (a.id().equals(addition.id())) {
@@ -85,6 +88,9 @@ public class AdditionList {
     public void addAddition(Addition addition) {
         if (accepting != ModifierType.ANY && addition.type().type() != accepting) {
             throw new IllegalArgumentException("This list does not accept type " + addition.type());
+        }
+        if (parent != null && addition.type().cannotApply(parent)) {
+            return;
         }
         Addition target = additionList.get(addition.type);
         if (target == null) {

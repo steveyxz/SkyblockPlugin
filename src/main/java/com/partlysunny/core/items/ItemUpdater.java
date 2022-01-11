@@ -28,14 +28,18 @@ public class ItemUpdater implements Listener {
 
     public static final Map<UUID, SkyblockItem> items = new HashMap<>();
 
-    public static void registerItem(ItemStack i) {
+    public static void registerItem(ItemStack i, Player player) {
         NBTItem nbti = new NBTItem(i);
         if (nbti.hasKey("sb_unique_id")) {
             UUID sb_unique_id = nbti.getUUID("sb_unique_id");
             if (!nbti.getBoolean("vanilla") && !items.containsKey(sb_unique_id)) {
-                items.put(sb_unique_id, SkyblockItem.getItemFrom(i));
+                items.put(sb_unique_id, SkyblockItem.getItemFrom(i, player));
             }
         }
+    }
+
+    public static void registerItem(ItemStack i) {
+        registerItem(i, null);
     }
 
     public static ItemStack transformNBT(ItemStack i) {
@@ -51,11 +55,11 @@ public class ItemUpdater implements Listener {
         return DataUtils.convertVanilla(nbti.getItem());
     }
 
-    public static void updateVanilla(Inventory inv) {
+    public static void updateVanilla(Inventory inv, Player p) {
         int count = 0;
         for (ItemStack i : inv.getContents()) {
             if (i != null && i.getType() != Material.AIR) {
-                ItemStack vanilla = getVanilla(i);
+                ItemStack vanilla = getVanilla(i, p);
                 if (vanilla != i) {
                     inv.setItem(count, vanilla);
                 }
@@ -64,7 +68,7 @@ public class ItemUpdater implements Listener {
         }
     }
 
-    public static ItemStack getVanilla(ItemStack s) {
+    public static ItemStack getVanilla(ItemStack s, Player entity) {
         NBTItem nbtItem = new NBTItem(s);
         if (nbtItem.hasKey("vanilla") && nbtItem.getBoolean("vanilla")) {
             //TODO update vanilla items
@@ -78,12 +82,12 @@ public class ItemUpdater implements Listener {
         return s;
     }
 
-    public static List<Integer> idify(Inventory inventory) {
+    public static List<Integer> idify(Inventory inventory, Player player) {
         int count = 0;
         List<Integer> toDelete = new ArrayList<>();
         for (ItemStack s : inventory.getContents()) {
             if (s != null && s.getType() != Material.AIR) {
-                ItemStack ided = getIded(s);
+                ItemStack ided = getIded(s, player);
                 if (!Objects.equals(ided, s)) {
                     inventory.setItem(count, ided);
                 }
@@ -93,7 +97,7 @@ public class ItemUpdater implements Listener {
         return toDelete;
     }
 
-    public static ItemStack getIded(ItemStack s) {
+    public static ItemStack getIded(ItemStack s, Player player) {
         NBTItem nbti = new NBTItem(s);
         if (!nbti.hasKey("sb_unique") || !nbti.hasKey("sb_id") || !nbti.hasKey("vanilla")) {
             ConsoleLogger.console("Item has been found with missing information");
@@ -101,7 +105,7 @@ public class ItemUpdater implements Listener {
         }
         if (!nbti.getBoolean("sb_unique")) {
             if (!nbti.getBoolean("vanilla")) {
-                SkyblockItem i = SkyblockItem.getItemFrom(s);
+                SkyblockItem i = SkyblockItem.getItemFrom(s, player);
                 if (i == null) {
                     ConsoleLogger.console("Null skyblock item obtained?");
                     return s;
@@ -127,11 +131,11 @@ public class ItemUpdater implements Listener {
         return nbti.getItem();
     }
 
-    public static void updateInventory(Inventory inventory) {
+    public static void updateInventory(Inventory inventory, Player p) {
         int count = 0;
         for (ItemStack s : inventory.getContents()) {
             if (s != null && s.getType() != Material.AIR) {
-                ItemStack updated = getUpdated(s);
+                ItemStack updated = getUpdated(s, p);
                 if (!updated.equals(s)) {
                     inventory.setItem(count, updated);
                 }
@@ -140,13 +144,14 @@ public class ItemUpdater implements Listener {
         }
     }
 
-    public static ItemStack getUpdated(ItemStack i) {
+    public static ItemStack getUpdated(ItemStack i, Player entity) {
         NBTItem nbti = new NBTItem(i);
         if (!nbti.getBoolean("sb_unique")) {
             return i;
         }
         if (items.containsKey(nbti.getUUID("sb_unique_id")) && !nbti.getBoolean("vanilla")) {
             SkyblockItem sbi = items.get(nbti.getUUID("sb_unique_id"));
+            sbi.setOwner(entity);
             sbi.updateSkyblockItem();
             ItemStack skyblockItem = sbi.getSkyblockItem();
             if (skyblockItem != null && skyblockItem.getItemMeta() != null && i.getItemMeta() != null) {
@@ -165,11 +170,11 @@ public class ItemUpdater implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onInventoryOpen(InventoryOpenEvent e) {
-        updateVanilla(e.getInventory());
-        for (Integer i : idify(e.getInventory())) {
+        updateVanilla(e.getInventory(), (Player) e.getPlayer());
+        for (Integer i : idify(e.getInventory(), (Player) e.getPlayer())) {
             e.setCancelled(true);
         }
-        updateInventory(e.getInventory());
+        updateInventory(e.getInventory(), (Player) e.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.LOW)
@@ -177,20 +182,20 @@ public class ItemUpdater implements Listener {
         if (e.getClickedInventory() == null) {
             return;
         }
-        updateVanilla(e.getClickedInventory());
-        for (Integer i : idify(e.getInventory())) {
+        updateVanilla(e.getClickedInventory(), (Player) e.getWhoClicked());
+        for (Integer i : idify(e.getInventory(), (Player) e.getWhoClicked())) {
             e.setCancelled(true);
         }
-        updateInventory(e.getClickedInventory());
+        updateInventory(e.getClickedInventory(), (Player) e.getWhoClicked());
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onItemPickup(EntityPickupItemEvent e) {
         if (e.getEntity() instanceof Player) {
             ItemStack i = e.getItem().getItemStack();
-            i = getVanilla(i);
-            i = getIded(i);
-            i = getUpdated(i);
+            i = getVanilla(i, (Player) e.getEntity());
+            i = getIded(i, (Player) e.getEntity());
+            i = getUpdated(i, (Player) e.getEntity());
             e.setCancelled(true);
             e.getItem().remove();
             ((Player) e.getEntity()).getInventory().addItem(i);
@@ -200,11 +205,11 @@ public class ItemUpdater implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onPlayerClick(PlayerInteractEvent e) {
-        updateVanilla(e.getPlayer().getInventory());
-        for (Integer i : idify(e.getPlayer().getInventory())) {
+        updateVanilla(e.getPlayer().getInventory(), e.getPlayer());
+        for (Integer i : idify(e.getPlayer().getInventory(), e.getPlayer())) {
             e.setCancelled(true);
         }
-        updateInventory(e.getPlayer().getInventory());
+        updateInventory(e.getPlayer().getInventory(), e.getPlayer());
     }
 
 

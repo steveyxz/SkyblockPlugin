@@ -1,5 +1,8 @@
 package com.partlysunny.core.items;
 
+import com.partlysunny.core.ConsoleLogger;
+import org.bukkit.entity.Player;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +28,15 @@ public class ItemManager {
             return type.itemType().getDeclaredConstructor().newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
             e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static SkyblockItem getInstance(ItemInfo type, Player p) {
+        try {
+            return type.itemType().getDeclaredConstructor(Player.class).newInstance(p);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            ConsoleLogger.console("This item has no player constructor! ITEM_ID: " + type.id());
         }
         return null;
     }

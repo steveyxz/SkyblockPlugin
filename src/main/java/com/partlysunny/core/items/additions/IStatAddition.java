@@ -1,11 +1,15 @@
 package com.partlysunny.core.items.additions;
 
 import com.partlysunny.core.StatList;
+import org.bukkit.entity.Player;
+
+import javax.annotation.Nullable;
 
 public interface IStatAddition {
 
     //CALCULATE THE FINAL STATS, NOT JUST FOR ONE ADDITION (include amount)
-    //TODO make stat additions be able to be shown in lore (like hyperion increases your stats depending on your cata lvl)
-    StatList getStats();
+    @Nullable
+    String getLore(Player player);
+    StatList getStats(@Nullable Player player);
 
 }

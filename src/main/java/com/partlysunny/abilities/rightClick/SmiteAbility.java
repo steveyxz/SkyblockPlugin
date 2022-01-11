@@ -1,7 +1,9 @@
 package com.partlysunny.abilities.rightClick;
 
+import com.partlysunny.core.items.SkyblockItem;
 import com.partlysunny.core.items.abilities.Ability;
 import com.partlysunny.core.items.abilities.AbilityType;
+import com.partlysunny.core.items.additions.AppliableTypeDefaults;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -10,7 +12,11 @@ import org.bukkit.inventory.ItemStack;
 public class SmiteAbility extends Ability {
 
     public SmiteAbility() {
-        super("smite", "Smite", "Strike down enemies around you with the power infused inside the ultra blade", 100, 0, 1, AbilityType.RIGHT_CLICK);
+        super("smite", "Smite", "Strike down enemies around you with the power infused inside the ultra blade", AbilityType.RIGHT_CLICK, null,  AppliableTypeDefaults.meleeWeapons);
+    }
+
+    public SmiteAbility(SkyblockItem parent) {
+        super("smite", "Smite", "Strike down enemies around you with the power infused inside the ultra blade", AbilityType.RIGHT_CLICK, parent,  AppliableTypeDefaults.meleeWeapons);
     }
 
     @Override

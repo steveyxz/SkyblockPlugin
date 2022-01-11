@@ -1,6 +1,7 @@
 package com.partlysunny;
 
 import com.partlysunny.core.ConsoleLogger;
+import com.partlysunny.core.commands.SkyblockAddAddition;
 import com.partlysunny.core.commands.SkyblockGive;
 import com.partlysunny.core.commands.SkyblockSummon;
 import com.partlysunny.core.entities.DamageManager;
@@ -37,9 +38,9 @@ public final class Skyblock extends JavaPlugin {
     private void updateEverything() {
         for (Player p : getServer().getOnlinePlayers()) {
             Inventory inventory = p.getInventory();
-            ItemUpdater.updateVanilla(inventory);
-            ItemUpdater.idify(inventory);
-            ItemUpdater.updateInventory(inventory);
+            ItemUpdater.updateVanilla(inventory, p);
+            ItemUpdater.idify(inventory, p);
+            ItemUpdater.updateInventory(inventory, p);
         }
         for (World w : getServer().getWorlds()) {
             for (Entity e : w.getEntities()) {
@@ -55,6 +56,7 @@ public final class Skyblock extends JavaPlugin {
     private void registerCommands() {
         getCommand("sbgive").setExecutor(new SkyblockGive());
         getCommand("sbsummon").setExecutor(new SkyblockSummon());
+        getCommand("sbadd").setExecutor(new SkyblockAddAddition());
     }
 
     private void registerListeners() {

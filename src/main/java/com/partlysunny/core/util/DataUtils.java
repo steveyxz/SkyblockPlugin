@@ -18,13 +18,18 @@ import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
+
+import static com.partlysunny.core.items.ItemUpdater.items;
+import static com.partlysunny.core.items.ItemUpdater.registerItem;
 
 public class DataUtils {
 
@@ -61,10 +66,30 @@ public class DataUtils {
         return type;
     }
 
-    public static SkyblockItem createSkyblockItemFromVanilla(ItemStack s) {
+    public static SkyblockItem getSkyblockItem(ItemStack stack, Player p) {
+        if (stack == null || stack.getType() == Material.AIR) {
+            ConsoleLogger.console("null");
+            return null;
+        }
+        NBTItem i = new NBTItem(stack);
+        if (!i.getBoolean("vanilla") && i.getBoolean("sb_unique")) {
+            if (!items.containsKey(i.getUUID("sb_unique_id"))) {
+                registerItem(stack, p);
+            }
+            return items.get(i.getUUID("sb_unique_id"));
+        }
+        ConsoleLogger.console(i.getBoolean("vanilla") + " " + i.getBoolean("sb_unique"));
+        return null;
+    }
+
+    public static SkyblockItem getSkyblockItem(ItemStack stack) {
+        return getSkyblockItem(stack, null);
+    }
+
+    public static SkyblockItem createSkyblockItemFromVanilla(ItemStack s, @Nullable Player player) {
         NBTItem nbti = new NBTItem(s);
         if (nbti.getBoolean("vanilla")) {
-            SkyblockItem skyblockItem = new SkyblockItem(s.getType().toString().toLowerCase(), false, getTypeOfItem(s.getType()), true) {
+            SkyblockItem skyblockItem = new SkyblockItem(s.getType().toString().toLowerCase(), false, getTypeOfItem(s.getType()), player, true) {
                 @Override
                 public Material getDefaultItem() {
                     return s.getType();
@@ -108,8 +133,8 @@ public class DataUtils {
         return null;
     }
 
-    public static SkyblockItem createSkyblockItemFromVanilla(Material s) {
-        return new SkyblockItem(s.toString().toLowerCase(), false, getTypeOfItem(s), true) {
+    public static SkyblockItem createSkyblockItemFromVanilla(Material s, @Nullable Player player) {
+        return new SkyblockItem(s.toString().toLowerCase(), false, getTypeOfItem(s), player, true) {
             @Override
             public Material getDefaultItem() {
                 return s;

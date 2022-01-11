@@ -7,6 +7,7 @@ import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.ModifierType;
 import com.partlysunny.core.items.abilities.Ability;
 import com.partlysunny.core.items.abilities.AbilityList;
+import com.partlysunny.core.items.abilities.AbilityType;
 import com.partlysunny.core.items.additions.Addition;
 import com.partlysunny.core.items.additions.AdditionInfo;
 import com.partlysunny.core.items.additions.AdditionList;
@@ -17,6 +18,7 @@ import com.partlysunny.core.items.stats.ItemStat;
 import com.partlysunny.core.util.DataUtils;
 import com.partlysunny.core.util.TextUtils;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -26,6 +28,7 @@ public class LoreBuilder {
     private final List<String> lore = new ArrayList<>();
     private final List<String> statLore = new ArrayList<>();
     private final List<String> abilityLore = new ArrayList<>();
+    private final List<String> statAbilityLore = new ArrayList<>();
     private String description = "";
     private Reforge reforge;
     private Rarity r = Rarity.COMMON;
@@ -46,53 +49,109 @@ public class LoreBuilder {
             String desc = a.description();
             List<String> split = new ArrayList<>(TextUtils.wrap(desc, 30));
             abilityLore.add("");
-            if (!Objects.equals(a.type().toString(), "")) {
-                abilityLore.add(ChatColor.GOLD + "Ability: " + a.name() + " " + ChatColor.YELLOW + ChatColor.BOLD + a);
-            }
-            if (split.size() > 1) {
-                for (String s : split) {
-                    abilityLore.add(ChatColor.GRAY + s.substring(2));
+            if (a.type().weapon()) {
+                if (!Objects.equals(a.type().toString(), "")) {
+                    abilityLore.add(ChatColor.GOLD + "Ability: " + a.name() + " " + ChatColor.YELLOW + ChatColor.BOLD + a);
+                }
+                if (split.size() > 1) {
+                    for (String s : split) {
+                        abilityLore.add(ChatColor.GRAY + s.substring(2));
+                    }
+                } else {
+                    for (String s : split) {
+                        abilityLore.add(ChatColor.GRAY + s);
+                    }
+                }
+                if (a.manaCost() > 0) {
+                    abilityLore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + a.manaCost());
+                }
+                if (a.soulflowCost() > 0) {
+                    abilityLore.add(ChatColor.DARK_GRAY + "Soulflow Cost: " + ChatColor.DARK_AQUA + a.soulflowCost());
+                }
+                if (a.cooldown() > 0) {
+                    abilityLore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + a.cooldown() + "s");
                 }
             } else {
-                for (String s : split) {
-                    abilityLore.add(ChatColor.GRAY + s);
+                if (a.type() == AbilityType.PASSIVE) {
+                    abilityLore.add(ChatColor.GOLD + "Ability: " + a.name());
+                    if (split.size() > 1) {
+                        for (String s : split) {
+                            abilityLore.add(ChatColor.GRAY + s.substring(2));
+                        }
+                    } else {
+                        for (String s : split) {
+                            abilityLore.add(ChatColor.GRAY + s);
+                        }
+                    }
+                } else {
+                    abilityLore.add(ChatColor.GOLD + (a.type() == AbilityType.FULL_SET_BONUS ? "Full Set Bonus: " : "Piece Bonus: ") + a.name());
+                    if (split.size() > 1) {
+                        for (String s : split) {
+                            abilityLore.add(ChatColor.GRAY + s.substring(2));
+                        }
+                    } else {
+                        for (String s : split) {
+                            abilityLore.add(ChatColor.GRAY + s);
+                        }
+                    }
                 }
-            }
-            if (a.manaCost() > 0) {
-                abilityLore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + a.manaCost());
-            }
-            if (a.soulflowCost() > 0) {
-                abilityLore.add(ChatColor.DARK_GRAY + "Soulflow Cost: " + ChatColor.DARK_AQUA + a.soulflowCost());
-            }
-            if (a.cooldown() > 0) {
-                abilityLore.add(ChatColor.DARK_GRAY + "Cooldown: " + ChatColor.GREEN + a.cooldown() + "s");
             }
         }
         return this;
     }
 
     //Must be called AFTER setReforge or will bug out
-    public LoreBuilder setStats(StatList stats, AdditionList additions, Rarity rarity) {
+    public LoreBuilder setStats(StatList stats, AdditionList additions, Rarity rarity, Player player) {
         if (reforge != null) {
-            setStats(stats, additions, DataUtils.getStatsOfBest(reforge.id(), rarity), reforge.displayName());
+            setStats(stats, additions, DataUtils.getStatsOfBest(reforge.id(), rarity), reforge.displayName(), player);
         } else {
-            setStats(stats, additions, null, null);
+            setStats(stats, additions, null, null, player);
         }
         return this;
     }
 
-    public LoreBuilder setStats(StatList stats, AdditionList additions, StatList reforgeBonus, String reforgeName) {
+    //Automatically called on setstats. No need to call again
+    public LoreBuilder setStatLore(AdditionList additions, Player player) {
+        if (additions != null) {
+            if (additions.accepting() != ModifierType.STAT) {
+                throw new IllegalArgumentException("Additions argument is of wrong type (not of type STAT)");
+            }
+            List<Addition> additionList = additions.asArrayList();
+            for (Addition a : additionList) {
+                statAbilityLore.add("");
+                IStatAddition isa = (IStatAddition) a;
+                String lore = isa.getLore(player);
+                if (lore != null) {
+                    //TODO fix the bug where lines of lore have no color
+                    List<String> formatted = TextUtils.wrap(TextUtils.getHighlightedText(lore), 30);
+                    if (formatted.size() > 1) {
+                        for (String s : formatted) {
+                            statAbilityLore.add(ChatColor.GRAY + s.substring(2));
+                        }
+                    } else {
+                        for (String s : formatted) {
+                            statAbilityLore.add(ChatColor.GRAY + s);
+                        }
+                    }
+                }
+            }
+        }
+        return this;
+    }
+
+    public LoreBuilder setStats(StatList stats, AdditionList additions, StatList reforgeBonus, String reforgeName, Player player) {
         Map<StatType, HashMap<AdditionInfo, Double>> sorted;
         TreeMap<StatType, HashMap<AdditionInfo, Double>> realSorted = null;
         if (additions != null) {
             if (additions.accepting() != ModifierType.STAT) {
                 throw new IllegalArgumentException("Additions argument is of wrong type (not of type STAT)");
             }
+            setStatLore(additions, player);
             List<Addition> additionList = additions.asArrayList();
             sorted = new HashMap<>();
             for (Addition a : additionList) {
                 IStatAddition isa = (IStatAddition) a;
-                for (ItemStat s : isa.getStats().asList()) {
+                for (ItemStat s : isa.getStats(player).asList()) {
                     if (sorted.containsKey(s.type())) {
                         sorted.get(s.type()).put(a.type(), s.value());
                     } else {
@@ -183,6 +242,9 @@ public class LoreBuilder {
                     lore.add(ChatColor.GRAY + s);
                 }
             }
+        }
+        if (statAbilityLore.size() > 0) {
+            lore.addAll(statAbilityLore);
         }
         if (abilityLore.size() > 0) {
             lore.addAll(abilityLore);

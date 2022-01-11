@@ -1,8 +1,13 @@
 package com.partlysunny.core.items.additions;
 
 import com.partlysunny.core.enums.BracketType;
+import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.ModifierType;
+import com.partlysunny.core.items.SkyblockItem;
 import org.bukkit.ChatColor;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 
 public class AdditionInfo {
 
@@ -15,17 +20,19 @@ public class AdditionInfo {
     private int shownLevel;
     private ChatColor color;
     private BracketType bt;
+    protected final ItemType[] appliableTypes;
 
-    public AdditionInfo(String id, int maxAdditions, ModifierType type, Class<? extends Addition> cl) {
+    public AdditionInfo(String id, int maxAdditions, ModifierType type, Class<? extends Addition> cl, ItemType... appliableTypes) {
         this.id = id;
         this.maxAdditions = maxAdditions;
         this.type = type;
         this.cl = cl;
+        this.appliableTypes = appliableTypes;
         AdditionManager.addAddition(this);
     }
 
     //Only for stat additions
-    public AdditionInfo(String id, int maxAdditions, ModifierType type, Class<? extends Addition> cl, int shownLevel, ChatColor color, BracketType bt) {
+    public AdditionInfo(String id, int maxAdditions, ModifierType type, Class<? extends Addition> cl, int shownLevel, ChatColor color, BracketType bt, ItemType... appliableTypes) {
         if (type != ModifierType.STAT) {
             throw new IllegalArgumentException("This constructor only accepts stat modifier additions");
         }
@@ -36,16 +43,26 @@ public class AdditionInfo {
         this.color = color;
         this.shownLevel = shownLevel;
         this.bt = bt;
+        this.appliableTypes = appliableTypes;
         AdditionManager.addAddition(this);
     }
 
-    public AdditionInfo(String id, int maxAdditions, ModifierType type, Class<? extends Addition> cl, AdditionInfo depends) {
+    public AdditionInfo(String id, int maxAdditions, ModifierType type, Class<? extends Addition> cl, AdditionInfo depends, ItemType... appliableTypes) {
         this.id = id;
         this.maxAdditions = maxAdditions;
         this.type = type;
         this.cl = cl;
         this.depends = depends;
+        this.appliableTypes = appliableTypes;
         AdditionManager.addAddition(this);
+    }
+
+    public ItemType[] appliableTypes() {
+        return appliableTypes;
+    }
+
+    public boolean cannotApply(SkyblockItem i) {
+        return !Arrays.asList(appliableTypes).contains(i.type());
     }
 
     public Integer shownLevel() {
@@ -94,6 +111,15 @@ public class AdditionInfo {
 
     public void setType(ModifierType type) {
         this.type = type;
+    }
+
+    public Addition getNewInstance(SkyblockItem parent) {
+        try {
+            return cl.getDeclaredConstructor(SkyblockItem.class).newInstance(parent);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override

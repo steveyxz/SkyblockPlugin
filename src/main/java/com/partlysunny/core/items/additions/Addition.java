@@ -5,12 +5,8 @@ import com.partlysunny.core.items.SkyblockItem;
 public abstract class Addition {
 
     protected final AdditionInfo type;
-    protected SkyblockItem parent = null;
+    protected SkyblockItem parent;
     protected int amount = 1;
-
-    public Addition(AdditionInfo type) {
-        this.type = type;
-    }
 
     public Addition(AdditionInfo type, SkyblockItem parent) {
         this.type = type;
@@ -32,4 +28,5 @@ public abstract class Addition {
     public void setAmount(int amount) {
         this.amount = amount;
     }
+
 }

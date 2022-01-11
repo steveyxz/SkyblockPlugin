@@ -8,6 +8,7 @@ import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -32,13 +33,12 @@ public class DamageManager implements Listener {
         if (e.getDamage() <= 0) {
             return;
         }
-        e.setDamage(0);
-        if (!(e.getDamager() instanceof LivingEntity damager) || !(e.getEntity() instanceof LivingEntity receiver) || e.getDamager().getType() == EntityType.ARROW || e.getDamager().getType() == EntityType.SPECTRAL_ARROW) {
+        if (!(e.getDamager() instanceof LivingEntity damager) || e.getDamager() instanceof Player || !(e.getEntity() instanceof LivingEntity receiver) || e.getDamager().getType() == EntityType.ARROW || e.getDamager().getType() == EntityType.SPECTRAL_ARROW) {
             return;
         }
+        e.setDamage(0);
         if (!(damager instanceof Player)) {
             if (receiver instanceof Player) {
-                //TODO player damaged, implement playerstats first
             } else {
                 dealDamage(receiver, getStat(damager, EntityStatType.DAMAGE), false, false);
             }
@@ -50,17 +50,20 @@ public class DamageManager implements Listener {
         if (e.getDamage() <= 0) {
             return;
         }
-        e.setDamage(0);
-        if (!(e.getDamager() instanceof LivingEntity damager) || !(e.getEntity() instanceof LivingEntity receiver) || e.getDamager().getType() == EntityType.ARROW || e.getDamager().getType() == EntityType.SPECTRAL_ARROW) {
+        if (!(e.getDamager() instanceof Player p) || !(e.getEntity() instanceof LivingEntity receiver) || e.getDamager().getType() == EntityType.ARROW || e.getDamager().getType() == EntityType.SPECTRAL_ARROW) {
             return;
         }
-        if (damager instanceof Player) {
-            if (receiver instanceof Player) {
-                e.setCancelled(true);
-            } else {
-                Pair<Double, Boolean> hitDamage = getHitDamage((Player) damager);
+        e.setDamage(0);
+        if (receiver instanceof Player) {
+            e.setCancelled(true);
+        } else {
+            if ((p).getInventory().getItemInMainHand().getType() == Material.CROSSBOW || p.getInventory().getItemInMainHand().getType() == Material.BOW) {
+                Pair<Double, Boolean> hitDamage = getHitDamage(p, true);
                 dealDamage(receiver, hitDamage.a(), hitDamage.b(), true);
+                return;
             }
+            Pair<Double, Boolean> hitDamage = getHitDamage(p, false);
+            dealDamage(receiver, hitDamage.a(), hitDamage.b(), true);
         }
     }
 
@@ -72,7 +75,6 @@ public class DamageManager implements Listener {
         receiver.damage(0, damager);
         if (!(damager instanceof Player)) {
             if (receiver instanceof Player) {
-                //TODO player damaged, implement playerstats first
             } else {
                 dealDamage(receiver, getStat(damager, EntityStatType.DAMAGE), false, false);
             }
@@ -89,9 +91,8 @@ public class DamageManager implements Listener {
         receiver.damage(0, damager);
         if (damager instanceof Player) {
             if (receiver instanceof Player) {
-                //TODO player damaged, implement playerstats first
             } else {
-                Pair<Double, Boolean> hitDamage = getHitDamage((Player) damager);
+                Pair<Double, Boolean> hitDamage = getHitDamage((Player) damager, false);
                 dealDamage(receiver, hitDamage.a(), hitDamage.b(), true);
             }
         }
@@ -178,7 +179,7 @@ public class DamageManager implements Listener {
         return temp.toString();
     }
 
-    public static Pair<Double, Boolean> getHitDamage(Player p) {
+    public static Pair<Double, Boolean> getHitDamage(Player p, boolean ignoreHand) {
         //TODO player stats + damage
         return new Pair<>(140000D, false);
     }

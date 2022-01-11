@@ -1,14 +1,14 @@
 package com.partlysunny.additions;
 
+import com.partlysunny.additions.ability.Glow;
 import com.partlysunny.additions.reforge.WitheredReforge;
 import com.partlysunny.additions.stat.Infusion;
-import com.partlysunny.additions.stat.PotatoBook;
 
 public class AdditionRegister {
 
     public static void registerAdditions() {
         new Infusion();
-        new PotatoBook();
+        new Glow();
     }
 
     public static void registerReforges() {

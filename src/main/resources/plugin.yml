@@ -14,6 +14,10 @@ commands:
     description: Summons a skyblock entity
     usage: /sbsummon <entity-id>
     permission: skyblock.op
+  sbadd:
+    description: Adds and addition to your held item
+    usage: /sbadd <addition-id>
+    permission: skyblock.op
 
 permissions:
   skyblock.op:

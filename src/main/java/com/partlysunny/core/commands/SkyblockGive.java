@@ -22,7 +22,7 @@ public class SkyblockGive implements CommandExecutor {
             p.sendMessage(ChatColor.RED + "Invalid item type: " + strings[0]);
             return true;
         }
-        SkyblockItem instance = ItemManager.getInstance(infoFromId);
+        SkyblockItem instance = ItemManager.getInstance(infoFromId, p);
         if (instance != null) {
             if (strings.length > 1) {
                 try {

@@ -12,7 +12,9 @@ import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -21,6 +23,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.UUID;
+
+import static org.bukkit.inventory.EquipmentSlot.*;
 
 public abstract class SkyblockItem implements Listener {
 
@@ -39,24 +43,39 @@ public abstract class SkyblockItem implements Listener {
     private boolean vanilla = false;
     private UUID uniqueId;
     private ItemStack asSkyblockItem;
+    private Player owner;
+    private String[] fullSet;
 
-    protected SkyblockItem(String id, boolean unique, ItemType type) {
+    protected SkyblockItem(String id, boolean unique, ItemType type, @Nullable Player owner) {
         this.id = id;
         this.unique = unique;
         this.type = type;
+        this.owner = owner;
         Skyblock plugin = JavaPlugin.getPlugin(Skyblock.class);
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
         ItemManager.addItem(new ItemInfo(id, getClass(), type));
         updateSkyblockItem();
     }
 
-    protected SkyblockItem(String id, boolean unique, ItemType type, boolean vanilla) {
-        this(id, unique, type);
+    protected SkyblockItem(String id, boolean unique, ItemType type, @Nullable Player owner, String[] fullSet) {
+        this.id = id;
+        this.unique = unique;
+        this.type = type;
+        this.owner = owner;
+        this.fullSet = fullSet;
+        Skyblock plugin = JavaPlugin.getPlugin(Skyblock.class);
+        plugin.getServer().getPluginManager().registerEvents(this, plugin);
+        ItemManager.addItem(new ItemInfo(id, getClass(), type));
+        updateSkyblockItem();
+    }
+
+    protected SkyblockItem(String id, boolean unique, ItemType type, @Nullable Player owner, boolean vanilla) {
+        this(id, unique, type, owner);
         this.vanilla = vanilla;
     }
 
     @Nullable
-    public static SkyblockItem getItemFrom(ItemStack s) {
+    public static SkyblockItem getItemFrom(ItemStack s, @Nullable Player player) {
         NBTItem nbti = new NBTItem(s);
         ItemInfo type = ItemManager.getInfoFromId(nbti.getString("sb_id"));
         if (type == null) {
@@ -68,6 +87,7 @@ public abstract class SkyblockItem implements Listener {
             System.out.println("Bad Instance");
             return null;
         }
+        item.owner = player;
         item.baseMaterial = s.getType();
         if (nbti.hasKey("sb_unique_id")) {
             item.setUniqueId(nbti.getUUID("sb_unique_id"));
@@ -133,6 +153,35 @@ public abstract class SkyblockItem implements Listener {
         return item;
     }
 
+    public boolean hasFullSet() {
+        Player owner = owner();
+        if (owner != null) {
+            String[] fullSet = fullSet();
+            if (fullSet != null) {
+                return matches(HEAD, owner, fullSet[0]) && matches(CHEST, owner, fullSet[1]) && matches(LEGS, owner, fullSet[2]) && matches(FEET, owner, fullSet[3]);
+            }
+        }
+        return false;
+    }
+
+    public boolean pieceBonusActive() {
+        return matches(HEAD, owner, id) || matches(CHEST, owner, id) || matches(LEGS, owner, id) || matches(FEET, owner, id);
+    }
+
+    @SuppressWarnings("all")
+    private boolean matches(EquipmentSlot slot, Player owner, String match) {
+        ItemStack item = owner.getInventory().getItem(slot);
+        if (match == null) {
+            return true;
+        }
+        if (item == null || item.getType() == Material.AIR) {
+            return false;
+        }
+        NBTItem i = new NBTItem(item);
+        return Objects.equals(match, i.getString("sb_id"));
+    }
+
+
     public ItemStack addGlow(ItemStack itemStack) {
         // adds protection to bows and infinity to every other item as infinity is only useful on bows and protection is only useful on armor
         itemStack.addUnsafeEnchantment((itemStack.getType() == Material.BOW) ? Enchantment.PROTECTION_ENVIRONMENTAL : Enchantment.ARROW_INFINITE, 1);
@@ -140,8 +189,28 @@ public abstract class SkyblockItem implements Listener {
         return itemStack;
     }
 
+    public ItemType type() {
+        return type;
+    }
+
+    public String[] fullSet() {
+        return fullSet;
+    }
+
+    public void setFullSet(String[] fullSet) {
+        this.fullSet = fullSet;
+    }
+
     public int stackCount() {
         return stackCount;
+    }
+
+    public Player owner() {
+        return owner;
+    }
+
+    public void setOwner(Player owner) {
+        this.owner = owner;
     }
 
     public void setStackCount(int stackCount) {
@@ -199,7 +268,7 @@ public abstract class SkyblockItem implements Listener {
         StatList base;
         base = Objects.requireNonNullElseGet(stats, StatList::new);
         for (IStatAddition a : statAdditions.asStatList()) {
-            base = base.merge(a.getStats());
+            base = base.merge(a.getStats(owner));
         }
         if (reforge != null) {
             StatList addition = DataUtils.getStatsOfBest(reforge, getRarity());
@@ -268,7 +337,7 @@ public abstract class SkyblockItem implements Listener {
                 .setReforge(reforge)
                 .setDescription(getDescription() != null ? getDescription() : "")
                 .setRarity(getFinalRarity())
-                .setStats(getCombinedStats(), statAdditions(), getRarity())
+                .setStats(getCombinedStats(), statAdditions(), getRarity(), owner)
                 .addAbilities(getCombinedAbilities())
                 .setType(type)
                 .build()
