@@ -1,7 +1,7 @@
 package com.partlysunny.additions.stat;
 
-import com.partlysunny.core.StatList;
-import com.partlysunny.core.StatType;
+import com.partlysunny.core.stats.StatList;
+import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.enums.BracketType;
 import com.partlysunny.core.items.ModifierType;
 import com.partlysunny.core.items.SkyblockItem;
@@ -9,7 +9,7 @@ import com.partlysunny.core.items.additions.Addition;
 import com.partlysunny.core.items.additions.AdditionInfo;
 import com.partlysunny.core.items.additions.AppliableTypeDefaults;
 import com.partlysunny.core.items.additions.IStatAddition;
-import com.partlysunny.core.items.stats.ItemStat;
+import com.partlysunny.core.stats.Stat;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
@@ -39,8 +39,8 @@ public class Infusion extends Addition implements IStatAddition {
             health = player.getHealth();
         }
         return new StatList(
-                new ItemStat(StatType.DAMAGE, health * 5),
-                new ItemStat(StatType.HEALTH, health * 5)
+                new Stat(StatType.DAMAGE, health * 5),
+                new Stat(StatType.MAX_HEALTH, health * 5)
         );
     }
 }

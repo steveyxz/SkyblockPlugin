@@ -7,6 +7,8 @@ import com.partlysunny.core.commands.SkyblockSummon;
 import com.partlysunny.core.entities.DamageManager;
 import com.partlysunny.core.entities.EntityUpdater;
 import com.partlysunny.core.items.ItemUpdater;
+import com.partlysunny.core.player.PlayerStatManager;
+import com.partlysunny.core.util.ConfigManager;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -17,13 +19,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 import static com.partlysunny.abilities.AbilityRegister.registerAbilities;
 import static com.partlysunny.additions.AdditionRegister.registerAdditions;
 import static com.partlysunny.additions.AdditionRegister.registerReforges;
+import static com.partlysunny.core.player.BaseStatManager.initializeBaseStats;
+import static com.partlysunny.core.player.BaseStatManager.repairDefaultStats;
 import static com.partlysunny.entities.EntityRegister.registerEntityInfos;
 import static com.partlysunny.items.ItemRegister.registerItems;
 
 public final class Skyblock extends JavaPlugin {
 
+    public static ConfigManager configManager;
+
     @Override
     public void onEnable() {
+        configManager = new ConfigManager(JavaPlugin.getPlugin(Skyblock.class));
+        repairDefaultStats();
+        initializeBaseStats(this);
         registerCommands();
         registerListeners();
         registerItems();
@@ -42,6 +51,7 @@ public final class Skyblock extends JavaPlugin {
             ItemUpdater.idify(inventory, p);
             ItemUpdater.updateInventory(inventory, p);
         }
+
         for (World w : getServer().getWorlds()) {
             for (Entity e : w.getEntities()) {
                 if (!e.getType().isAlive() || e.getType() == EntityType.ARMOR_STAND || e.getType() == EntityType.PLAYER) {
@@ -63,6 +73,7 @@ public final class Skyblock extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new ItemUpdater(), this);
         this.getServer().getPluginManager().registerEvents(new EntityUpdater(getServer()), this);
         this.getServer().getPluginManager().registerEvents(new DamageManager(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerStatManager(), this);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.partlysunny.core.util;
 
-import com.partlysunny.core.StatType;
+import com.partlysunny.core.stats.StatType;
 import org.bukkit.ChatColor;
 import org.bukkit.util.ChatPaginator;
 

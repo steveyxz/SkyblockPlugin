@@ -1,13 +1,11 @@
-package com.partlysunny.core.items.stats;
+package com.partlysunny.core.stats;
 
-import com.partlysunny.core.StatType;
-
-public class ItemStat {
+public class Stat {
 
     private final StatType type;
     private double value;
 
-    public ItemStat(StatType type, double value) {
+    public Stat(StatType type, double value) {
         this.type = type;
         this.value = value;
     }

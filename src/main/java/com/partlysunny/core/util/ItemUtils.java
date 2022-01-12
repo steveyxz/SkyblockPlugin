@@ -1,11 +1,12 @@
-package com.partlysunny.core.items.stats;
+package com.partlysunny.core.util;
 
+import com.partlysunny.core.stats.Stat;
 import de.tr7zw.nbtapi.NBTItem;
 
-public class ItemStats {
+public class ItemUtils {
 
-    public static NBTItem setItemStats(NBTItem item, ItemStat... stats) {
-        for (ItemStat s : stats) {
+    public static NBTItem setItemStats(NBTItem item, Stat... stats) {
+        for (Stat s : stats) {
             if (s.value() == 0) {
                 item.removeKey(s.type().id());
                 continue;

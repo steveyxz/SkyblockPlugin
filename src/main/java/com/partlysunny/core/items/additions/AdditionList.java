@@ -68,6 +68,9 @@ public class AdditionList {
     }
 
     public void addAdditions(NBTCompound additions) {
+        if (additions == null) {
+            return;
+        }
         for (String s : additions.getKeys()) {
             addAdditions(AdditionManager.getAddition(s), additions.getInteger(s));
         }

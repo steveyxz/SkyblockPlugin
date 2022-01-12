@@ -1,12 +1,12 @@
 package com.partlysunny.items;
 
-import com.partlysunny.core.StatList;
-import com.partlysunny.core.StatType;
+import com.partlysunny.core.stats.StatList;
+import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.SkyblockItem;
 import com.partlysunny.core.items.abilities.AbilityList;
-import com.partlysunny.core.items.stats.ItemStat;
+import com.partlysunny.core.stats.Stat;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -42,14 +42,14 @@ public class UltraChestplate extends SkyblockItem {
     @Override
     public StatList getStats() {
         return new StatList(
-                new ItemStat(StatType.CRIT_CHANCE, 40),
-                new ItemStat(StatType.CRIT_DAMAGE, 300),
-                new ItemStat(StatType.ATTACK_SPEED, 20),
-                new ItemStat(StatType.MAGIC_FIND, 10),
-                new ItemStat(StatType.INTELLIGENCE, 280),
-                new ItemStat(StatType.STRENGTH, 120),
-                new ItemStat(StatType.DEFENSE, 420),
-                new ItemStat(StatType.HEALTH, 620)
+                new Stat(StatType.CRIT_CHANCE, 40),
+                new Stat(StatType.CRIT_DAMAGE, 300),
+                new Stat(StatType.ATTACK_SPEED, 20),
+                new Stat(StatType.MAGIC_FIND, 10),
+                new Stat(StatType.INTELLIGENCE, 280),
+                new Stat(StatType.STRENGTH, 120),
+                new Stat(StatType.DEFENSE, 420),
+                new Stat(StatType.MAX_HEALTH, 620)
         );
     }
 

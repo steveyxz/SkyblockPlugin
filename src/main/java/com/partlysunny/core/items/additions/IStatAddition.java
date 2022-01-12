@@ -1,6 +1,6 @@
 package com.partlysunny.core.items.additions;
 
-import com.partlysunny.core.StatList;
+import com.partlysunny.core.stats.StatList;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;

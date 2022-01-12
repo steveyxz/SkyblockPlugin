@@ -1,7 +1,6 @@
-package com.partlysunny.core;
+package com.partlysunny.core.stats;
 
-import com.partlysunny.core.items.stats.ItemStat;
-import com.partlysunny.core.items.stats.ItemStats;
+import com.partlysunny.core.util.ItemUtils;
 import de.tr7zw.nbtapi.NBTItem;
 
 import java.util.HashMap;
@@ -9,18 +8,18 @@ import java.util.Map;
 
 public class StatList {
 
-    public final Map<StatType, ItemStat> statList = new HashMap<>();
+    public final Map<StatType, Stat> statList = new HashMap<>();
 
     public StatList() {
     }
 
-    public StatList(ItemStat... stats) {
-        for (ItemStat stat : stats) {
+    public StatList(Stat... stats) {
+        for (Stat stat : stats) {
             statList.put(stat.type(), stat);
         }
     }
 
-    public void addStat(ItemStat stat) {
+    public void addStat(Stat stat) {
         statList.put(stat.type(), stat);
     }
 
@@ -28,18 +27,18 @@ public class StatList {
         statList.remove(type);
     }
 
-    public void removeStat(ItemStat stat) {
+    public void removeStat(Stat stat) {
         statList.remove(stat.type());
     }
 
     public NBTItem applyStats(NBTItem item) {
-        return ItemStats.setItemStats(item, asList());
+        return ItemUtils.setItemStats(item, asList());
     }
 
-    public ItemStat[] asList() {
-        ItemStat[] returned = new ItemStat[statList.size()];
+    public Stat[] asList() {
+        Stat[] returned = new Stat[statList.size()];
         int count = 0;
-        for (ItemStat s : statList.values()) {
+        for (Stat s : statList.values()) {
             returned[count] = s;
             count++;
         }

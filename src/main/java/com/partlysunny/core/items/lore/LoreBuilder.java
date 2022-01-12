@@ -1,7 +1,7 @@
 package com.partlysunny.core.items.lore;
 
-import com.partlysunny.core.StatList;
-import com.partlysunny.core.StatType;
+import com.partlysunny.core.stats.StatList;
+import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.ModifierType;
@@ -14,7 +14,7 @@ import com.partlysunny.core.items.additions.AdditionList;
 import com.partlysunny.core.items.additions.IStatAddition;
 import com.partlysunny.core.items.additions.reforges.Reforge;
 import com.partlysunny.core.items.additions.reforges.ReforgeManager;
-import com.partlysunny.core.items.stats.ItemStat;
+import com.partlysunny.core.stats.Stat;
 import com.partlysunny.core.util.DataUtils;
 import com.partlysunny.core.util.TextUtils;
 import org.bukkit.ChatColor;
@@ -151,7 +151,7 @@ public class LoreBuilder {
             sorted = new HashMap<>();
             for (Addition a : additionList) {
                 IStatAddition isa = (IStatAddition) a;
-                for (ItemStat s : isa.getStats(player).asList()) {
+                for (Stat s : isa.getStats(player).asList()) {
                     if (sorted.containsKey(s.type())) {
                         sorted.get(s.type()).put(a.type(), s.value());
                     } else {
@@ -163,15 +163,15 @@ public class LoreBuilder {
             realSorted = new TreeMap<>(Comparator.comparingInt(StatType::level));
             realSorted.putAll(sorted);
         }
-        ItemStat[] reforgeAdditions = null;
+        Stat[] reforgeAdditions = null;
         if (reforgeBonus != null && reforgeName != null) {
             reforgeAdditions = reforgeBonus.asList();
         }
-        List<ItemStat> listed = new ArrayList<>(stats.statList.values());
-        Comparator<ItemStat> compareByType = Comparator.comparingInt(o -> (o.type().level()));
+        List<Stat> listed = new ArrayList<>(stats.statList.values());
+        Comparator<Stat> compareByType = Comparator.comparingInt(o -> (o.type().level()));
         listed.sort(compareByType);
         statLore.clear();
-        for (ItemStat s : listed) {
+        for (Stat s : listed) {
             StatType type = s.type();
             StringBuilder stat = new StringBuilder();
             if (type.isGreen()) {
@@ -192,7 +192,7 @@ public class LoreBuilder {
                 }
             }
             if (reforgeAdditions != null) {
-                for (ItemStat reforgeStat : reforgeAdditions) {
+                for (Stat reforgeStat : reforgeAdditions) {
                     if (reforgeStat.type() == type) {
                         stat.append(" ").append(ChatColor.BLUE).append("(").append(reforgeName).append(" +").append(getIntegerStringOf(reforgeStat.value())).append(")");
                     }
@@ -244,13 +244,20 @@ public class LoreBuilder {
             }
         }
         if (statAbilityLore.size() > 0) {
+            if (!hasDescription && statLore.size() > 0) {
+                lore.remove(lore.size() - 1);
+            }
             lore.addAll(statAbilityLore);
+        } else {
+            if (lore.size() > 0 && hasDescription) {
+                lore.add("");
+            }
         }
         if (abilityLore.size() > 0) {
             lore.addAll(abilityLore);
             lore.add("");
         } else {
-            if (lore.size() > 0 && hasDescription) {
+            if (lore.size() > 0 && statAbilityLore.size() > 0) {
                 lore.add("");
             }
         }

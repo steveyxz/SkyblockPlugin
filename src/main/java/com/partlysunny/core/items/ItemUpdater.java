@@ -1,11 +1,6 @@
 package com.partlysunny.core.items;
 
 import com.partlysunny.core.ConsoleLogger;
-import com.partlysunny.core.StatType;
-import com.partlysunny.core.enums.VanillaArmorAttributes;
-import com.partlysunny.core.enums.VanillaDamageAttributes;
-import com.partlysunny.core.items.stats.ItemStat;
-import com.partlysunny.core.items.stats.ItemStats;
 import com.partlysunny.core.util.DataUtils;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
@@ -32,7 +27,7 @@ public class ItemUpdater implements Listener {
         NBTItem nbti = new NBTItem(i);
         if (nbti.hasKey("sb_unique_id")) {
             UUID sb_unique_id = nbti.getUUID("sb_unique_id");
-            if (!nbti.getBoolean("vanilla") && !items.containsKey(sb_unique_id)) {
+            if (nbti.getBoolean("sb_unique") && !items.containsKey(sb_unique_id)) {
                 items.put(sb_unique_id, SkyblockItem.getItemFrom(i, player));
             }
         }
@@ -43,16 +38,7 @@ public class ItemUpdater implements Listener {
     }
 
     public static ItemStack transformNBT(ItemStack i) {
-        NBTItem nbti = new NBTItem(i);
-        try {
-            ItemStats.setItemStats(nbti, new ItemStat(StatType.DAMAGE, VanillaDamageAttributes.valueOf(i.getType().toString()).getDamage() * 5));
-        } catch (Exception ignored) {
-        }
-        try {
-            ItemStats.setItemStats(nbti, new ItemStat(StatType.DEFENSE, VanillaArmorAttributes.valueOf(i.getType().toString()).getDefense()));
-        } catch (Exception ignored) {
-        }
-        return DataUtils.convertVanilla(nbti.getItem());
+        return DataUtils.convertVanilla(DataUtils.setVanillaStats(i));
     }
 
     public static void updateVanilla(Inventory inv, Player p) {
@@ -68,10 +54,16 @@ public class ItemUpdater implements Listener {
         }
     }
 
-    public static ItemStack getVanilla(ItemStack s, Player entity) {
+    public static ItemStack getVanilla(ItemStack s, Player player) {
         NBTItem nbtItem = new NBTItem(s);
         if (nbtItem.hasKey("vanilla") && nbtItem.getBoolean("vanilla")) {
-            //TODO update vanilla items
+            SkyblockItem i = SkyblockItem.getItemFrom(s, player);
+            if (i == null) {
+                ConsoleLogger.console("Null vanilla item obtained?");
+                return s;
+            }
+            i.updateSkyblockItem();
+            return i.getSkyblockItem();
         }
         if (!nbtItem.hasKey("sb_id")) {
             ItemStack transformed = transformNBT(s);

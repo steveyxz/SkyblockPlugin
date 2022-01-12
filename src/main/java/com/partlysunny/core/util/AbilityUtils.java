@@ -18,7 +18,7 @@ public class AbilityUtils {
             return false;
         }
         NBTItem nbti = new NBTItem(i);
-        if (nbti.getBoolean("vanilla") || !nbti.getBoolean("sb_unique")) {
+        if (!nbti.getBoolean("sb_unique")) {
             return false;
         }
         UUID sb_unique_id = nbti.getUUID("sb_unique_id");
@@ -26,9 +26,11 @@ public class AbilityUtils {
             ItemUpdater.registerItem(i);
         }
         SkyblockItem sbi = ItemUpdater.items.get(sb_unique_id);
-        for (Ability a : sbi.getAbilities().asList()) {
-            if (Objects.equals(a.id(), type)) {
-                return true;
+        if (sbi.getAbilities() != null) {
+            for (Ability a : sbi.getAbilities().asList()) {
+                if (Objects.equals(a.id(), type)) {
+                    return true;
+                }
             }
         }
         for (IAbilityAddition a : sbi.abilityAdditions().asAbilityList()) {

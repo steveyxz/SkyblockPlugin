@@ -2,9 +2,9 @@ package com.partlysunny.core.util;
 
 import com.partlysunny.Skyblock;
 import com.partlysunny.core.ConsoleLogger;
-import com.partlysunny.core.StatList;
-import com.partlysunny.core.StatType;
 import com.partlysunny.core.enums.Rarity;
+import com.partlysunny.core.enums.VanillaArmorAttributes;
+import com.partlysunny.core.enums.VanillaDamageAttributes;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.SkyblockItem;
 import com.partlysunny.core.items.abilities.AbilityList;
@@ -12,7 +12,9 @@ import com.partlysunny.core.items.additions.reforges.Reforge;
 import com.partlysunny.core.items.additions.reforges.ReforgeManager;
 import com.partlysunny.core.items.lore.LoreBuilder;
 import com.partlysunny.core.items.name.NameBuilder;
-import com.partlysunny.core.items.stats.ItemStat;
+import com.partlysunny.core.stats.Stat;
+import com.partlysunny.core.stats.StatList;
+import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.util.classes.Pair;
 import de.tr7zw.nbtapi.NBTItem;
 import org.bukkit.Material;
@@ -71,7 +73,7 @@ public class DataUtils {
             return null;
         }
         NBTItem i = new NBTItem(stack);
-        if (!i.getBoolean("vanilla") && i.getBoolean("sb_unique")) {
+        if (i.getBoolean("sb_unique")) {
             if (!items.containsKey(i.getUUID("sb_unique_id"))) {
                 registerItem(stack, p);
             }
@@ -110,7 +112,7 @@ public class DataUtils {
 
                 @Override
                 public StatList getStats() {
-                    return null;
+                    return getVanillaStats(s.getType());
                 }
 
                 @Override
@@ -129,6 +131,32 @@ public class DataUtils {
             return skyblockItem;
         }
         return null;
+    }
+
+    public static ItemStack setVanillaStats(ItemStack i) {
+        NBTItem nbti = new NBTItem(i);
+        try {
+            ItemUtils.setItemStats(nbti, new Stat(StatType.DAMAGE, VanillaDamageAttributes.valueOf(i.getType().toString()).getDamage() * 5));
+        } catch (Exception ignored) {
+        }
+        try {
+            ItemUtils.setItemStats(nbti, new Stat(StatType.DEFENSE, VanillaArmorAttributes.valueOf(i.getType().toString()).getDefense()));
+        } catch (Exception ignored) {
+        }
+        return nbti.getItem();
+    }
+
+    public static StatList getVanillaStats(Material i) {
+        StatList stl = new StatList();
+        try {
+            stl.addStat(new Stat(StatType.DAMAGE, VanillaDamageAttributes.valueOf(i.toString()).getDamage() * 5));
+        } catch (Exception ignored) {
+        }
+        try {
+            stl.addStat(new Stat(StatType.DEFENSE, VanillaArmorAttributes.valueOf(i.toString()).getDefense()));
+        } catch (Exception ignored) {
+        }
+        return stl;
     }
 
     public static SkyblockItem createSkyblockItemFromVanilla(Material s, @Nullable Player player) {
@@ -155,7 +183,7 @@ public class DataUtils {
 
             @Override
             public StatList getStats() {
-                return null;
+                return getVanillaStats(s);
             }
 
             @Override
@@ -201,6 +229,7 @@ public class DataUtils {
                 .setDescription("")
                 .setRarity(Rarity.COMMON)
                 .setStats(readStats(i), null, null, null)
+                .setType(getTypeOfItem(i.getType()))
                 .build()
         );
         m.addItemFlags(ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_DESTROYS, ItemFlag.HIDE_UNBREAKABLE, ItemFlag.HIDE_PLACED_ON);
@@ -221,7 +250,7 @@ public class DataUtils {
         StatList r = new StatList();
         for (StatType s : StatType.values()) {
             if (i.hasKey(s.id())) {
-                r.addStat(new ItemStat(s, i.getInteger(s.id())));
+                r.addStat(new Stat(s, i.getInteger(s.id())));
             }
         }
         return r;

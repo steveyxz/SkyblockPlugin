@@ -1,7 +1,7 @@
 package com.partlysunny.core.items.additions.reforges;
 
 import com.partlysunny.Skyblock;
-import com.partlysunny.core.StatList;
+import com.partlysunny.core.stats.StatList;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.SkyblockItem;
 import org.bukkit.event.Listener;

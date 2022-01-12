@@ -1,12 +1,12 @@
 package com.partlysunny.core.items;
 
 import com.partlysunny.Skyblock;
-import com.partlysunny.core.StatList;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.abilities.AbilityList;
 import com.partlysunny.core.items.additions.*;
 import com.partlysunny.core.items.lore.LoreBuilder;
 import com.partlysunny.core.items.name.NameBuilder;
+import com.partlysunny.core.stats.StatList;
 import com.partlysunny.core.util.DataUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
@@ -79,10 +79,19 @@ public abstract class SkyblockItem implements Listener {
         NBTItem nbti = new NBTItem(s);
         ItemInfo type = ItemManager.getInfoFromId(nbti.getString("sb_id"));
         if (type == null) {
-            System.out.println("Bad Type: " + nbti.getString("sb_id"));
-            return null;
+            if (nbti.getBoolean("vanilla")) {
+                type = new ItemInfo(s.getType().toString().toLowerCase(), null, DataUtils.getTypeOfItem(s.getType()));
+            } else {
+                System.out.println("Bad Type: " + nbti.getString("sb_id"));
+                return null;
+            }
         }
-        SkyblockItem item = ItemManager.getInstance(type);
+        SkyblockItem item;
+        if (nbti.getBoolean("vanilla")) {
+            item = DataUtils.createSkyblockItemFromVanilla(s, player);
+        } else {
+            item = ItemManager.getInstance(type);
+        }
         if (item == null) {
             System.out.println("Bad Instance");
             return null;
@@ -150,6 +159,7 @@ public abstract class SkyblockItem implements Listener {
                 item.rarityAdditions.addAdditions(AdditionManager.getAddition(key), amount);
             }
         }
+        item.updateSkyblockItem();
         return item;
     }
 
@@ -375,7 +385,9 @@ public abstract class SkyblockItem implements Listener {
                 uniqueId = null;
             }
         }
-        nbti = getStats().applyStats(nbti);
+        if (getStats() != null) {
+            nbti = getStats().applyStats(nbti);
+        }
         nbti = statAdditions.applyAdditions(nbti);
         nbti = rarityAdditions.applyAdditions(nbti);
         nbti = abilityAdditions.applyAdditions(nbti);
