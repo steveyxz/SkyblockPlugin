@@ -1,15 +1,25 @@
 package com.partlysunny.core.entities;
 
 import com.partlysunny.Skyblock;
+import com.partlysunny.core.ConsoleLogger;
 import com.partlysunny.core.entities.stats.EntityStatType;
+import com.partlysunny.core.player.BaseStatManager;
+import com.partlysunny.core.player.PlayerStatManager;
+import com.partlysunny.core.player.PlayerUpdater;
+import com.partlysunny.core.stats.StatList;
+import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.util.EntityUtils;
+import com.partlysunny.core.util.NumberUtils;
+import com.partlysunny.core.util.TextUtils;
 import com.partlysunny.core.util.classes.Pair;
 import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -18,11 +28,14 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.Random;
+import java.util.UUID;
 
 import static com.partlysunny.core.entities.stats.EntityStatType.getStat;
 
@@ -55,9 +68,9 @@ public class DamageManager implements Listener {
         temp.setNoGravity(true);
         temp.noCulling = true;
         if (critical) {
-            temp.setCustomName(new TextComponent(getCritText(EntityUtils.getHealthText(damage))));
+            temp.setCustomName(new TextComponent(getCritText(TextUtils.getHealthText(damage))));
         } else {
-            temp.setCustomName(new TextComponent(ChatColor.GRAY + EntityUtils.getHealthText(damage)));
+            temp.setCustomName(new TextComponent(ChatColor.GRAY + TextUtils.getHealthText(damage)));
         }
         temp.setCustomNameVisible(true);
         EntityUtils.spawnEntity(temp);
@@ -94,13 +107,67 @@ public class DamageManager implements Listener {
         return temp.toString();
     }
 
-    public static Pair<Double, Boolean> getHitDamage(Player p, boolean ignoreHand) {
-        //TODO player stats + damage
-        return new Pair<>(140000D, false);
+    @EventHandler
+    public void onHungerDeplete(FoodLevelChangeEvent e) {
+        if (e.getEntity() instanceof Player p) {
+            e.setCancelled(true);
+            p.setFoodLevel(20);
+            p.setSaturation(0);
+        }
     }
 
-    public static double getHitDamageOn(Player p, double rawDamage) {
-        return rawDamage;
+    public static Pair<Double, Boolean> getHitDamage(Player p, boolean ignoreHand) {
+        StatList stats = PlayerUpdater.getStats(p, ignoreHand);
+        double damage = (5 + stats.getStat(StatType.DAMAGE)) * (1 + stats.getStat(StatType.STRENGTH) / 100);
+        double multiplier = /*TODO combat level*/ stats.getStat(StatType.DAMAGE_MULTIPLIER);
+        double critBonus = 1 + stats.getStat(StatType.CRIT_DAMAGE) / 100;
+        boolean critical = new Random().nextInt(100) < stats.getStat(StatType.CRIT_CHANCE);
+        double finalDamage = damage * multiplier * (critical ? critBonus : 1);
+        if (finalDamage > 50) {
+            finalDamage = finalDamage + (new Random().nextInt((int) Math.floor(finalDamage / 25)) - (int) Math.floor(finalDamage / 50));
+        }
+        return new Pair<>(finalDamage, critical);
+    }
+
+    public static double getHitDamageOn(Player p, double rawDamage, boolean trueDamage) {
+        StatList stats = PlayerUpdater.getStats(p, false);
+        if (trueDamage) {
+            return rawDamage;
+        }
+        double defense = stats.getStat(StatType.DEFENSE);
+        return rawDamage - ((defense / (defense + 100)) * rawDamage);
+    }
+
+    public static void damagePlayer(Player p, double damage) {
+        UUID uniqueId = p.getUniqueId();
+        PlayerStatManager.changeStat(uniqueId, StatType.HEALTH, -damage);
+        double health = PlayerStatManager.getStat(uniqueId, StatType.HEALTH);
+        double maxHealth = PlayerStatManager.getStat(uniqueId, StatType.MAX_HEALTH);
+        updatePlayerHealthBar(p, health, maxHealth);
+    }
+
+    public static void updatePlayerHealthBar(Player p, double sbHp, double sbMaxHp) {
+        if (sbHp < 1) {
+            setHealth(p, 0);
+        } else {
+            double newHp = 20;
+            if (sbMaxHp < 200) {
+                p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20);
+            } else {
+                p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(20 + NumberUtils.clamp((int) (sbMaxHp / 50f), 0, 20));
+            }
+            if (sbHp - 100 < 0) {
+                newHp = sbHp / 5;
+            } else {
+                newHp += NumberUtils.clamp((int) (sbHp / 50f), 0, 20);
+            }
+            setHealth(p, newHp);
+        }
+    }
+
+    public static void setHealth(Player p, double health) {
+        net.minecraft.world.entity.player.Player player = ((CraftPlayer) p).getHandle();
+        player.setHealth((float) health);
     }
 
     @EventHandler
@@ -114,10 +181,16 @@ public class DamageManager implements Listener {
         e.setDamage(0);
         if (!(damager instanceof Player)) {
             if (receiver instanceof Player) {
+                damagePlayer((Player) receiver, getHitDamageOn((Player) receiver, EntityStatType.getStat(damager, EntityStatType.DAMAGE), false));
             } else {
                 dealDamage(receiver, getStat(damager, EntityStatType.DAMAGE), false, false);
             }
         }
+    }
+
+    @EventHandler
+    public void playerDie(PlayerRespawnEvent e) {
+        BaseStatManager.initializeStats(e.getPlayer());
     }
 
     @EventHandler
@@ -150,6 +223,7 @@ public class DamageManager implements Listener {
         receiver.damage(0, damager);
         if (!(damager instanceof Player)) {
             if (receiver instanceof Player) {
+                damagePlayer((Player) receiver, getHitDamageOn((Player) receiver, EntityStatType.getStat(damager, EntityStatType.DAMAGE), false));
             } else {
                 dealDamage(receiver, getStat(damager, EntityStatType.DAMAGE), false, false);
             }
@@ -166,6 +240,7 @@ public class DamageManager implements Listener {
         receiver.damage(0, damager);
         if (damager instanceof Player) {
             if (receiver instanceof Player) {
+                e.setCancelled(true);
             } else {
                 Pair<Double, Boolean> hitDamage = getHitDamage((Player) damager, false);
                 dealDamage(receiver, hitDamage.a(), hitDamage.b(), true);
@@ -183,7 +258,11 @@ public class DamageManager implements Listener {
                 e.getCause() != EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK &&
                 e.getCause() != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION
         ) {
-            dealDamage((LivingEntity) e.getEntity(), e.getDamage() * 5, false, true);
+            if (e.getEntity() instanceof Player) {
+                damagePlayer((Player) e.getEntity(), getHitDamageOn((Player) e.getEntity(), e.getDamage() * 5, false));
+            } else {
+                dealDamage((LivingEntity) e.getEntity(), e.getDamage() * 5, false, true);
+            }
             e.setDamage(0);
         }
     }

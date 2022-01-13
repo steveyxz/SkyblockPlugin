@@ -24,6 +24,7 @@ public class SkyblockGive implements CommandExecutor {
         }
         SkyblockItem instance = ItemManager.getInstance(infoFromId, p);
         if (instance != null) {
+            instance.updateSkyblockItem();
             if (strings.length > 1) {
                 try {
                     instance.setStackCount(Integer.parseInt(strings[1]));

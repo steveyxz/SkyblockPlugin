@@ -4,7 +4,11 @@ import com.partlysunny.core.stats.StatType;
 import org.bukkit.ChatColor;
 import org.bukkit.util.ChatPaginator;
 
+import java.text.CompactNumberFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.List;
+import java.util.Locale;
 
 public class TextUtils {
 
@@ -21,6 +25,20 @@ public class TextUtils {
             capitalizeWord.append(first.toUpperCase()).append(afterFirst).append(" ");
         }
         return capitalizeWord.toString().trim();
+    }
+
+    public static String getHealthText(Double num) {
+        final String[] cp
+                = {"", "", "", "", "", "000K", "0M", "00M", "000M", "0B", "00B", "000B", "0T", "00T", "000T", "0Qa", "00Qa", "000Qa", "0Qi", "00Qi", "000Qi", "0Sx", "00Sx", "000Sx", "0Sp", "00Sp", "000Sp"};
+        final DecimalFormat df
+                = (DecimalFormat) NumberFormat.getInstance(new Locale("en", "US"));
+        NumberFormat fmt = new CompactNumberFormat(df.toPattern(), df.getDecimalFormatSymbols(), cp);
+        fmt.setMinimumFractionDigits(1);
+        String format = fmt.format(num);
+        if (format.contains(".0")) {
+            format = format.replace(".0", "");
+        }
+        return format;
     }
 
     /**

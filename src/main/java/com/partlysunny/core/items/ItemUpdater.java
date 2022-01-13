@@ -10,7 +10,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
@@ -167,18 +166,6 @@ public class ItemUpdater implements Listener {
             e.setCancelled(true);
         }
         updateInventory(e.getInventory(), (Player) e.getPlayer());
-    }
-
-    @EventHandler(priority = EventPriority.LOW)
-    public void onInventoryInteract(InventoryClickEvent e) {
-        if (e.getClickedInventory() == null) {
-            return;
-        }
-        updateVanilla(e.getClickedInventory(), (Player) e.getWhoClicked());
-        for (Integer i : idify(e.getInventory(), (Player) e.getWhoClicked())) {
-            e.setCancelled(true);
-        }
-        updateInventory(e.getClickedInventory(), (Player) e.getWhoClicked());
     }
 
     @EventHandler(priority = EventPriority.HIGH)

@@ -46,6 +46,7 @@ public class SkyblockAddAddition implements CommandExecutor {
                 sbi.rarityAdditions().addAddition(instance);
                 a = true;
             }
+            p.getInventory().setItemInMainHand(sbi.getSkyblockItem());
             if (a) {
                 p.sendMessage(ChatColor.GREEN + "Successfully applied the addition " + info.id() + " to your held item");
             } else {
@@ -70,6 +71,7 @@ public class SkyblockAddAddition implements CommandExecutor {
                 sbi.rarityAdditions().addAddition(instance);
                 a = true;
             }
+            p.getInventory().setItemInMainHand(sbi.getSkyblockItem());
             if (a) {
                 p.sendMessage(ChatColor.GREEN + "Successfully applied the addition " + info.id() + " to your held item");
             } else {

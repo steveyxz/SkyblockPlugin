@@ -1,6 +1,7 @@
 package com.partlysunny.core.items;
 
 import com.partlysunny.Skyblock;
+import com.partlysunny.core.ConsoleLogger;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.abilities.AbilityList;
 import com.partlysunny.core.items.additions.*;
@@ -10,6 +11,7 @@ import com.partlysunny.core.stats.StatList;
 import com.partlysunny.core.util.DataUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
+import de.tr7zw.nbtapi.NBTListCompound;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -199,6 +201,18 @@ public abstract class SkyblockItem implements Listener {
         return itemStack;
     }
 
+    public UUID skullId() {
+        return null;
+    }
+
+    public String skullValue() {
+        return null;
+    }
+
+    public Integer getColor() {
+        return null;
+    }
+
     public ItemType type() {
         return type;
     }
@@ -363,6 +377,18 @@ public abstract class SkyblockItem implements Listener {
         nbti.setBoolean("fragged", fragged);
         nbti.setInteger("stars", stars);
         nbti.setString("reforge", reforge);
+        if (skullId() != null) {
+            NBTCompound skull = nbti.addCompound("SkullOwner");
+            skull.setString("Name", "a");
+            skull.setString("Id", skullId().toString());
+
+            NBTListCompound texture = skull.addCompound("Properties").getCompoundList("textures").addCompound();
+            texture.setString("Value", skullValue());
+        }
+        if (getColor() != null) {
+            ConsoleLogger.console(getColor().toString());
+            nbti.getCompound("display").setInteger("color", getColor());
+        }
         if ((fragged || stars > 0 || (reforge != null && !reforge.equals(""))) && !unique) {
             unique = true;
             if (uniqueId == null) {
@@ -385,6 +411,7 @@ public abstract class SkyblockItem implements Listener {
                 uniqueId = null;
             }
         }
+        System.out.println(nbti);
         if (getStats() != null) {
             nbti = getStats().applyStats(nbti);
         }

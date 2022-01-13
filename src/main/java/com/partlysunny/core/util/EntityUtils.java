@@ -10,10 +10,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import static com.partlysunny.core.entities.stats.EntityStatType.*;
+import static com.partlysunny.core.util.TextUtils.getHealthText;
 
 public class EntityUtils {
     //This option will make the entity health display as one number instead of x/x (0=true, 1=false)
@@ -124,17 +122,6 @@ public class EntityUtils {
             }
         }
         return "NULL";
-    }
-
-    public static String getHealthText(Double num) {
-        NumberFormat fmt = NumberFormat.getCompactNumberInstance(
-                new Locale("en", "US"), NumberFormat.Style.SHORT);
-        fmt.setMinimumFractionDigits(1);
-        String format = fmt.format(num);
-        if (format.contains(".0")) {
-            format = format.replace(".0", "");
-        }
-        return format;
     }
 
     public static void setEntityInfo(Entity e, String id) {

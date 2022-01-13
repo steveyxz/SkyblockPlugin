@@ -19,6 +19,9 @@ public class BaseStatManager {
     private static final YamlConfiguration baseStats = configManager.getConfig("baseStats");
     private static final HashMap<String, Double> defaultStats = new HashMap<>() {{
         put(StatType.HEALTH.toString(), 100D);
+        put(StatType.DAMAGE_MULTIPLIER.toString(), 1D);
+        put(StatType.HEALTH_REGEN_SPEED.toString(), 1.5D);
+        put(StatType.MANA_REGEN_SPEED.toString(), 2D);
         put(StatType.MAX_HEALTH.toString(), 100D);
         put(StatType.DAMAGE.toString(), 1D);
         put(StatType.SPEED.toString(), 100D);
@@ -60,6 +63,11 @@ public class BaseStatManager {
         }
         for (StatType t : StatType.values()) {
             double amount = baseStats.getDouble(id + "." + t.toString());
+            if (!baseStats.contains(id + "." + t)) {
+                baseStats.set(id + "." + t, defaultStats.get(t.toString()));
+                configManager.saveConfig("baseStats", baseStats);
+                amount = defaultStats.get(t.toString());
+            }
             list.add(new Stat(t, amount));
         }
         return list;

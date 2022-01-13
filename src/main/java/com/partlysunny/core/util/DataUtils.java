@@ -78,6 +78,10 @@ public class DataUtils {
                 registerItem(stack, p);
             }
             return items.get(i.getUUID("sb_unique_id"));
+        } else {
+            if (i.getBoolean("vanilla")) {
+                return createSkyblockItemFromVanilla(stack, p);
+            }
         }
         return null;
     }

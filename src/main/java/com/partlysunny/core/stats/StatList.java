@@ -19,6 +19,11 @@ public class StatList {
         }
     }
 
+    public double getStat(StatType type) {
+        Stat stat = statList.get(type);
+        return stat == null ? 0 : stat.value();
+    }
+
     public void addStat(Stat stat) {
         statList.put(stat.type(), stat);
     }

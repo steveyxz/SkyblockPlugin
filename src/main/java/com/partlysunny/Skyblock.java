@@ -8,6 +8,7 @@ import com.partlysunny.core.entities.DamageManager;
 import com.partlysunny.core.entities.EntityUpdater;
 import com.partlysunny.core.items.ItemUpdater;
 import com.partlysunny.core.player.PlayerStatManager;
+import com.partlysunny.core.player.PlayerUpdater;
 import com.partlysunny.core.util.ConfigManager;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -74,6 +75,7 @@ public final class Skyblock extends JavaPlugin {
         this.getServer().getPluginManager().registerEvents(new EntityUpdater(getServer()), this);
         this.getServer().getPluginManager().registerEvents(new DamageManager(), this);
         this.getServer().getPluginManager().registerEvents(new PlayerStatManager(), this);
+        this.getServer().getPluginManager().registerEvents(new PlayerUpdater(getServer()), this);
     }
 
     @Override

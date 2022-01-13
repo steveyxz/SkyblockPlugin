@@ -1,7 +1,5 @@
 package com.partlysunny.core.items.lore;
 
-import com.partlysunny.core.stats.StatList;
-import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.ModifierType;
@@ -15,13 +13,16 @@ import com.partlysunny.core.items.additions.IStatAddition;
 import com.partlysunny.core.items.additions.reforges.Reforge;
 import com.partlysunny.core.items.additions.reforges.ReforgeManager;
 import com.partlysunny.core.stats.Stat;
+import com.partlysunny.core.stats.StatList;
+import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.util.DataUtils;
 import com.partlysunny.core.util.TextUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
-import java.math.BigDecimal;
 import java.util.*;
+
+import static com.partlysunny.core.util.NumberUtils.getIntegerStringOf;
 
 public class LoreBuilder {
 
@@ -175,9 +176,9 @@ public class LoreBuilder {
             StatType type = s.type();
             StringBuilder stat = new StringBuilder();
             if (type.isGreen()) {
-                stat.append(ChatColor.GRAY).append(type.displayName()).append(": ").append(ChatColor.GREEN).append("+").append(getIntegerStringOf(s.value())).append(type.percent() ? "%" : "");
+                stat.append(ChatColor.GRAY).append(type.displayName()).append(": ").append(ChatColor.GREEN).append("+").append(getIntegerStringOf(s.value(), 1)).append(type.percent() ? "%" : "");
             } else {
-                stat.append(ChatColor.GRAY).append(type.displayName()).append(": ").append(ChatColor.RED).append("+").append(getIntegerStringOf(s.value())).append(type.percent() ? "%" : "");
+                stat.append(ChatColor.GRAY).append(type.displayName()).append(": ").append(ChatColor.RED).append("+").append(getIntegerStringOf(s.value(), 1)).append(type.percent() ? "%" : "");
             }
             if (additions != null) {
                 if (realSorted.containsKey(s.type())) {
@@ -187,31 +188,20 @@ public class LoreBuilder {
                             continue;
                         }
                         Double amount = sortedValue.get(t);
-                        stat.append(" ").append(t.color()).append(t.bt().start()).append(amount > -1 ? "+" : "-").append(getIntegerStringOf(amount)).append(type.percent() ? "%" : "").append(t.bt().end());
+                        stat.append(" ").append(t.color()).append(t.bt().start()).append(amount > -1 ? "+" : "-").append(getIntegerStringOf(amount, 1)).append(type.percent() ? "%" : "").append(t.bt().end());
                     }
                 }
             }
             if (reforgeAdditions != null) {
                 for (Stat reforgeStat : reforgeAdditions) {
                     if (reforgeStat.type() == type) {
-                        stat.append(" ").append(ChatColor.BLUE).append("(").append(reforgeName).append(" +").append(getIntegerStringOf(reforgeStat.value())).append(")");
+                        stat.append(" ").append(ChatColor.BLUE).append("(").append(reforgeName).append(" +").append(getIntegerStringOf(reforgeStat.value(), 1)).append(")");
                     }
                 }
             }
             statLore.add(String.valueOf(stat));
         }
         return this;
-    }
-
-    private String getIntegerStringOf(double value) {
-        String s = Double.toString(value);
-        if (s.contains("E")) {
-            s = new BigDecimal(s).toPlainString();
-        }
-        if (s.endsWith(".0")) {
-            return s.substring(0, s.length() - 2);
-        }
-        return s;
     }
 
     public LoreBuilder setRarity(Rarity r) {
