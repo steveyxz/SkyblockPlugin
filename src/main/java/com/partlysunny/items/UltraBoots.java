@@ -62,6 +62,7 @@ public class UltraBoots extends SkyblockItem {
                 new Stat(StatType.ATTACK_SPEED, 20),
                 new Stat(StatType.MAGIC_FIND, 10),
                 new Stat(StatType.INTELLIGENCE, 100),
+                new Stat(StatType.SPEED, 120),
                 new Stat(StatType.STRENGTH, 320),
                 new Stat(StatType.DEFENSE, 350),
                 new Stat(StatType.MAX_HEALTH, 830)

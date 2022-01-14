@@ -106,7 +106,6 @@ public class LoreBuilder {
                 IStatAddition isa = (IStatAddition) a;
                 String lore = isa.getLore(player);
                 if (lore != null) {
-                    ConsoleLogger.console(TextUtils.getHighlightedText(lore));
                     List<String> formatted = TextUtils.wrap(TextUtils.getHighlightedText(lore), 30);
                     for (String s : formatted) {
                         statAbilityLore.add(ChatColor.GRAY + s);
@@ -139,6 +138,9 @@ public class LoreBuilder {
             }
             realSorted = new TreeMap<>(Comparator.comparingInt(StatType::level));
             realSorted.putAll(sorted);
+            realSorted.remove(StatType.SPEED_CAP);
+            realSorted.remove(StatType.HEALTH);
+            realSorted.remove(StatType.MANA);
         }
         Stat[] reforgeAdditions = null;
         if (reforgeBonus != null && reforgeName != null) {

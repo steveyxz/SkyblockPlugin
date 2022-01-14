@@ -12,6 +12,7 @@ public enum StatType {
     DEFENSE("sb_defense", "Defense", ChatColor.GREEN, "❈", false, 9, true),
     TRUE_DEFENSE("sb_true_defense", "True Defense", ChatColor.WHITE, "❂", false, 10, true),
     SPEED("sb_speed", "Speed", ChatColor.WHITE, "✦", false, 12, true),
+    SPEED_CAP("sb_speed_cap", "Speed Cap", ChatColor.WHITE, "✦", false, 0, true),
     INTELLIGENCE("sb_intelligence", "Intelligence", ChatColor.AQUA, "✎", false, 11, true),
     MANA("sb_mana", "Mana", ChatColor.AQUA, "✎", false, 11, true),
     CRIT_CHANCE("sb_crit_chance", "Crit Chance", ChatColor.BLUE, "☣", true, 3, false),

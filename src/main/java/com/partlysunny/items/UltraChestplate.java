@@ -64,6 +64,7 @@ public class UltraChestplate extends SkyblockItem {
                 new Stat(StatType.MAGIC_FIND, 10),
                 new Stat(StatType.INTELLIGENCE, 280),
                 new Stat(StatType.STRENGTH, 120),
+                new Stat(StatType.SPEED, 120),
                 new Stat(StatType.DEFENSE, 420),
                 new Stat(StatType.MAX_HEALTH, 620)
         );

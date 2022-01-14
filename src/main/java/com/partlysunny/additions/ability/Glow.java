@@ -1,6 +1,6 @@
 package com.partlysunny.additions.ability;
 
-import com.partlysunny.abilities.passive.piece.GlowAbility;
+import com.partlysunny.abilities.passive.fullSet.GlowAbility;
 import com.partlysunny.core.items.ModifierType;
 import com.partlysunny.core.items.SkyblockItem;
 import com.partlysunny.core.items.abilities.Ability;

@@ -62,6 +62,7 @@ public class UltraLeggings extends SkyblockItem {
                 new Stat(StatType.CRIT_DAMAGE, 240),
                 new Stat(StatType.ATTACK_SPEED, 15),
                 new Stat(StatType.INTELLIGENCE, 350),
+                new Stat(StatType.SPEED, 120),
                 new Stat(StatType.STRENGTH, 20),
                 new Stat(StatType.DEFENSE, 500),
                 new Stat(StatType.MAX_HEALTH, 530)

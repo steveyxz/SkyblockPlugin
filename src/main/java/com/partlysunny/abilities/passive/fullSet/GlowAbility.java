@@ -1,4 +1,4 @@
-package com.partlysunny.abilities.passive.piece;
+package com.partlysunny.abilities.passive.fullSet;
 
 import com.partlysunny.core.items.SkyblockItem;
 import com.partlysunny.core.items.abilities.Ability;

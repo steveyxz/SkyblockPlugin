@@ -23,6 +23,7 @@ public class BaseStatManager {
         put(StatType.MAX_HEALTH.toString(), 100D);
         put(StatType.DAMAGE.toString(), 1D);
         put(StatType.SPEED.toString(), 100D);
+        put(StatType.SPEED_CAP.toString(), 400D);
         put(StatType.MANA.toString(), 100D);
         put(StatType.INTELLIGENCE.toString(), 100D);
         put(StatType.CRIT_CHANCE.toString(), 30D);

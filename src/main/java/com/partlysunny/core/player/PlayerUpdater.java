@@ -10,6 +10,7 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -76,13 +77,23 @@ public class PlayerUpdater implements Listener {
             newStats.addStat(new Stat(StatType.MANA, newStats.getStat(StatType.INTELLIGENCE)));
             hasInitializedChangableStats.put(id, true);
         }
+        double speedCap = newStats.getStat(StatType.SPEED_CAP);
+        if (newStats.getStat(StatType.SPEED) > speedCap) {
+            newStats.addStat(new Stat(StatType.SPEED, speedCap));
+        }
         return newStats;
     }
 
     public static void updatePlayer(Player player) {
         StatList stats = getStats(player, false);
         double health = PlayerStatManager.getStat(player.getUniqueId(), StatType.HEALTH);
+        double speed = PlayerStatManager.getStat(player.getUniqueId(), StatType.SPEED);
+        double speedCap = PlayerStatManager.getStat(player.getUniqueId(), StatType.SPEED_CAP);
         double maxHealth = PlayerStatManager.getStat(player.getUniqueId(), StatType.MAX_HEALTH);
+        if (speed > speedCap) {
+            speed = speedCap;
+        }
+        ((CraftPlayer) player).getHandle().setSpeed((float) (0.2f * (speed / 100)));
         updatePlayerHealthBar(player, health, maxHealth);
         playerStats.put(player.getUniqueId(), stats);
     }

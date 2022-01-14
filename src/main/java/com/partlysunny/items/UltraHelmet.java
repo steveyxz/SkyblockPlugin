@@ -69,6 +69,7 @@ public class UltraHelmet extends SkyblockItem {
                 new Stat(StatType.MAGIC_FIND, 10),
                 new Stat(StatType.INTELLIGENCE, 100),
                 new Stat(StatType.STRENGTH, 320),
+                new Stat(StatType.SPEED, 120),
                 new Stat(StatType.DEFENSE, 250),
                 new Stat(StatType.MAX_HEALTH, 830)
         );
