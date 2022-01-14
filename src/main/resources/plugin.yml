@@ -15,8 +15,20 @@ commands:
     usage: /sbsummon <entity-id>
     permission: skyblock.op
   sbadd:
-    description: Adds and addition to your held item
+    description: Adds an addition to your held item
     usage: /sbadd <addition-id>
+    permission: skyblock.op
+  sbreforge:
+    description: Adds a reforge to your held item
+    usage: /sbreforge <reforge-id>
+    permission: skyblock.op
+  sbstar:
+    description: Adds a amount of stars to your held item (default 5)
+    usage: /sbstar [optional-amount]
+    permission: skyblock.op
+  sbfrag:
+    description: Sets your held item to fragged / unfragged (default true)
+    usage: /sbfrag [optional-boolean]
     permission: skyblock.op
 
 permissions:

@@ -21,6 +21,16 @@ public class UltraChestplate extends SkyblockItem {
     }
 
     @Override
+    public boolean fraggable() {
+        return true;
+    }
+
+    @Override
+    public boolean starrable() {
+        return true;
+    }
+
+    @Override
     public Material getDefaultItem() {
         return Material.LEATHER_CHESTPLATE;
     }

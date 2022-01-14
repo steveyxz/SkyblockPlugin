@@ -1,9 +1,7 @@
 package com.partlysunny;
 
 import com.partlysunny.core.ConsoleLogger;
-import com.partlysunny.core.commands.SkyblockAddAddition;
-import com.partlysunny.core.commands.SkyblockGive;
-import com.partlysunny.core.commands.SkyblockSummon;
+import com.partlysunny.core.commands.*;
 import com.partlysunny.core.entities.DamageManager;
 import com.partlysunny.core.entities.EntityUpdater;
 import com.partlysunny.core.items.ItemUpdater;
@@ -64,10 +62,14 @@ public final class Skyblock extends JavaPlugin {
         }
     }
 
+    @SuppressWarnings("all")
     private void registerCommands() {
         getCommand("sbgive").setExecutor(new SkyblockGive());
         getCommand("sbsummon").setExecutor(new SkyblockSummon());
         getCommand("sbadd").setExecutor(new SkyblockAddAddition());
+        getCommand("sbreforge").setExecutor(new SkyblockReforge());
+        getCommand("sbstar").setExecutor(new SkyblockStar());
+        getCommand("sbfrag").setExecutor(new SkyblockFrag());
     }
 
     private void registerListeners() {

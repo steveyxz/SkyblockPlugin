@@ -4,6 +4,7 @@ import com.partlysunny.Skyblock;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.abilities.AbilityList;
 import com.partlysunny.core.items.additions.*;
+import com.partlysunny.core.items.additions.reforges.ReforgeManager;
 import com.partlysunny.core.items.lore.LoreBuilder;
 import com.partlysunny.core.items.name.NameBuilder;
 import com.partlysunny.core.stats.StatList;
@@ -265,15 +266,29 @@ public abstract class SkyblockItem implements Listener {
     public abstract Rarity getRarity();
 
     public void setFragged(boolean fragged) {
-        this.fragged = fragged;
+        if (fraggable()) {
+            this.fragged = fragged;
+        }
+    }
+
+    public boolean fraggable() {
+        return false;
     }
 
     public void setStars(int stars) {
-        this.stars = stars;
+        if (starrable()) {
+            this.stars = stars;
+        }
+    }
+
+    public boolean starrable() {
+        return false;
     }
 
     public void setReforge(String reforge) {
-        this.reforge = reforge;
+        if (type.reforgable() && ReforgeManager.getReforge(reforge) != null && ReforgeManager.getReforge(reforge).canApply(this)) {
+            this.reforge = reforge;
+        }
     }
 
     public boolean fragged() {

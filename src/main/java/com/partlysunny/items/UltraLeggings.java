@@ -41,6 +41,16 @@ public class UltraLeggings extends SkyblockItem {
     }
 
     @Override
+    public boolean fraggable() {
+        return true;
+    }
+
+    @Override
+    public boolean starrable() {
+        return true;
+    }
+
+    @Override
     public boolean isEnchanted() {
         return true;
     }
