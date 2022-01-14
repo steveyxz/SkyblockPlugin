@@ -61,8 +61,11 @@ public class ItemUpdater implements Listener {
             return i.getSkyblockItem();
         }
         if (!nbtItem.hasKey("sb_id")) {
-            SkyblockItem transformed = DataUtils.createSkyblockItemFromVanilla(s, player);
+            NBTItem nbti = new NBTItem(s);
+            nbti.setBoolean("vanilla", true);
+            SkyblockItem transformed = DataUtils.createSkyblockItemFromVanilla(nbti.getItem(), player);
             if (transformed != null) {
+                transformed.updateSkyblockItem();
                 return transformed.getSkyblockItem();
             }
         }

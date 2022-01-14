@@ -125,6 +125,7 @@ public class DataUtils {
                     return Rarity.COMMON;
                 }
             };
+            skyblockItem.setStackCount(s.getAmount());
             skyblockItem.statAdditions().addAdditions(nbti.getCompound("statAdditions"));
             skyblockItem.abilityAdditions().addAdditions(nbti.getCompound("abilityAdditions"));
             skyblockItem.rarityAdditions().addAdditions(nbti.getCompound("rarityAdditions"));

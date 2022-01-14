@@ -295,7 +295,7 @@ public abstract class SkyblockItem implements Listener {
         for (IStatAddition a : statAdditions.asStatList()) {
             base = base.merge(a.getStats(owner));
         }
-        if (reforge != null) {
+        if (reforge != null && type.reforgable()) {
             StatList addition = DataUtils.getStatsOfBest(reforge, getRarity());
             if (addition != null) {
                 base = base.merge(addition);
@@ -347,8 +347,6 @@ public abstract class SkyblockItem implements Listener {
         ItemStack i = new ItemStack(baseMaterial);
         if (stackCount > 0) {
             i.setAmount(stackCount);
-        } else {
-            System.out.println(stackCount);
         }
         if (isEnchanted()) {
             i = addGlow(i);
@@ -364,7 +362,7 @@ public abstract class SkyblockItem implements Listener {
         }
         m.setDisplayName(new NameBuilder().setName(getDisplayName()).setRarity(getRarity()).setFragged(fragged).setStars(stars).setReforge(reforge).build());
         m.setLore(new LoreBuilder()
-                .setReforge(reforge)
+                .setReforge(type.reforgable() ? reforge : null)
                 .setDescription(getDescription() != null ? getDescription() : "")
                 .setRarity(getFinalRarity())
                 .setStats(getCombinedStats(), statAdditions(), getRarity(), owner)
