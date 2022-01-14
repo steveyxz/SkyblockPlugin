@@ -36,10 +36,6 @@ public class ItemUpdater implements Listener {
         registerItem(i, null);
     }
 
-    public static ItemStack transformNBT(ItemStack i) {
-        return DataUtils.convertVanilla(DataUtils.setVanillaStats(i));
-    }
-
     public static void updateVanilla(Inventory inv, Player p) {
         int count = 0;
         for (ItemStack i : inv.getContents()) {
@@ -65,9 +61,9 @@ public class ItemUpdater implements Listener {
             return i.getSkyblockItem();
         }
         if (!nbtItem.hasKey("sb_id")) {
-            ItemStack transformed = transformNBT(s);
+            SkyblockItem transformed = DataUtils.createSkyblockItemFromVanilla(s, player);
             if (transformed != null) {
-                return transformed;
+                return transformed.getSkyblockItem();
             }
         }
         return s;

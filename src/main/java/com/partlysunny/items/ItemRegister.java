@@ -7,6 +7,7 @@ public class ItemRegister {
         new UltraLeggings();
         new UltraHelmet();
         new UltraKatana();
+        new UltraBoots();
     }
 
 }

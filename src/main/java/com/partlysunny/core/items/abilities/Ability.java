@@ -3,6 +3,9 @@ package com.partlysunny.core.items.abilities;
 import com.partlysunny.Skyblock;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.SkyblockItem;
+import com.partlysunny.core.player.PlayerStatManager;
+import com.partlysunny.core.player.PlayerUpdater;
+import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.util.AbilityUtils;
 import com.partlysunny.core.util.DataUtils;
 import org.bukkit.ChatColor;
@@ -194,22 +197,41 @@ public abstract class Ability implements Listener {
             }
             if ((e.getAction() == Action.LEFT_CLICK_AIR || e.getAction() == Action.LEFT_CLICK_BLOCK)) {
                 if (e.getPlayer().isSneaking() && type == AbilityType.SHIFT_LEFT_CLICK) {
-                    trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
-                    startCooldown();
+                    if (mana(e.getPlayer())) {
+                        trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
+                        startCooldown();
+                    }
                 } else if (type == AbilityType.LEFT_CLICK) {
-                    trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
-                    startCooldown();
+                    if (mana(e.getPlayer())) {
+                        trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
+                        startCooldown();
+                    }
                 }
             } else if ((e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)) {
                 if (e.getPlayer().isSneaking() && type == AbilityType.SHIFT_RIGHT_CLICK) {
-                    trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
-                    startCooldown();
+                    if (mana(e.getPlayer())) {
+                        trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
+                        startCooldown();
+                    }
                 } else if (type == AbilityType.RIGHT_CLICK) {
-                    trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
-                    startCooldown();
+                    if (mana(e.getPlayer())) {
+                        trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
+                        startCooldown();
+                    }
                 }
             }
         }
+    }
+
+    private boolean mana(Player p) {
+        double mana = PlayerStatManager.getStat(p.getUniqueId(), StatType.MANA);
+        if (mana < manaCost) {
+            PlayerUpdater.sendPlayerDisplay(p, true);
+            p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);
+            return false;
+        }
+        PlayerStatManager.setStat(p.getUniqueId(), StatType.MANA, mana - manaCost);
+        return true;
     }
 
     protected boolean onCooldown() {

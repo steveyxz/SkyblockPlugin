@@ -1,5 +1,6 @@
 package com.partlysunny.items;
 
+import com.partlysunny.abilities.rightClick.SmiteAbility;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.SkyblockItem;
@@ -31,7 +32,7 @@ public class UltraKatana extends SkyblockItem {
 
     @Override
     public AbilityList getAbilities() {
-        return new AbilityList();
+        return new AbilityList(new SmiteAbility(this));
     }
 
     @Override

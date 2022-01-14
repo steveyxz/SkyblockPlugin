@@ -1,5 +1,6 @@
 package com.partlysunny.core.items.lore;
 
+import com.partlysunny.core.ConsoleLogger;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.ModifierType;
@@ -48,20 +49,14 @@ public class LoreBuilder {
     public LoreBuilder addAbilities(AbilityList abilities) {
         for (Ability a : abilities.asList()) {
             String desc = a.description();
-            List<String> split = new ArrayList<>(TextUtils.wrap(desc, 30));
+            List<String> split = new ArrayList<>(TextUtils.wrap(TextUtils.getHighlightedText(desc), 30));
             abilityLore.add("");
             if (a.type().weapon()) {
                 if (!Objects.equals(a.type().toString(), "")) {
                     abilityLore.add(ChatColor.GOLD + "Ability: " + a.name() + " " + ChatColor.YELLOW + ChatColor.BOLD + a);
                 }
-                if (split.size() > 1) {
-                    for (String s : split) {
-                        abilityLore.add(ChatColor.GRAY + s.substring(2));
-                    }
-                } else {
-                    for (String s : split) {
-                        abilityLore.add(ChatColor.GRAY + s);
-                    }
+                for (String s : split) {
+                    abilityLore.add(ChatColor.GRAY + s);
                 }
                 if (a.manaCost() > 0) {
                     abilityLore.add(ChatColor.DARK_GRAY + "Mana Cost: " + ChatColor.DARK_AQUA + a.manaCost());
@@ -75,25 +70,13 @@ public class LoreBuilder {
             } else {
                 if (a.type() == AbilityType.PASSIVE) {
                     abilityLore.add(ChatColor.GOLD + "Ability: " + a.name());
-                    if (split.size() > 1) {
-                        for (String s : split) {
-                            abilityLore.add(ChatColor.GRAY + s.substring(2));
-                        }
-                    } else {
-                        for (String s : split) {
-                            abilityLore.add(ChatColor.GRAY + s);
-                        }
+                    for (String s : split) {
+                        abilityLore.add(ChatColor.GRAY + s);
                     }
                 } else {
                     abilityLore.add(ChatColor.GOLD + (a.type() == AbilityType.FULL_SET_BONUS ? "Full Set Bonus: " : "Piece Bonus: ") + a.name());
-                    if (split.size() > 1) {
-                        for (String s : split) {
-                            abilityLore.add(ChatColor.GRAY + s.substring(2));
-                        }
-                    } else {
-                        for (String s : split) {
-                            abilityLore.add(ChatColor.GRAY + s);
-                        }
+                    for (String s : split) {
+                        abilityLore.add(ChatColor.GRAY + s);
                     }
                 }
             }
@@ -112,7 +95,7 @@ public class LoreBuilder {
     }
 
     //Automatically called on setstats. No need to call again
-    public LoreBuilder setStatLore(AdditionList additions, Player player) {
+    public void setStatLore(AdditionList additions, Player player) {
         if (additions != null) {
             if (additions.accepting() != ModifierType.STAT) {
                 throw new IllegalArgumentException("Additions argument is of wrong type (not of type STAT)");
@@ -123,21 +106,14 @@ public class LoreBuilder {
                 IStatAddition isa = (IStatAddition) a;
                 String lore = isa.getLore(player);
                 if (lore != null) {
-                    //TODO fix the bug where lines of lore have no color
+                    ConsoleLogger.console(TextUtils.getHighlightedText(lore));
                     List<String> formatted = TextUtils.wrap(TextUtils.getHighlightedText(lore), 30);
-                    if (formatted.size() > 1) {
-                        for (String s : formatted) {
-                            statAbilityLore.add(ChatColor.GRAY + s.substring(2));
-                        }
-                    } else {
-                        for (String s : formatted) {
-                            statAbilityLore.add(ChatColor.GRAY + s);
-                        }
+                    for (String s : formatted) {
+                        statAbilityLore.add(ChatColor.GRAY + s);
                     }
                 }
             }
         }
-        return this;
     }
 
     public LoreBuilder setStats(StatList stats, AdditionList additions, StatList reforgeBonus, String reforgeName, Player player) {
@@ -223,14 +199,8 @@ public class LoreBuilder {
         if (!Objects.equals(description, "")) {
             hasDescription = true;
             List<String> desc = TextUtils.wrap(description, 30);
-            if (desc.size() > 1) {
-                for (String s : desc) {
-                    lore.add(ChatColor.GRAY + s.substring(2));
-                }
-            } else {
-                for (String s : desc) {
-                    lore.add(ChatColor.GRAY + s);
-                }
+            for (String s : desc) {
+                lore.add(ChatColor.GRAY + s);
             }
         }
         if (statAbilityLore.size() > 0) {
@@ -239,7 +209,7 @@ public class LoreBuilder {
             }
             lore.addAll(statAbilityLore);
         } else {
-            if (lore.size() > 0 && hasDescription) {
+            if (lore.size() > 0 && hasDescription && abilityLore.size() < 1) {
                 lore.add("");
             }
         }
@@ -254,14 +224,8 @@ public class LoreBuilder {
         if (reforge != null && reforge.bonusDesc() != null) {
             lore.add(ChatColor.BLUE + reforge.displayName() + " Bonus");
             List<String> reforgeText = TextUtils.wrap(TextUtils.getHighlightedText(reforge.bonusDesc()), 30);
-            if (reforgeText.size() > 1) {
-                for (String s : reforgeText) {
-                    lore.add(ChatColor.GRAY + s.substring(2));
-                }
-            } else {
-                for (String s : reforgeText) {
-                    lore.add(ChatColor.GRAY + s);
-                }
+            for (String s : reforgeText) {
+                lore.add(ChatColor.GRAY + s);
             }
             lore.add("");
         }

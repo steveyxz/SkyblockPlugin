@@ -1,7 +1,6 @@
 package com.partlysunny.core.entities;
 
 import com.partlysunny.Skyblock;
-import com.partlysunny.core.ConsoleLogger;
 import com.partlysunny.core.entities.stats.EntityStatType;
 import com.partlysunny.core.player.BaseStatManager;
 import com.partlysunny.core.player.PlayerStatManager;
@@ -19,6 +18,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_17_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -30,16 +30,20 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.ProjectileHitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
 import static com.partlysunny.core.entities.stats.EntityStatType.getStat;
 
 public class DamageManager implements Listener {
+
+    private static final Map<UUID, Pair<String, Long>> lastDamagedBy = new HashMap<>();
 
     public static void dealDamage(LivingEntity e, double damage, boolean isCritical, boolean showDamageIndicator) {
         if (e.getType() == EntityType.ARMOR_STAND || e.getType() == EntityType.PLAYER) {
@@ -56,6 +60,12 @@ public class DamageManager implements Listener {
         e.setCustomName(EntityUtils.getDisplayName(e));
         if (showDamageIndicator)
             summonDamageIndicator(e.getLocation(), damage, isCritical, e.getHeight());
+    }
+
+    public static void dealDamage(LivingEntity e, double damage, boolean isCritical, boolean showDamageIndicator, Player p) {
+        dealDamage(e, damage, isCritical, showDamageIndicator);
+        double attackSpeed = PlayerStatManager.getStat(p.getUniqueId(), StatType.ATTACK_SPEED);
+        ((CraftLivingEntity) e).getHandle().invulnerableTime = (int) (10 / (1 + attackSpeed / 100));
     }
 
     public static void summonDamageIndicator(Location central, double damage, boolean critical, double entityHeight) {
@@ -139,16 +149,36 @@ public class DamageManager implements Listener {
     }
 
     public static void damagePlayer(Player p, double damage) {
+        damagePlayer(p, damage, null, "");
+    }
+
+    public static void damagePlayer(Player p, double damage, EntityDamageEvent.DamageCause cause, String entityName) {
         UUID uniqueId = p.getUniqueId();
         PlayerStatManager.changeStat(uniqueId, StatType.HEALTH, -damage);
         double health = PlayerStatManager.getStat(uniqueId, StatType.HEALTH);
         double maxHealth = PlayerStatManager.getStat(uniqueId, StatType.MAX_HEALTH);
-        updatePlayerHealthBar(p, health, maxHealth);
+        if (!entityName.equals("")) {
+            lastDamagedBy.put(p.getUniqueId(), new Pair<>(entityName, Instant.now().getEpochSecond()));
+        }
+        updatePlayerHealthBar(p, health, maxHealth, cause);
     }
 
     public static void updatePlayerHealthBar(Player p, double sbHp, double sbMaxHp) {
+        updatePlayerHealthBar(p, sbHp, sbMaxHp, null);
+    }
+
+    public static void updatePlayerHealthBar(Player p, double sbHp, double sbMaxHp, EntityDamageEvent.DamageCause cause) {
         if (sbHp < 1) {
-            setHealth(p, 0);
+            Pair<String, Long> info = lastDamagedBy.get(p.getUniqueId());
+            if (info == null) {
+                kill(p, cause, "");
+            } else {
+                String killer = info.a();
+                if (Instant.now().getEpochSecond() - info.b() > 3) {
+                    killer = "";
+                }
+                kill(p, cause, killer);
+            }
         } else {
             double newHp = 20;
             if (sbMaxHp < 200) {
@@ -163,6 +193,34 @@ public class DamageManager implements Listener {
             }
             setHealth(p, newHp);
         }
+    }
+
+    public static void kill(Player p, EntityDamageEvent.DamageCause cause, String killer) {
+        BaseStatManager.initializeStats(p);
+        Location bedSpawnLocation = p.getBedSpawnLocation();
+        if (bedSpawnLocation == null) {
+            bedSpawnLocation = p.getWorld().getSpawnLocation();
+        }
+        p.teleport(bedSpawnLocation);
+        if (cause == null) {
+            for (Player a : p.getWorld().getPlayers()) {
+                a.sendMessage(ChatColor.RED + "☠ " + a.getDisplayName() + " died.");
+            }
+        } else {
+            for (Player a : p.getWorld().getPlayers()) {
+                switch (cause) {
+                    case FALL -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " fell to their death" + (killer.equals("") ? "." : " with help from " + killer + "."));
+                    case FIRE, FIRE_TICK -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " burnt to death" + (killer.equals("") ? "." : " while trying to fight " + killer + "."));
+                    case VOID -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY+ p.getDisplayName() + (killer.equals("") ? " was thrown into the void by " + killer : " fell into the void"));
+                    case ENTITY_ATTACK, ENTITY_SWEEP_ATTACK, ENTITY_EXPLOSION, MAGIC -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " was slain by " + killer + ".");
+                    case SUFFOCATION -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY+ p.getDisplayName() + " suffocated.");
+                    case DROWNING -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " drowned.");
+                    case BLOCK_EXPLOSION -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " blew up.");
+                    default -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " died");
+                }
+            }
+        }
+        lastDamagedBy.remove(p.getUniqueId());
     }
 
     public static void setHealth(Player p, double health) {
@@ -181,16 +239,11 @@ public class DamageManager implements Listener {
         e.setDamage(0);
         if (!(damager instanceof Player)) {
             if (receiver instanceof Player) {
-                damagePlayer((Player) receiver, getHitDamageOn((Player) receiver, EntityStatType.getStat(damager, EntityStatType.DAMAGE), false));
+                damagePlayer((Player) receiver, getHitDamageOn((Player) receiver, EntityStatType.getStat(damager, EntityStatType.DAMAGE), false), EntityDamageEvent.DamageCause.ENTITY_ATTACK, EntityUtils.getName(damager));
             } else {
                 dealDamage(receiver, getStat(damager, EntityStatType.DAMAGE), false, false);
             }
         }
-    }
-
-    @EventHandler
-    public void playerDie(PlayerRespawnEvent e) {
-        BaseStatManager.initializeStats(e.getPlayer());
     }
 
     @EventHandler
@@ -207,11 +260,11 @@ public class DamageManager implements Listener {
         } else {
             if ((p).getInventory().getItemInMainHand().getType() == Material.CROSSBOW || p.getInventory().getItemInMainHand().getType() == Material.BOW) {
                 Pair<Double, Boolean> hitDamage = getHitDamage(p, true);
-                dealDamage(receiver, hitDamage.a(), hitDamage.b(), true);
+                dealDamage(receiver, hitDamage.a(), hitDamage.b(), true, p);
                 return;
             }
             Pair<Double, Boolean> hitDamage = getHitDamage(p, false);
-            dealDamage(receiver, hitDamage.a(), hitDamage.b(), true);
+            dealDamage(receiver, hitDamage.a(), hitDamage.b(), true, p);
         }
     }
 
@@ -223,7 +276,7 @@ public class DamageManager implements Listener {
         receiver.damage(0, damager);
         if (!(damager instanceof Player)) {
             if (receiver instanceof Player) {
-                damagePlayer((Player) receiver, getHitDamageOn((Player) receiver, EntityStatType.getStat(damager, EntityStatType.DAMAGE), false));
+                damagePlayer((Player) receiver, getHitDamageOn((Player) receiver, EntityStatType.getStat(damager, EntityStatType.DAMAGE), false), EntityDamageEvent.DamageCause.ENTITY_ATTACK, EntityUtils.getName(damager));
             } else {
                 dealDamage(receiver, getStat(damager, EntityStatType.DAMAGE), false, false);
             }
@@ -234,17 +287,15 @@ public class DamageManager implements Listener {
 
     @EventHandler
     public void playerArrowAttack(ProjectileHitEvent e) {
-        if (!(e.getEntity().getShooter() instanceof LivingEntity damager) || !(e.getHitEntity() instanceof LivingEntity receiver)) {
+        if (!(e.getEntity().getShooter() instanceof Player p) || !(e.getHitEntity() instanceof LivingEntity receiver)) {
             return;
         }
-        receiver.damage(0, damager);
-        if (damager instanceof Player) {
-            if (receiver instanceof Player) {
-                e.setCancelled(true);
-            } else {
-                Pair<Double, Boolean> hitDamage = getHitDamage((Player) damager, false);
-                dealDamage(receiver, hitDamage.a(), hitDamage.b(), true);
-            }
+        receiver.damage(0, p);
+        if (receiver instanceof Player) {
+            e.setCancelled(true);
+        } else {
+            Pair<Double, Boolean> hitDamage = getHitDamage(p, false);
+            dealDamage(receiver, hitDamage.a(), hitDamage.b(), true, p);
         }
         e.getEntity().remove();
         e.setCancelled(true);
@@ -259,7 +310,7 @@ public class DamageManager implements Listener {
                 e.getCause() != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION
         ) {
             if (e.getEntity() instanceof Player) {
-                damagePlayer((Player) e.getEntity(), getHitDamageOn((Player) e.getEntity(), e.getDamage() * 5, false));
+                damagePlayer((Player) e.getEntity(), getHitDamageOn((Player) e.getEntity(), e.getDamage() * 5, false), e.getCause(), "");
             } else {
                 dealDamage((LivingEntity) e.getEntity(), e.getDamage() * 5, false, true);
             }

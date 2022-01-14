@@ -124,6 +124,16 @@ public class EntityUtils {
         return "NULL";
     }
 
+    public static String getName(Entity e) {
+        String id = getId(e);
+        EntityInfo info = EntityManager.getEntity(id);
+        if (info == null) {
+            return TextUtils.capitalizeWord(e.getType().toString().toLowerCase().replace('_', ' '));
+        } else {
+            return info.displayName();
+        }
+    }
+
     public static void setEntityInfo(Entity e, String id) {
         EntityInfo info = EntityManager.getEntity(id);
         if (info != null) {

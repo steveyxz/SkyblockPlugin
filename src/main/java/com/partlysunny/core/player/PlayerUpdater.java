@@ -22,6 +22,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.util.UUID;
 
 import static com.partlysunny.core.entities.DamageManager.updatePlayerHealthBar;
+import static com.partlysunny.core.player.BaseStatManager.hasInitializedChangableStats;
 import static com.partlysunny.core.player.PlayerStatManager.playerStats;
 import static com.partlysunny.core.util.NumberUtils.getIntegerStringOf;
 
@@ -67,8 +68,14 @@ public class PlayerUpdater implements Listener {
         if (hand != null) {
             newStats = newStats.merge(hand.getCombinedStats());
         }
-        newStats.addStat(new Stat(StatType.HEALTH, oldStats.getStat(StatType.HEALTH)));
-        newStats.addStat(new Stat(StatType.MANA, oldStats.getStat(StatType.MANA)));
+        if (hasInitializedChangableStats.get(id)) {
+            newStats.addStat(new Stat(StatType.HEALTH, oldStats.getStat(StatType.HEALTH)));
+            newStats.addStat(new Stat(StatType.MANA, oldStats.getStat(StatType.MANA)));
+        } else {
+            newStats.addStat(new Stat(StatType.HEALTH, newStats.getStat(StatType.MAX_HEALTH)));
+            newStats.addStat(new Stat(StatType.MANA, newStats.getStat(StatType.INTELLIGENCE)));
+            hasInitializedChangableStats.put(id, true);
+        }
         return newStats;
     }
 
@@ -77,14 +84,16 @@ public class PlayerUpdater implements Listener {
         double health = PlayerStatManager.getStat(player.getUniqueId(), StatType.HEALTH);
         double maxHealth = PlayerStatManager.getStat(player.getUniqueId(), StatType.MAX_HEALTH);
         updatePlayerHealthBar(player, health, maxHealth);
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(getPlayerDisplay(stats, false)));
-        //NMS version
-        //ActionBar.sendToPlayer(player, getPlayerDisplay(stats, false));
         playerStats.put(player.getUniqueId(), stats);
     }
 
+    public static void sendPlayerDisplay(Player p, boolean notEnoughMana) {
+        StatList stats = getStats(p, false);
+        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(getPlayerDisplay(stats, notEnoughMana)));
+    }
+
     public static String getPlayerDisplay(StatList stats, boolean notEnoughMana) {
-        return ChatColor.RED + "" + getIntegerStringOf(stats.getStat(StatType.HEALTH), 0) + "/" + getIntegerStringOf(stats.getStat(StatType.MAX_HEALTH), 0) + "❤   " + ChatColor.GREEN + "" + getIntegerStringOf(stats.getStat(StatType.DEFENSE), 0) + "❈   " + (notEnoughMana ? ChatColor.RED + "NOT ENOUGH MANA" : ChatColor.AQUA + "" + getIntegerStringOf(stats.getStat(StatType.MANA), 0) + "/" + getIntegerStringOf(stats.getStat(StatType.INTELLIGENCE), 0) + "✎");
+        return ChatColor.RED + "" + getIntegerStringOf(stats.getStat(StatType.HEALTH), 0) + "/" + getIntegerStringOf(stats.getStat(StatType.MAX_HEALTH), 0) + "❤   " + ChatColor.GREEN + "" + getIntegerStringOf(stats.getStat(StatType.DEFENSE), 0) + "❈   " + (notEnoughMana ? ChatColor.RED + "" + ChatColor.BOLD + "NOT ENOUGH MANA" : ChatColor.AQUA + "" + getIntegerStringOf(stats.getStat(StatType.MANA), 0) + "/" + getIntegerStringOf(stats.getStat(StatType.INTELLIGENCE), 0) + "✎");
     }
 }
 
@@ -113,6 +122,7 @@ class NaturalRegeneration extends BukkitRunnable {
 
 class ConstantUpdater extends BukkitRunnable {
     private final Server s;
+    private int count = 0;
 
     public ConstantUpdater(Server s) {
         this.s = s;
@@ -120,8 +130,15 @@ class ConstantUpdater extends BukkitRunnable {
 
     @Override
     public void run() {
+        if (count == 4) {
+            count = 0;
+            for (Player p : s.getOnlinePlayers()) {
+                PlayerUpdater.sendPlayerDisplay(p, false);
+            }
+        }
         for (Player p : s.getOnlinePlayers()) {
             PlayerUpdater.updatePlayer(p);
         }
+        count++;
     }
 }

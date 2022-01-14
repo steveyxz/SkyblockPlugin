@@ -1,13 +1,13 @@
 package com.partlysunny.items;
 
-import com.partlysunny.core.stats.StatList;
-import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.SkyblockItem;
 import com.partlysunny.core.items.abilities.AbilityList;
 import com.partlysunny.core.stats.Stat;
-import com.partlysunny.core.util.NumberUtils;
+import com.partlysunny.core.stats.StatList;
+import com.partlysunny.core.stats.StatType;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -17,7 +17,7 @@ public class UltraLeggings extends SkyblockItem {
     }
 
     public UltraLeggings() {
-        super("ultraleggings", true, ItemType.LEGGINGS, null, new String[]{"ultrahelmet", "ultrachestplate", "ultraleggings", null});
+        super("ultraleggings", true, ItemType.LEGGINGS, null, new String[]{"ultrahelmet", "ultrachestplate", "ultraleggings", "ultraboots"});
     }
 
     @Override
@@ -31,8 +31,8 @@ public class UltraLeggings extends SkyblockItem {
     }
 
     @Override
-    public Integer getColor() {
-        return NumberUtils.getColor(190, 150, 10);
+    public Color getColor() {
+        return Color.fromRGB(20, 20, 20);
     }
 
     @Override

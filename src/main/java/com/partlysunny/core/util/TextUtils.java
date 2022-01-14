@@ -2,18 +2,98 @@ package com.partlysunny.core.util;
 
 import com.partlysunny.core.stats.StatType;
 import org.bukkit.ChatColor;
-import org.bukkit.util.ChatPaginator;
 
 import java.text.CompactNumberFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
 public class TextUtils {
 
     public static List<String> wrap(String text, int width) {
-        return List.of(ChatPaginator.wordWrap(text, width));
+        if (text == null) {
+            return List.of(new String[]{""});
+        } else if (text.length() <= width && !text.contains("\n")) {
+            return List.of(new String[]{text});
+        } else {
+            char[] rawChars = (text + ' ').toCharArray();
+            StringBuilder word = new StringBuilder();
+            StringBuilder line = new StringBuilder();
+            List<String> lines = new LinkedList<>();
+            int lineColorChars = 0;
+
+            int i;
+            String partialWord;
+            for(i = 0; i < rawChars.length; ++i) {
+                char c = rawChars[i];
+                if (c == 167) {
+                    word.append(ChatColor.getByChar(rawChars[i + 1]));
+                    lineColorChars += 2;
+                    ++i;
+                } else if (c != ' ' && c != '\n') {
+                    word.append(c);
+                } else {
+                    int var10;
+                    int var11;
+                    String[] var12;
+                    String[] split = word.toString().split("(?<=\\G.{" + width + "})");
+                    if (line.length() == 0 && word.length() > width) {
+                        var11 = (var12 = split).length;
+
+                        for(var10 = 0; var10 < var11; ++var10) {
+                            partialWord = var12[var10];
+                            lines.add(partialWord);
+                        }
+                    } else if (line.length() + 1 + word.length() - lineColorChars == width) {
+                        if (line.length() > 0) {
+                            line.append(' ');
+                        }
+
+                        line.append(word);
+                        lines.add(line.toString());
+                        line = new StringBuilder();
+                        lineColorChars = 0;
+                    } else if (line.length() + 1 + word.length() - lineColorChars > width) {
+                        var11 = (var12 = split).length;
+
+                        for(var10 = 0; var10 < var11; ++var10) {
+                            partialWord = var12[var10];
+                            lines.add(line.toString());
+                            line = new StringBuilder(partialWord);
+                        }
+
+                        lineColorChars = 0;
+                    } else {
+                        if (line.length() > 0) {
+                            line.append(' ');
+                        }
+
+                        line.append(word);
+                    }
+
+                    word = new StringBuilder();
+                    if (c == '\n') {
+                        lines.add(line.toString());
+                        line = new StringBuilder();
+                    }
+                }
+            }
+
+            if (line.length() > 0) {
+                lines.add(line.toString());
+            }
+
+            for(i = 1; i < lines.size(); ++i) {
+                String pLine = lines.get(i - 1);
+                partialWord = lines.get(i);
+                String color = ChatColor.getLastColors(pLine);
+                lines.set(i, color + partialWord);
+            }
+
+            return List.of(lines.toArray(new String[0]));
+        }
     }
 
     public static String capitalizeWord(String str) {

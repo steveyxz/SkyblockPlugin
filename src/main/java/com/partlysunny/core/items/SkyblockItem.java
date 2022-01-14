@@ -1,7 +1,6 @@
 package com.partlysunny.core.items;
 
 import com.partlysunny.Skyblock;
-import com.partlysunny.core.ConsoleLogger;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.abilities.AbilityList;
 import com.partlysunny.core.items.additions.*;
@@ -12,6 +11,7 @@ import com.partlysunny.core.util.DataUtils;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTListCompound;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -20,6 +20,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.annotation.Nullable;
@@ -209,7 +210,7 @@ public abstract class SkyblockItem implements Listener {
         return null;
     }
 
-    public Integer getColor() {
+    public Color getColor() {
         return null;
     }
 
@@ -356,6 +357,11 @@ public abstract class SkyblockItem implements Listener {
         if (m == null) {
             return;
         }
+        if (getColor() != null) {
+            if (m instanceof LeatherArmorMeta) {
+                ((LeatherArmorMeta) m).setColor(getColor());
+            }
+        }
         m.setDisplayName(new NameBuilder().setName(getDisplayName()).setRarity(getRarity()).setFragged(fragged).setStars(stars).setReforge(reforge).build());
         m.setLore(new LoreBuilder()
                 .setReforge(reforge)
@@ -379,15 +385,11 @@ public abstract class SkyblockItem implements Listener {
         nbti.setString("reforge", reforge);
         if (skullId() != null) {
             NBTCompound skull = nbti.addCompound("SkullOwner");
-            skull.setString("Name", "a");
+            skull.setString("Name", "Dragonsbreath Opal");
             skull.setString("Id", skullId().toString());
 
             NBTListCompound texture = skull.addCompound("Properties").getCompoundList("textures").addCompound();
             texture.setString("Value", skullValue());
-        }
-        if (getColor() != null) {
-            ConsoleLogger.console(getColor().toString());
-            nbti.getCompound("display").setInteger("color", getColor());
         }
         if ((fragged || stars > 0 || (reforge != null && !reforge.equals(""))) && !unique) {
             unique = true;
@@ -411,7 +413,6 @@ public abstract class SkyblockItem implements Listener {
                 uniqueId = null;
             }
         }
-        System.out.println(nbti);
         if (getStats() != null) {
             nbti = getStats().applyStats(nbti);
         }

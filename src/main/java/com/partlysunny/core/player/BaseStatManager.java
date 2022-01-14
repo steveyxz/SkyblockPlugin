@@ -7,16 +7,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static com.partlysunny.Skyblock.configManager;
 
 public class BaseStatManager {
 
     private static final YamlConfiguration baseStats = configManager.getConfig("baseStats");
+    public static final Map<UUID, Boolean> hasInitializedChangableStats = new HashMap<>();
     private static final HashMap<String, Double> defaultStats = new HashMap<>() {{
         put(StatType.HEALTH.toString(), 100D);
         put(StatType.DAMAGE_MULTIPLIER.toString(), 1D);
@@ -49,6 +47,7 @@ public class BaseStatManager {
 
     public static void initializeStats(Player p) {
         UUID id = p.getUniqueId();
+        hasInitializedChangableStats.put(id, false);
         PlayerStatManager.playerStats.put(id, new StatList(getStatsOf(id).toArray(new Stat[0])));
     }
 
