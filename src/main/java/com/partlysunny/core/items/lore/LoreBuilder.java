@@ -1,6 +1,5 @@
 package com.partlysunny.core.items.lore;
 
-import com.partlysunny.core.ConsoleLogger;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.ItemType;
 import com.partlysunny.core.items.ModifierType;
@@ -127,12 +126,14 @@ public class LoreBuilder {
             sorted = new HashMap<>();
             for (Addition a : additionList) {
                 IStatAddition isa = (IStatAddition) a;
-                for (Stat s : isa.getStats(player).asList()) {
-                    if (sorted.containsKey(s.type())) {
-                        sorted.get(s.type()).put(a.type(), s.value());
-                    } else {
-                        sorted.put(s.type(), new HashMap<>());
-                        sorted.get(s.type()).put(a.type(), s.value());
+                if (isa.show()) {
+                    for (Stat s : isa.getStats(player).asList()) {
+                        if (sorted.containsKey(s.type())) {
+                            sorted.get(s.type()).put(a.type(), s.value());
+                        } else {
+                            sorted.put(s.type(), new HashMap<>());
+                            sorted.get(s.type()).put(a.type(), s.value());
+                        }
                     }
                 }
             }

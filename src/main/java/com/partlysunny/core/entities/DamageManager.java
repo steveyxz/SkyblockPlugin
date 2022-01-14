@@ -16,6 +16,7 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftLivingEntity;
@@ -62,18 +63,36 @@ public class DamageManager implements Listener {
             summonDamageIndicator(e.getLocation(), damage, isCritical, e.getHeight());
     }
 
-    public static void dealDamage(LivingEntity e, double damage, boolean isCritical, boolean showDamageIndicator, Player p) {
+    public static void dealDamage(LivingEntity e, double damage, boolean isCritical, boolean showDamageIndicator, Player p, boolean ferocity) {
         dealDamage(e, damage, isCritical, showDamageIndicator);
+        double ferocityChance = PlayerStatManager.getStat(p.getUniqueId(), StatType.FEROCITY);
+        if (!ferocity) {
+            int one= (int) ((ferocityChance)%10);
+            int tens= (int) ((ferocityChance/10)%10);
+            int hundred = (int) ((ferocityChance / 100) % 10);
+            boolean ferocityActive = new Random().nextInt(100) < one + tens * 10;
+            for (int i = 0; i < hundred; i++) {
+                p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.7f, 1.5f);
+                dealDamage(e, damage, isCritical, showDamageIndicator, p, true);
+            }
+            if (ferocityActive) {
+                p.getWorld().playSound(p.getLocation(), Sound.ENTITY_ZOMBIE_BREAK_WOODEN_DOOR, 0.7f, 1.5f);
+                dealDamage(e, damage, isCritical, showDamageIndicator, p, true);
+            }
+            return;
+        }
         double attackSpeed = PlayerStatManager.getStat(p.getUniqueId(), StatType.ATTACK_SPEED);
+        ((CraftLivingEntity) e).getHandle().invulnerableDuration = (int) (10 / (1 + attackSpeed / 100));
         ((CraftLivingEntity) e).getHandle().invulnerableTime = (int) (10 / (1 + attackSpeed / 100));
     }
 
     public static void summonDamageIndicator(Location central, double damage, boolean critical, double entityHeight) {
         Random r = new Random();
         double xOffset = (r.nextInt(200) / 100f) - 1;
-        double yOffset = (entityHeight / 2 + ((r.nextInt((int) (entityHeight * 50)) / 100f) - entityHeight / 4)) - entityHeight / 2;
+        double yOffset = (entityHeight / 2 + ((r.nextInt((int) (entityHeight * 50)) / 100f) - entityHeight / 4)) + entityHeight / 2;
         double zOffset = (r.nextInt(200) / 100f) - 1;
         ArmorStand temp = new ArmorStand(((CraftWorld) central.getWorld()).getHandle(), central.getX() + xOffset, central.getY() - 1 + yOffset, central.getZ() + zOffset);
+        temp.setMarker(true);
         temp.setInvisible(true);
         temp.setNoGravity(true);
         temp.noCulling = true;
@@ -202,6 +221,9 @@ public class DamageManager implements Listener {
             bedSpawnLocation = p.getWorld().getSpawnLocation();
         }
         p.teleport(bedSpawnLocation);
+        p.setFireTicks(0);
+        p.setVisualFire(false);
+        p.getWorld().playSound(p.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1, 1);
         if (cause == null) {
             for (Player a : p.getWorld().getPlayers()) {
                 a.sendMessage(ChatColor.RED + "☠ " + a.getDisplayName() + " died.");
@@ -260,11 +282,11 @@ public class DamageManager implements Listener {
         } else {
             if ((p).getInventory().getItemInMainHand().getType() == Material.CROSSBOW || p.getInventory().getItemInMainHand().getType() == Material.BOW) {
                 Pair<Double, Boolean> hitDamage = getHitDamage(p, true);
-                dealDamage(receiver, hitDamage.a(), hitDamage.b(), true, p);
+                dealDamage(receiver, hitDamage.a(), hitDamage.b(), true, p, false);
                 return;
             }
             Pair<Double, Boolean> hitDamage = getHitDamage(p, false);
-            dealDamage(receiver, hitDamage.a(), hitDamage.b(), true, p);
+            dealDamage(receiver, hitDamage.a(), hitDamage.b(), true, p, false);
         }
     }
 
@@ -295,7 +317,7 @@ public class DamageManager implements Listener {
             e.setCancelled(true);
         } else {
             Pair<Double, Boolean> hitDamage = getHitDamage(p, false);
-            dealDamage(receiver, hitDamage.a(), hitDamage.b(), true, p);
+            dealDamage(receiver, hitDamage.a(), hitDamage.b(), true, p, false);
         }
         e.getEntity().remove();
         e.setCancelled(true);

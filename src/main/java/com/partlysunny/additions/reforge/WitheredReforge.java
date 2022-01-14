@@ -1,5 +1,6 @@
 package com.partlysunny.additions.reforge;
 
+import com.partlysunny.core.items.additions.AppliableTypeDefaults;
 import com.partlysunny.core.stats.StatList;
 import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.enums.Rarity;
@@ -17,6 +18,6 @@ public class WitheredReforge extends Reforge {
                 new Pair<>(Rarity.EPIC, new StatList(new Stat(StatType.STRENGTH, 100))),
                 new Pair<>(Rarity.LEGENDARY, new StatList(new Stat(StatType.STRENGTH, 200))),
                 new Pair<>(Rarity.MYTHIC, new StatList(new Stat(StatType.STRENGTH, 275)))
-        ));
+        ), AppliableTypeDefaults.meleeWeapons);
     }
 }

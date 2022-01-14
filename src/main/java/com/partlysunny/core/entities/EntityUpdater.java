@@ -1,13 +1,16 @@
 package com.partlysunny.core.entities;
 
 import com.partlysunny.Skyblock;
+import com.partlysunny.core.entities.stats.EntityStatType;
 import com.partlysunny.core.util.EntityUtils;
 import net.minecraft.server.level.ServerPlayer;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,6 +28,9 @@ public class EntityUpdater implements Listener {
 
     public static void updateStats(Entity e) {
         EntityUtils.repairEntity(e);
+        if (e instanceof LivingEntity) {
+            ((LivingEntity) e).getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue(EntityStatType.getStat(e, EntityStatType.SPEED).floatValue() / 500f);
+        }
     }
 
     public static void updateName(Entity e) {

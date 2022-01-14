@@ -59,7 +59,7 @@ public class UltraKatana extends SkyblockItem {
                 new Stat(StatType.MAGIC_FIND, 10),
                 new Stat(StatType.INTELLIGENCE, 100),
                 new Stat(StatType.STRENGTH, 320),
-                new Stat(StatType.FEROCITY, 20)
+                new Stat(StatType.FEROCITY, 500)
         );
     }
 

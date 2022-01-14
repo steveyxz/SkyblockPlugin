@@ -50,4 +50,9 @@ public class Infusion extends Addition implements IStatAddition {
         }
         return statList;
     }
+
+    @Override
+    public boolean show() {
+        return false;
+    }
 }

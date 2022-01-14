@@ -29,7 +29,7 @@ public enum VanillaEntityDamageAttributes {
     POLAR_BEAR(4),
     PUFFERFISH(2),
     RAVAGER(7),
-    SHULKER_BULLET(4),
+    SHULKER(4),
     SILVERFISH(1),
     SLIME(2),
     SPIDER(2),
@@ -41,7 +41,10 @@ public enum VanillaEntityDamageAttributes {
     ZOMBIE(3),
     ZOMBIFIED_PIGLIN(5),
     ZOMBIE_VILLAGER(3),
-    ARROW(4);
+    SKELETON(4),
+    STRAY(4),
+    PILLAGER(4),
+    ;
 
 
     private final int value;

@@ -13,4 +13,6 @@ public interface IStatAddition {
 
     StatList getStats(@Nullable Player player);
 
+    boolean show();
+
 }

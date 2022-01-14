@@ -10,7 +10,6 @@ import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
-import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -28,6 +27,8 @@ import static com.partlysunny.core.player.PlayerStatManager.playerStats;
 import static com.partlysunny.core.util.NumberUtils.getIntegerStringOf;
 
 public class PlayerUpdater implements Listener {
+
+    private static final UUID movementSpeedUUID = UUID.fromString("2029ae02-a2cf-4224-9d4f-5df0db423a44");
 
     public PlayerUpdater(Server s) {
         new ConstantUpdater(s).runTaskTimer(JavaPlugin.getPlugin(Skyblock.class), 0, 10);
@@ -78,6 +79,8 @@ public class PlayerUpdater implements Listener {
             hasInitializedChangableStats.put(id, true);
         }
         double speedCap = newStats.getStat(StatType.SPEED_CAP);
+        //ConsoleLogger.console(String.valueOf(speedCap));
+        //ConsoleLogger.console(String.valueOf(newStats.getStat(StatType.SPEED)));
         if (newStats.getStat(StatType.SPEED) > speedCap) {
             newStats.addStat(new Stat(StatType.SPEED, speedCap));
         }
@@ -93,7 +96,18 @@ public class PlayerUpdater implements Listener {
         if (speed > speedCap) {
             speed = speedCap;
         }
-        ((CraftPlayer) player).getHandle().setSpeed((float) (0.2f * (speed / 100)));
+        //net.minecraft.world.entity.player.Player pplayer = ((CraftPlayer) player).getHandle();
+        //AttributeInstance i = pplayer.getAttribute(Attributes.MOVEMENT_SPEED);
+        //AttributeModifier mod = new AttributeModifier(movementSpeedUUID, "speed stat", speed / 100, AttributeModifier.Operation.MULTIPLY_BASE);
+        //for (AttributeModifier m : i.getModifiers()) {
+        //    i.removeModifier(m.getId());
+        //}
+        //i.addTransientModifier(mod);
+        if (speed / 500 > 1) {
+            speed = 1;
+        }
+        player.setWalkSpeed((float) (speed / 500));
+        player.setFlySpeed((float) (speed / 500));
         updatePlayerHealthBar(player, health, maxHealth);
         playerStats.put(player.getUniqueId(), stats);
     }
