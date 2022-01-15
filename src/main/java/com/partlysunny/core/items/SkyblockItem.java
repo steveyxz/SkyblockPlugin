@@ -428,8 +428,7 @@ public abstract class SkyblockItem implements Listener {
         nbti.setString("reforge", reforge);
         if (skullId() != null) {
             NBTCompound skull = nbti.addCompound("SkullOwner");
-            skull.setString("Name", "sus");
-            skull.setString("Id", skullId().toString());
+            skull.setUUID("Id", skullId());
 
             NBTListCompound texture = skull.addCompound("Properties").getCompoundList("textures").addCompound();
             texture.setString("Value", skullValue());

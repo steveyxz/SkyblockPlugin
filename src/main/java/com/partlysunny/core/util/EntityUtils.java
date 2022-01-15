@@ -7,8 +7,11 @@ import com.partlysunny.core.enums.VanillaEntityDamageAttributes;
 import com.partlysunny.core.enums.VanillaEntityHealthAttributes;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.persistence.PersistentDataType;
+
+import java.util.Objects;
 
 import static com.partlysunny.core.entities.stats.EntityStatType.*;
 import static com.partlysunny.core.util.TextUtils.getHealthText;
@@ -137,6 +140,9 @@ public class EntityUtils {
     public static void setEntityInfo(Entity e, String id) {
         EntityInfo info = EntityManager.getEntity(id);
         if (info != null) {
+            if (e instanceof LivingEntity) {
+                Objects.requireNonNull(((LivingEntity) e).getEquipment()).setArmorContents(info.armorSlots());
+            }
             setId(id, e);
             setBoss(info.isBoss() ? (byte) 0 : (byte) 1, e);
             setHealth(info.stats().maxHealth().value(), e);
