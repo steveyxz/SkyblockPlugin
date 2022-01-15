@@ -30,7 +30,10 @@ commands:
     description: Sets your held item to fragged / unfragged (default true)
     usage: /sbfrag [optional-boolean]
     permission: skyblock.op
-
+  sbenchant:
+    description: Adds and enchant to your held item (default 1)
+    usage: /sbenchant <enchant-id> [level]
+    permission: skyblock.op
 permissions:
   skyblock.op:
     description: Gives you access to commands like sbgive and sbsummon

@@ -10,12 +10,15 @@ import com.partlysunny.core.items.additions.Addition;
 import com.partlysunny.core.items.additions.AdditionInfo;
 import com.partlysunny.core.items.additions.AdditionList;
 import com.partlysunny.core.items.additions.IStatAddition;
+import com.partlysunny.core.items.additions.enchants.Enchant;
+import com.partlysunny.core.items.additions.enchants.EnchantList;
 import com.partlysunny.core.items.additions.reforges.Reforge;
 import com.partlysunny.core.items.additions.reforges.ReforgeManager;
 import com.partlysunny.core.stats.Stat;
 import com.partlysunny.core.stats.StatList;
 import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.util.DataUtils;
+import com.partlysunny.core.util.NumberUtils;
 import com.partlysunny.core.util.TextUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -30,6 +33,7 @@ public class LoreBuilder {
     private final List<String> statLore = new ArrayList<>();
     private final List<String> abilityLore = new ArrayList<>();
     private final List<String> statAbilityLore = new ArrayList<>();
+    private final List<String> enchantLore = new ArrayList<>();
     private String description = "";
     private Reforge reforge;
     private Rarity r = Rarity.COMMON;
@@ -37,6 +41,28 @@ public class LoreBuilder {
 
     public LoreBuilder setReforge(String r) {
         reforge = ReforgeManager.getReforge(r);
+        return this;
+    }
+
+    public LoreBuilder setEnchants(EnchantList list) {
+        if (list.asList().length < 5) {
+            for (Enchant e : list.asList()) {
+                String color = e.isUltimate() ? ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD : "" + ChatColor.BLUE;
+                enchantLore.add(color + e.displayName() + " " + NumberUtils.toRoman(e.level()));
+                for (String s : TextUtils.wrap(TextUtils.getHighlightedText(e.description()), 30)) {
+                    enchantLore.add(ChatColor.GRAY + s);
+                }
+            }
+        } else {
+            StringBuilder description = new StringBuilder();
+            for (Enchant e : list.asList()) {
+                String color = e.isUltimate() ? ChatColor.LIGHT_PURPLE + "" + ChatColor.BOLD : "" + ChatColor.BLUE;
+                description.append(color).append(e.displayName()).append(" ").append(NumberUtils.toRoman(e.level())).append(", ");
+            }
+            String strDesc = description.toString();
+            strDesc = strDesc.substring(0, strDesc.length() - 2);
+            enchantLore.addAll(TextUtils.wrap(strDesc, 30));
+        }
         return this;
     }
 
@@ -198,6 +224,10 @@ public class LoreBuilder {
             lore.addAll(statLore);
             lore.add("");
         }
+        if (enchantLore.size() > 0) {
+            lore.addAll(enchantLore);
+            lore.add("");
+        }
         boolean hasDescription = false;
         if (!Objects.equals(description, "")) {
             hasDescription = true;
@@ -217,6 +247,9 @@ public class LoreBuilder {
             }
         }
         if (abilityLore.size() > 0) {
+            if (!hasDescription && statLore.size() > 0 && statAbilityLore.size() < 1) {
+                lore.remove(lore.size() - 1);
+            }
             lore.addAll(abilityLore);
             lore.add("");
         } else {

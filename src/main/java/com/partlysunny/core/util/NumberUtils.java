@@ -2,42 +2,44 @@ package com.partlysunny.core.util;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.UUID;
+import java.util.TreeMap;
 
 public class NumberUtils {
+
+    private static final TreeMap<Integer, String> map = new TreeMap<>();
+
+    private static void initRomanConverter() {
+        map.put(1000, "M");
+        map.put(900, "CM");
+        map.put(500, "D");
+        map.put(400, "CD");
+        map.put(100, "C");
+        map.put(90, "XC");
+        map.put(50, "L");
+        map.put(40, "XL");
+        map.put(10, "X");
+        map.put(9, "IX");
+        map.put(5, "V");
+        map.put(4, "IV");
+        map.put(1, "I");
+    }
+
+    public static String toRoman(int number) {
+        if (map.size() < 1) {
+            initRomanConverter();
+        }
+        int l = map.floorKey(number);
+        if (number == l) {
+            return map.get(number);
+        }
+        return map.get(l) + toRoman(number - l);
+    }
 
     public static int clamp(int number, int min, int max) {
         if (number < min) {
             return min;
         }
         return Math.min(number, max);
-    }
-
-    public static int getColor(int r, int g, int b) {
-        System.out.println(r + ", " + b + ", " + g + ": " + (r<<16 + g<<8 + b));
-        return r<<16 + g<<8 + b;
-    }
-
-    /*
-    public static UUID getUUIDFromIntArray(int[] input) {
-        return UUID.fromString(getUUIDPart(Math.abs(input[0])) + "-" + getUUIDPart(Math.abs(input[1])) + "-" + getUUIDPart(Math.abs(input[2])) + "-" + getUUIDPart(Math.abs(input[3])));
-    }
-
-    private static String getUUIDPart(int value) {
-        String s = String.valueOf(value);
-        String extra = "0".repeat(8 - s.length());
-        return extra + s;
-    }
-     */
-
-    public static int[] getArrayFromUUID(UUID id) {
-        String s = id.toString();
-        int[] returned = new int[4];
-        s = s.replace("-", "");
-        for (int i = 0; i < 4; i++) {
-            returned[i] = Integer.parseInt(s.substring(i, i + 8));
-        }
-        return returned;
     }
 
     public static double round(double value, int places) {

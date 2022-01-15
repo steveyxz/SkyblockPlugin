@@ -1,11 +1,11 @@
 package com.partlysunny.additions.reforge;
 
-import com.partlysunny.core.items.additions.AppliableTypeDefaults;
-import com.partlysunny.core.stats.StatList;
-import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.enums.Rarity;
+import com.partlysunny.core.items.additions.AppliableTypeDefaults;
 import com.partlysunny.core.items.additions.reforges.Reforge;
 import com.partlysunny.core.stats.Stat;
+import com.partlysunny.core.stats.StatList;
+import com.partlysunny.core.stats.StatType;
 import com.partlysunny.core.util.DataUtils;
 import com.partlysunny.core.util.classes.Pair;
 

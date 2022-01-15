@@ -163,7 +163,7 @@ public class AdditionList {
             if (!item.getBoolean("sb_unique")) {
                 item.setBoolean("sb_unique", true);
             }
-            c.setInteger(a.type().id(), (c.getInteger(a.type.id()) == null ? 0 : c.getInteger(a.type.id())) + a.amount());
+            c.setInteger(a.type().id(), (c.getInteger(a.type.id()) == null ? a.amount() : c.getInteger(a.type.id())) + a.amount());
         }
         return item;
     }

@@ -13,8 +13,8 @@ import static com.partlysunny.Skyblock.configManager;
 
 public class BaseStatManager {
 
-    private static final YamlConfiguration baseStats = configManager.getConfig("baseStats");
     public static final Map<UUID, Boolean> hasInitializedChangableStats = new HashMap<>();
+    private static final YamlConfiguration baseStats = configManager.getConfig("baseStats");
     private static final HashMap<String, Double> defaultStats = new HashMap<>() {{
         put(StatType.HEALTH.toString(), 100D);
         put(StatType.DAMAGE_MULTIPLIER.toString(), 1D);

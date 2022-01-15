@@ -4,6 +4,8 @@ import com.partlysunny.Skyblock;
 import com.partlysunny.core.enums.Rarity;
 import com.partlysunny.core.items.abilities.AbilityList;
 import com.partlysunny.core.items.additions.*;
+import com.partlysunny.core.items.additions.enchants.Enchant;
+import com.partlysunny.core.items.additions.enchants.EnchantList;
 import com.partlysunny.core.items.additions.reforges.ReforgeManager;
 import com.partlysunny.core.items.lore.LoreBuilder;
 import com.partlysunny.core.items.name.NameBuilder;
@@ -15,6 +17,7 @@ import de.tr7zw.nbtapi.NBTListCompound;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.EquipmentSlot;
@@ -37,6 +40,7 @@ public abstract class SkyblockItem implements Listener {
     private final AdditionList statAdditions = new AdditionList(ModifierType.STAT, this);
     private final AdditionList rarityAdditions = new AdditionList(ModifierType.RARITY, this);
     private final AdditionList abilityAdditions = new AdditionList(ModifierType.ABILITY, this);
+    private final EnchantList enchants = new EnchantList(this);
     private boolean fragged = false;
     private int stars = 0;
     private String reforge = null;
@@ -124,6 +128,7 @@ public abstract class SkyblockItem implements Listener {
         NBTCompound abilityAdditions = nbti.getCompound("abilityAdditions");
         NBTCompound statAdditions = nbti.getCompound("statAdditions");
         NBTCompound rarityAdditions = nbti.getCompound("rarityAdditions");
+        NBTCompound enchants = nbti.getCompound("enchants");
         if (abilityAdditions != null) {
             for (String key : abilityAdditions.getKeys()) {
                 if (!item.unique) {
@@ -161,6 +166,19 @@ public abstract class SkyblockItem implements Listener {
                     continue;
                 }
                 item.rarityAdditions.addAdditions(AdditionManager.getAddition(key), amount);
+            }
+        }
+        if (enchants != null) {
+            for (String key : enchants.getKeys()) {
+                if (!item.unique) {
+                    item.unique = true;
+                    item.uniqueId = UUID.randomUUID();
+                }
+                Integer amount = enchants.getInteger(key);
+                if (amount == null) {
+                    continue;
+                }
+                item.enchants.addEnchant(key, amount);
             }
         }
         item.updateSkyblockItem();
@@ -308,7 +326,9 @@ public abstract class SkyblockItem implements Listener {
         StatList base;
         base = Objects.requireNonNullElseGet(stats, StatList::new);
         for (IStatAddition a : statAdditions.asStatList()) {
-            base = base.merge(a.getStats(owner));
+            if (a.show()) {
+                base = base.merge(a.getStats(owner));
+            }
         }
         if (reforge != null && type.reforgable()) {
             StatList addition = DataUtils.getStatsOfBest(reforge, getRarity());
@@ -317,6 +337,15 @@ public abstract class SkyblockItem implements Listener {
             }
         }
         return base;
+    }
+
+    public StatList getEnchantStats(Player p, Entity e) {
+        Enchant[] enchants = this.enchants.asList();
+        StatList returned = new StatList();
+        for (Enchant en : enchants) {
+            returned = returned.merge(en.getBonusStats(p, e));
+        }
+        return returned;
     }
 
     public AbilityList getCombinedAbilities() {
@@ -377,6 +406,7 @@ public abstract class SkyblockItem implements Listener {
         }
         m.setDisplayName(new NameBuilder().setName(getDisplayName()).setRarity(getRarity()).setFragged(fragged).setStars(stars).setReforge(reforge).build());
         m.setLore(new LoreBuilder()
+                .setEnchants(enchants)
                 .setReforge(type.reforgable() ? reforge : null)
                 .setDescription(getDescription() != null ? getDescription() : "")
                 .setRarity(getFinalRarity())
@@ -398,7 +428,7 @@ public abstract class SkyblockItem implements Listener {
         nbti.setString("reforge", reforge);
         if (skullId() != null) {
             NBTCompound skull = nbti.addCompound("SkullOwner");
-            skull.setString("Name", "Dragonsbreath Opal");
+            skull.setString("Name", "sus");
             skull.setString("Id", skullId().toString());
 
             NBTListCompound texture = skull.addCompound("Properties").getCompoundList("textures").addCompound();
@@ -432,6 +462,7 @@ public abstract class SkyblockItem implements Listener {
         nbti = statAdditions.applyAdditions(nbti);
         nbti = rarityAdditions.applyAdditions(nbti);
         nbti = abilityAdditions.applyAdditions(nbti);
+        nbti = enchants.applyEnchants(nbti);
         this.unique = nbti.getBoolean("sb_unique");
         i = nbti.getItem();
         asSkyblockItem = i;
@@ -447,6 +478,10 @@ public abstract class SkyblockItem implements Listener {
 
     public AdditionList abilityAdditions() {
         return abilityAdditions;
+    }
+
+    public EnchantList enchants() {
+        return enchants;
     }
 
     public String id() {

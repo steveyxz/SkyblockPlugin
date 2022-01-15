@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 public class PacketUtils {
 
     public static void sendToPlayer(Player p, String text) {
-        ((CraftPlayer)p).getHandle().connection.send(new ClientboundSetActionBarTextPacket(new TextComponent(text)));
+        ((CraftPlayer) p).getHandle().connection.send(new ClientboundSetActionBarTextPacket(new TextComponent(text)));
     }
 
     public static void sendToAll(String text) {
@@ -21,8 +21,8 @@ public class PacketUtils {
     }
 
     public static void sendScreenMessageToPlayer(Player p, String mainText, String smallText) {
-        ((CraftPlayer)p).getHandle().connection.send(new ClientboundSetTitleTextPacket(new TextComponent(mainText)));
-        ((CraftPlayer)p).getHandle().connection.send(new ClientboundSetSubtitleTextPacket(new TextComponent(smallText)));
+        ((CraftPlayer) p).getHandle().connection.send(new ClientboundSetTitleTextPacket(new TextComponent(mainText)));
+        ((CraftPlayer) p).getHandle().connection.send(new ClientboundSetSubtitleTextPacket(new TextComponent(smallText)));
     }
 
     public static void sendScreenMessageToAll(String bigText, String smallText) {

@@ -19,6 +19,7 @@ public class UltraBoots extends SkyblockItem {
     public UltraBoots() {
         super("ultraboots", true, ItemType.BOOTS, null, new String[]{"ultrahelmet", "ultrachestplate", "ultraleggings", "ultraboots"});
     }
+
     @Override
     public boolean fraggable() {
         return true;

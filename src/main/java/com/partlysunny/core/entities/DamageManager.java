@@ -21,6 +21,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.craftbukkit.v1_17_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_17_R1.entity.CraftPlayer;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -67,8 +68,8 @@ public class DamageManager implements Listener {
         dealDamage(e, damage, isCritical, showDamageIndicator);
         double ferocityChance = PlayerStatManager.getStat(p.getUniqueId(), StatType.FEROCITY);
         if (!ferocity) {
-            int one= (int) ((ferocityChance)%10);
-            int tens= (int) ((ferocityChance/10)%10);
+            int one = (int) ((ferocityChance) % 10);
+            int tens = (int) ((ferocityChance / 10) % 10);
             int hundred = (int) ((ferocityChance / 100) % 10);
             boolean ferocityActive = new Random().nextInt(100) < one + tens * 10;
             for (int i = 0; i < hundred; i++) {
@@ -136,17 +137,8 @@ public class DamageManager implements Listener {
         return temp.toString();
     }
 
-    @EventHandler
-    public void onHungerDeplete(FoodLevelChangeEvent e) {
-        if (e.getEntity() instanceof Player p) {
-            e.setCancelled(true);
-            p.setFoodLevel(20);
-            p.setSaturation(0);
-        }
-    }
-
-    public static Pair<Double, Boolean> getHitDamage(Player p, boolean ignoreHand) {
-        StatList stats = PlayerUpdater.getStats(p, ignoreHand);
+    public static Pair<Double, Boolean> getHitDamage(Player p, Entity e, boolean ignoreHand) {
+        StatList stats = PlayerUpdater.getStats(p, ignoreHand, e);
         double damage = (5 + stats.getStat(StatType.DAMAGE)) * (1 + stats.getStat(StatType.STRENGTH) / 100);
         double multiplier = /*TODO combat level*/ stats.getStat(StatType.DAMAGE_MULTIPLIER);
         double critBonus = 1 + stats.getStat(StatType.CRIT_DAMAGE) / 100;
@@ -158,8 +150,8 @@ public class DamageManager implements Listener {
         return new Pair<>(finalDamage, critical);
     }
 
-    public static double getHitDamageOn(Player p, double rawDamage, boolean trueDamage) {
-        StatList stats = PlayerUpdater.getStats(p, false);
+    public static double getHitDamageOn(Player p, Entity e, double rawDamage, boolean trueDamage) {
+        StatList stats = PlayerUpdater.getStats(p, false, e);
         if (trueDamage) {
             return rawDamage;
         }
@@ -233,9 +225,9 @@ public class DamageManager implements Listener {
                 switch (cause) {
                     case FALL -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " fell to their death" + (killer.equals("") ? "." : " with help from " + killer + "."));
                     case FIRE, FIRE_TICK -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " burnt to death" + (killer.equals("") ? "." : " while trying to fight " + killer + "."));
-                    case VOID -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY+ p.getDisplayName() + (killer.equals("") ? " was thrown into the void by " + killer : " fell into the void"));
+                    case VOID -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + (killer.equals("") ? " was thrown into the void by " + killer : " fell into the void"));
                     case ENTITY_ATTACK, ENTITY_SWEEP_ATTACK, ENTITY_EXPLOSION, MAGIC -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " was slain by " + killer + ".");
-                    case SUFFOCATION -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY+ p.getDisplayName() + " suffocated.");
+                    case SUFFOCATION -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " suffocated.");
                     case DROWNING -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " drowned.");
                     case BLOCK_EXPLOSION -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " blew up.");
                     default -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " died");
@@ -251,6 +243,15 @@ public class DamageManager implements Listener {
     }
 
     @EventHandler
+    public void onHungerDeplete(FoodLevelChangeEvent e) {
+        if (e.getEntity() instanceof Player p) {
+            e.setCancelled(true);
+            p.setFoodLevel(20);
+            p.setSaturation(0);
+        }
+    }
+
+    @EventHandler
     public void entityAttack(EntityDamageByEntityEvent e) {
         if (e.getDamage() <= 0) {
             return;
@@ -261,7 +262,7 @@ public class DamageManager implements Listener {
         e.setDamage(0);
         if (!(damager instanceof Player)) {
             if (receiver instanceof Player) {
-                damagePlayer((Player) receiver, getHitDamageOn((Player) receiver, EntityStatType.getStat(damager, EntityStatType.DAMAGE), false), EntityDamageEvent.DamageCause.ENTITY_ATTACK, EntityUtils.getName(damager));
+                damagePlayer((Player) receiver, getHitDamageOn((Player) receiver, damager, EntityStatType.getStat(damager, EntityStatType.DAMAGE), false), EntityDamageEvent.DamageCause.ENTITY_ATTACK, EntityUtils.getName(damager));
             } else {
                 dealDamage(receiver, getStat(damager, EntityStatType.DAMAGE), false, false);
             }
@@ -281,11 +282,11 @@ public class DamageManager implements Listener {
             e.setCancelled(true);
         } else {
             if ((p).getInventory().getItemInMainHand().getType() == Material.CROSSBOW || p.getInventory().getItemInMainHand().getType() == Material.BOW) {
-                Pair<Double, Boolean> hitDamage = getHitDamage(p, true);
+                Pair<Double, Boolean> hitDamage = getHitDamage(p, receiver, true);
                 dealDamage(receiver, hitDamage.a(), hitDamage.b(), true, p, false);
                 return;
             }
-            Pair<Double, Boolean> hitDamage = getHitDamage(p, false);
+            Pair<Double, Boolean> hitDamage = getHitDamage(p, receiver, false);
             dealDamage(receiver, hitDamage.a(), hitDamage.b(), true, p, false);
         }
     }
@@ -298,7 +299,7 @@ public class DamageManager implements Listener {
         receiver.damage(0, damager);
         if (!(damager instanceof Player)) {
             if (receiver instanceof Player) {
-                damagePlayer((Player) receiver, getHitDamageOn((Player) receiver, EntityStatType.getStat(damager, EntityStatType.DAMAGE), false), EntityDamageEvent.DamageCause.ENTITY_ATTACK, EntityUtils.getName(damager));
+                damagePlayer((Player) receiver, getHitDamageOn((Player) receiver, damager, EntityStatType.getStat(damager, EntityStatType.DAMAGE), false), EntityDamageEvent.DamageCause.ENTITY_ATTACK, EntityUtils.getName(damager));
             } else {
                 dealDamage(receiver, getStat(damager, EntityStatType.DAMAGE), false, false);
             }
@@ -316,7 +317,7 @@ public class DamageManager implements Listener {
         if (receiver instanceof Player) {
             e.setCancelled(true);
         } else {
-            Pair<Double, Boolean> hitDamage = getHitDamage(p, false);
+            Pair<Double, Boolean> hitDamage = getHitDamage(p, receiver, false);
             dealDamage(receiver, hitDamage.a(), hitDamage.b(), true, p, false);
         }
         e.getEntity().remove();
@@ -332,7 +333,7 @@ public class DamageManager implements Listener {
                 e.getCause() != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION
         ) {
             if (e.getEntity() instanceof Player) {
-                damagePlayer((Player) e.getEntity(), getHitDamageOn((Player) e.getEntity(), e.getDamage() * 5, false), e.getCause(), "");
+                damagePlayer((Player) e.getEntity(), getHitDamageOn((Player) e.getEntity(), null, e.getDamage() * 5, false), e.getCause(), "");
             } else {
                 dealDamage((LivingEntity) e.getEntity(), e.getDamage() * 5, false, true);
             }

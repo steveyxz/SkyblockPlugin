@@ -26,7 +26,7 @@ public class TextUtils {
 
             int i;
             String partialWord;
-            for(i = 0; i < rawChars.length; ++i) {
+            for (i = 0; i < rawChars.length; ++i) {
                 char c = rawChars[i];
                 if (c == 167) {
                     word.append(ChatColor.getByChar(rawChars[i + 1]));
@@ -42,7 +42,7 @@ public class TextUtils {
                     if (line.length() == 0 && word.length() > width) {
                         var11 = (var12 = split).length;
 
-                        for(var10 = 0; var10 < var11; ++var10) {
+                        for (var10 = 0; var10 < var11; ++var10) {
                             partialWord = var12[var10];
                             lines.add(partialWord);
                         }
@@ -58,7 +58,7 @@ public class TextUtils {
                     } else if (line.length() + 1 + word.length() - lineColorChars > width) {
                         var11 = (var12 = split).length;
 
-                        for(var10 = 0; var10 < var11; ++var10) {
+                        for (var10 = 0; var10 < var11; ++var10) {
                             partialWord = var12[var10];
                             lines.add(line.toString());
                             line = new StringBuilder(partialWord);
@@ -85,7 +85,7 @@ public class TextUtils {
                 lines.add(line.toString());
             }
 
-            for(i = 1; i < lines.size(); ++i) {
+            for (i = 1; i < lines.size(); ++i) {
                 String pLine = lines.get(i - 1);
                 partialWord = lines.get(i);
                 String color = ChatColor.getLastColors(pLine);

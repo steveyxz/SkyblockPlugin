@@ -16,8 +16,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import static com.partlysunny.abilities.AbilityRegister.registerAbilities;
-import static com.partlysunny.additions.AdditionRegister.registerAdditions;
-import static com.partlysunny.additions.AdditionRegister.registerReforges;
+import static com.partlysunny.additions.AdditionRegister.*;
 import static com.partlysunny.core.player.BaseStatManager.initializeBaseStats;
 import static com.partlysunny.core.player.BaseStatManager.repairDefaultStats;
 import static com.partlysunny.entities.EntityRegister.registerEntityInfos;
@@ -33,6 +32,7 @@ public final class Skyblock extends JavaPlugin {
         repairDefaultStats();
         initializeBaseStats(this);
         registerCommands();
+        registerEnchants();
         registerListeners();
         registerItems();
         registerAbilities();
@@ -70,6 +70,7 @@ public final class Skyblock extends JavaPlugin {
         getCommand("sbreforge").setExecutor(new SkyblockReforge());
         getCommand("sbstar").setExecutor(new SkyblockStar());
         getCommand("sbfrag").setExecutor(new SkyblockFrag());
+        getCommand("sbenchant").setExecutor(new SkyblockEnchant());
     }
 
     private void registerListeners() {

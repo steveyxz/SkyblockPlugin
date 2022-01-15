@@ -16,16 +16,6 @@ public class PlayerStatManager implements Listener {
 
     public static final Map<UUID, StatList> playerStats = new HashMap<>();
 
-    @EventHandler
-    public void join(PlayerJoinEvent event) {
-        BaseStatManager.initializeStats(event.getPlayer());
-    }
-
-    @EventHandler
-    public void leave(PlayerQuitEvent event) {
-        BaseStatManager.removeStats(event.getPlayer());
-    }
-
     public static void setStat(UUID id, StatType type, double value) {
         playerStats.get(id).addStat(new Stat(type, value));
     }
@@ -36,7 +26,17 @@ public class PlayerStatManager implements Listener {
 
     public static void changeStat(UUID id, StatType type, double value) {
         StatList statList = playerStats.get(id);
-        statList.addStat(new Stat(type, statList.getStat(type) + value));;
+        statList.addStat(new Stat(type, statList.getStat(type) + value));
+    }
+
+    @EventHandler
+    public void join(PlayerJoinEvent event) {
+        BaseStatManager.initializeStats(event.getPlayer());
+    }
+
+    @EventHandler
+    public void leave(PlayerQuitEvent event) {
+        BaseStatManager.removeStats(event.getPlayer());
     }
 
 }

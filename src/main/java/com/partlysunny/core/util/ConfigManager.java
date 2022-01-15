@@ -20,7 +20,7 @@ public class ConfigManager {
         if (!name.endsWith(".yml")) {
             name = name + ".yml";
         }
-        File file = new File(plugin.getDataFolder(),name);
+        File file = new File(plugin.getDataFolder(), name);
         if (!file.exists()) {
             plugin.getDataFolder().mkdir();
             try {
@@ -36,7 +36,7 @@ public class ConfigManager {
         if (!name.endsWith(".yml")) {
             name = name + ".yml";
         }
-        File file = new File(plugin.getDataFolder(),name);
+        File file = new File(plugin.getDataFolder(), name);
         try {
             config.save(file);
         } catch (IOException e) {
@@ -49,7 +49,7 @@ public class ConfigManager {
             name = name + ".yml";
         }
         createConfig(name);
-        File file = new File(plugin.getDataFolder(),name);
+        File file = new File(plugin.getDataFolder(), name);
         return YamlConfiguration.loadConfiguration(file); // file found, load into config and return it.
     }
 
