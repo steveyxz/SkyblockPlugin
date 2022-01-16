@@ -4,6 +4,7 @@ import com.partlysunny.core.ConsoleLogger;
 import com.partlysunny.core.commands.*;
 import com.partlysunny.core.entities.DamageManager;
 import com.partlysunny.core.entities.EntityUpdater;
+import com.partlysunny.core.gui.craft.CraftCommand;
 import com.partlysunny.core.items.ItemUpdater;
 import com.partlysunny.core.player.PlayerStatManager;
 import com.partlysunny.core.player.PlayerUpdater;
@@ -71,6 +72,7 @@ public final class Skyblock extends JavaPlugin {
         getCommand("sbstar").setExecutor(new SkyblockStar());
         getCommand("sbfrag").setExecutor(new SkyblockFrag());
         getCommand("sbenchant").setExecutor(new SkyblockEnchant());
+        getCommand("craft").setExecutor(new CraftCommand());
     }
 
     private void registerListeners() {

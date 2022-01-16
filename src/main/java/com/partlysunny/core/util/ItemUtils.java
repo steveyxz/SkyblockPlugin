@@ -36,8 +36,7 @@ public class ItemUtils {
 
     public static ItemStack getLeatherArmorItem(Color color, Material material) {
         ItemStack item = new ItemStack(material);
-        if (item.getItemMeta() instanceof LeatherArmorMeta) {
-            LeatherArmorMeta m = (LeatherArmorMeta) item.getItemMeta();
+        if (item.getItemMeta() instanceof LeatherArmorMeta m) {
             m.setColor(color);
             item.setItemMeta(m);
         }

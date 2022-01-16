@@ -321,13 +321,13 @@ public abstract class SkyblockItem implements Listener {
         return reforge;
     }
 
-    public StatList getCombinedStats() {
+    public StatList getCombinedStats(Player p, Entity e) {
         StatList stats = getStats();
         StatList base;
         base = Objects.requireNonNullElseGet(stats, StatList::new);
         for (IStatAddition a : statAdditions.asStatList()) {
             if (a.show()) {
-                base = base.merge(a.getStats(owner));
+                base = base.merge(a.getStats(p, e));
             }
         }
         if (reforge != null && type.reforgable()) {
@@ -410,7 +410,7 @@ public abstract class SkyblockItem implements Listener {
                 .setReforge(type.reforgable() ? reforge : null)
                 .setDescription(getDescription() != null ? getDescription() : "")
                 .setRarity(getFinalRarity())
-                .setStats(getCombinedStats(), statAdditions(), getRarity(), owner)
+                .setStats(getCombinedStats(owner, null), statAdditions(), getRarity(), owner)
                 .addAbilities(getCombinedAbilities())
                 .setType(type)
                 .build()
@@ -441,6 +441,14 @@ public abstract class SkyblockItem implements Listener {
             nbti.setBoolean("sb_unique", true);
             nbti.setUUID("sb_unique_id", uniqueId);
         }
+        if (getStats() != null) {
+            nbti = getStats().applyStats(nbti);
+        }
+        nbti = statAdditions.applyAdditions(nbti);
+        nbti = rarityAdditions.applyAdditions(nbti);
+        nbti = abilityAdditions.applyAdditions(nbti);
+        nbti = enchants.applyEnchants(nbti);
+        this.unique = nbti.getBoolean("sb_unique");
         if (uniqueId == null) {
             if (unique) {
                 UUID value = UUID.randomUUID();
@@ -455,14 +463,6 @@ public abstract class SkyblockItem implements Listener {
                 uniqueId = null;
             }
         }
-        if (getStats() != null) {
-            nbti = getStats().applyStats(nbti);
-        }
-        nbti = statAdditions.applyAdditions(nbti);
-        nbti = rarityAdditions.applyAdditions(nbti);
-        nbti = abilityAdditions.applyAdditions(nbti);
-        nbti = enchants.applyEnchants(nbti);
-        this.unique = nbti.getBoolean("sb_unique");
         i = nbti.getItem();
         asSkyblockItem = i;
     }

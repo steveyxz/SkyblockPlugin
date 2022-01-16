@@ -1,6 +1,7 @@
 package com.partlysunny.core.items.additions;
 
 import com.partlysunny.core.stats.StatList;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import javax.annotation.Nullable;
@@ -11,7 +12,7 @@ public interface IStatAddition {
     @Nullable
     String getLore(Player player);
 
-    StatList getStats(@Nullable Player player);
+    StatList getStats(@Nullable Player player, @Nullable Entity e);
 
     boolean show();
 

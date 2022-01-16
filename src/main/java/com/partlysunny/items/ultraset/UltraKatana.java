@@ -1,4 +1,4 @@
-package com.partlysunny.items;
+package com.partlysunny.items.ultraset;
 
 import com.partlysunny.abilities.rightClick.SmiteAbility;
 import com.partlysunny.core.enums.Rarity;

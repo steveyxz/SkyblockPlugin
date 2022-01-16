@@ -11,12 +11,15 @@ import java.util.List;
 import java.util.Locale;
 
 public class TextUtils {
-
     public static List<String> wrap(String text, int width) {
+        return wrap(text, width, ChatColor.GRAY);
+    }
+
+    public static List<String> wrap(String text, int width, ChatColor defaultColor) {
         if (text == null) {
             return List.of(new String[]{""});
         } else if (text.length() <= width && !text.contains("\n")) {
-            return List.of(new String[]{text});
+            return List.of(new String[]{defaultColor + text});
         } else {
             char[] rawChars = (text + ' ').toCharArray();
             StringBuilder word = new StringBuilder();
@@ -60,7 +63,7 @@ public class TextUtils {
 
                         for (var10 = 0; var10 < var11; ++var10) {
                             partialWord = var12[var10];
-                            lines.add(line.toString());
+                            lines.add(defaultColor + line.toString());
                             line = new StringBuilder(partialWord);
                         }
 
@@ -75,7 +78,7 @@ public class TextUtils {
 
                     word = new StringBuilder();
                     if (c == '\n') {
-                        lines.add(line.toString());
+                        lines.add(defaultColor + line.toString());
                         line = new StringBuilder();
                     }
                 }

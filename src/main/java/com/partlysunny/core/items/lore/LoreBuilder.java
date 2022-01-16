@@ -153,7 +153,7 @@ public class LoreBuilder {
             for (Addition a : additionList) {
                 IStatAddition isa = (IStatAddition) a;
                 if (isa.show()) {
-                    for (Stat s : isa.getStats(player).asList()) {
+                    for (Stat s : isa.getStats(player, null).asList()) {
                         if (sorted.containsKey(s.type())) {
                             sorted.get(s.type()).put(a.type(), s.value());
                         } else {
@@ -168,6 +168,8 @@ public class LoreBuilder {
             realSorted.remove(StatType.SPEED_CAP);
             realSorted.remove(StatType.HEALTH);
             realSorted.remove(StatType.MANA);
+            realSorted.remove(StatType.DAMAGE_REDUCTION);
+            realSorted.remove(StatType.DAMAGE_MULTIPLIER);
         }
         Stat[] reforgeAdditions = null;
         if (reforgeBonus != null && reforgeName != null) {
@@ -179,6 +181,15 @@ public class LoreBuilder {
         statLore.clear();
         for (Stat s : listed) {
             StatType type = s.type();
+            if (
+                    type == StatType.SPEED_CAP ||
+                    type == StatType.HEALTH ||
+                    type == StatType.MANA ||
+                    type == StatType.DAMAGE_REDUCTION ||
+                    type == StatType.DAMAGE_MULTIPLIER
+            ) {
+                continue;
+            }
             StringBuilder stat = new StringBuilder();
             if (type.isGreen()) {
                 stat.append(ChatColor.GRAY).append(type.displayName()).append(": ").append(ChatColor.GREEN).append("+").append(getIntegerStringOf(s.value(), 1)).append(type.percent() ? "%" : "");

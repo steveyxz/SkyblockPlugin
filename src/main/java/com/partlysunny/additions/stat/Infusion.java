@@ -12,6 +12,7 @@ import com.partlysunny.core.stats.Stat;
 import com.partlysunny.core.stats.StatList;
 import com.partlysunny.core.stats.StatType;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,7 +33,7 @@ public class Infusion extends Addition implements IStatAddition {
     }
 
     @Override
-    public StatList getStats(Player player) {
+    public StatList getStats(Player player, Entity e) {
         double health;
         if (player == null) {
             health = 100;

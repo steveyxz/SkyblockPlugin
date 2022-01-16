@@ -23,6 +23,9 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 import static com.partlysunny.core.util.AbilityUtils.hasAbility;
 
@@ -41,6 +44,7 @@ public abstract class Ability implements Listener {
     protected boolean onCooldown = false;
     private String cooldownMessage = ChatColor.RED + "This ability is on cooldown!";
     private int cooldownRemaining = -1;
+    private static final Map<String, Map<UUID, Integer>> cooldowns = new HashMap<>();
 
     public Ability(String id, String name, String description, AbilityType type, @Nullable SkyblockItem parent, ItemType... appliableTypes) {
         this.name = name;
@@ -53,6 +57,7 @@ public abstract class Ability implements Listener {
         this.appliableTypes = appliableTypes;
         this.parent = parent;
         if (!registered.contains(id)) {
+            cooldowns.put(id, new HashMap<>());
             Skyblock plugin = JavaPlugin.getPlugin(Skyblock.class);
             plugin.getServer().getPluginManager().registerEvents(this, plugin);
             registered.add(id);
@@ -70,6 +75,7 @@ public abstract class Ability implements Listener {
         this.appliableTypes = appliableTypes;
         this.parent = parent;
         if (!registered.contains(id)) {
+            cooldowns.put(id, new HashMap<>());
             Skyblock plugin = JavaPlugin.getPlugin(Skyblock.class);
             plugin.getServer().getPluginManager().registerEvents(this, plugin);
             registered.add(id);
@@ -190,7 +196,7 @@ public abstract class Ability implements Listener {
             return;
         }
         if (AbilityUtils.hasAbility(e.getPlayer().getInventory().getItemInMainHand(), this.id)) {
-            if (onCooldown()) {
+            if (onCooldown(e.getPlayer())) {
                 e.getPlayer().sendMessage(cooldownMessage);
                 e.getPlayer().getWorld().playSound(e.getPlayer().getLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);
                 return;
@@ -199,24 +205,24 @@ public abstract class Ability implements Listener {
                 if (e.getPlayer().isSneaking() && type == AbilityType.SHIFT_LEFT_CLICK) {
                     if (mana(e.getPlayer())) {
                         trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
-                        startCooldown();
+                        startCooldown(e.getPlayer());
                     }
                 } else if (type == AbilityType.LEFT_CLICK) {
                     if (mana(e.getPlayer())) {
                         trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
-                        startCooldown();
+                        startCooldown(e.getPlayer());
                     }
                 }
             } else if ((e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)) {
                 if (e.getPlayer().isSneaking() && type == AbilityType.SHIFT_RIGHT_CLICK) {
                     if (mana(e.getPlayer())) {
                         trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
-                        startCooldown();
+                        startCooldown(e.getPlayer());
                     }
                 } else if (type == AbilityType.RIGHT_CLICK) {
                     if (mana(e.getPlayer())) {
                         trigger(e.getPlayer(), e.getPlayer().getInventory().getItemInMainHand());
-                        startCooldown();
+                        startCooldown(e.getPlayer());
                     }
                 }
             }
@@ -234,19 +240,17 @@ public abstract class Ability implements Listener {
         return true;
     }
 
-    protected boolean onCooldown() {
-        return onCooldown;
+    protected boolean onCooldown(Player p) {
+        return cooldowns.get(id).get(p.getUniqueId()) != null && cooldowns.get(id).get(p.getUniqueId()) < 0;
     }
 
-    protected void startCooldown() {
-        onCooldown = true;
-        cooldownRemaining = cooldown;
+    protected void startCooldown(Player p) {
+        cooldowns.get(id).put(p.getUniqueId(), cooldown);
         new BukkitRunnable() {
             @Override
             public void run() {
-                cooldownRemaining--;
-                if (cooldownRemaining == -1) {
-                    onCooldown = false;
+                cooldowns.get(id).put(p.getUniqueId(), cooldowns.get(id).get(p.getUniqueId()) - 1);
+                if (!onCooldown(p)) {
                     cancel();
                 }
             }

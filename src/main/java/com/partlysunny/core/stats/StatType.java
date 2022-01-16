@@ -5,6 +5,7 @@ import org.bukkit.ChatColor;
 public enum StatType {
 
     DAMAGE_MULTIPLIER("sb_damage_multiplier", "damage_multiplier", ChatColor.GRAY, "X", false, 0, false),
+    DAMAGE_REDUCTION("sb_damage_reduction", "damage_reduction", ChatColor.GRAY, "-", false, 0, false),
     MAX_HEALTH("sb_max_health", "Health", ChatColor.RED, "❤", false, 8, true),
     HEALTH("sb_health", "hp", ChatColor.RED, "❤", false, 8, true),
     STRENGTH("sb_strength", "Strength", ChatColor.RED, "❁", false, 2, false),

@@ -3,7 +3,7 @@ version: '0.0.0'
 main: com.partlysunny.Skyblock
 api-version: 1.17
 authors: [ PartlySunny ]
-depend: [ Citizens, NBTAPI, RedLib, SidebarAPI ]
+depend: [ Citizens, NBTAPI, SidebarAPI, WorldEdit ]
 description: Hypixel Skyblock Remade
 commands:
   sbgive:
@@ -34,7 +34,14 @@ commands:
     description: Adds and enchant to your held item (default 1)
     usage: /sbenchant <enchant-id> [level]
     permission: skyblock.op
+  craft:
+    description: Opens the craft menu
+    usage: /craft
+    permission: skyblock.user
 permissions:
   skyblock.op:
     description: Gives you access to commands like sbgive and sbsummon
     default: op
+  skyblock.user:
+    description: default user
+    default: true

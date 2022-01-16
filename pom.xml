@@ -123,11 +123,11 @@
         </dependency>
 
         <dependency>
-            <groupId>redempt.redlib</groupId>
-            <artifactId>redlib</artifactId>
-            <version>2.0</version>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldedit</artifactId>
+            <version>7.2.8</version>
             <scope>system</scope>
-            <systemPath>${basedir}/libs/RedLib.jar</systemPath>
+            <systemPath>${basedir}/libs/worldedit-bukkit-7.2.8.jar</systemPath>
         </dependency>
 
         <dependency>

@@ -49,23 +49,23 @@ public class PlayerUpdater implements Listener {
             hand = null;
         }
         if (helmet != null) {
-            newStats = newStats.merge(helmet.getCombinedStats());
+            newStats = newStats.merge(helmet.getCombinedStats(player, targetEntity));
             newStats = newStats.merge(helmet.getEnchantStats(player, targetEntity));
         }
         if (chestplate != null) {
-            newStats = newStats.merge(chestplate.getCombinedStats());
+            newStats = newStats.merge(chestplate.getCombinedStats(player, targetEntity));
             newStats = newStats.merge(chestplate.getEnchantStats(player, targetEntity));
         }
         if (leggings != null) {
-            newStats = newStats.merge(leggings.getCombinedStats());
+            newStats = newStats.merge(leggings.getCombinedStats(player, targetEntity));
             newStats = newStats.merge(leggings.getEnchantStats(player, targetEntity));
         }
         if (boots != null) {
-            newStats = newStats.merge(boots.getCombinedStats());
+            newStats = newStats.merge(boots.getCombinedStats(player, targetEntity));
             newStats = newStats.merge(boots.getEnchantStats(player, targetEntity));
         }
         if (hand != null) {
-            newStats = newStats.merge(hand.getCombinedStats());
+            newStats = newStats.merge(hand.getCombinedStats(player, targetEntity));
             newStats = newStats.merge(hand.getEnchantStats(player, targetEntity));
         }
         if (BaseStatManager.hasInitializedChangableStats.get(id)) {

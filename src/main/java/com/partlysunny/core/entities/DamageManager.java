@@ -156,7 +156,13 @@ public class DamageManager implements Listener {
             return rawDamage;
         }
         double defense = stats.getStat(StatType.DEFENSE);
-        return rawDamage - ((defense / (defense + 100)) * rawDamage);
+        double reduction = stats.getStat(StatType.DAMAGE_REDUCTION);
+        System.out.println(reduction);
+        double reducedDamage = rawDamage - ((reduction / 100) * rawDamage) - ((defense / (defense + 100)) * rawDamage);
+        if (reducedDamage < 0) {
+            return 0;
+        }
+        return reducedDamage;
     }
 
     public static void damagePlayer(Player p, double damage) {
@@ -215,7 +221,9 @@ public class DamageManager implements Listener {
         p.teleport(bedSpawnLocation);
         p.setFireTicks(0);
         p.setVisualFire(false);
-        p.getWorld().playSound(p.getLocation(), Sound.BLOCK_ANVIL_BREAK, 1, 1);
+        //TODO make this sound when losing coins
+        //p.getWorld().playSound(p.getLocation(), Sound.BLOCK_ANVIL_PLACE, 1, 2);
+        p.getWorld().playSound(p.getLocation(), Sound.ENTITY_PLAYER_HURT, 1, 1);
         if (cause == null) {
             for (Player a : p.getWorld().getPlayers()) {
                 a.sendMessage(ChatColor.RED + "☠ " + a.getDisplayName() + " died.");
@@ -225,7 +233,7 @@ public class DamageManager implements Listener {
                 switch (cause) {
                     case FALL -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " fell to their death" + (killer.equals("") ? "." : " with help from " + killer + "."));
                     case FIRE, FIRE_TICK -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " burnt to death" + (killer.equals("") ? "." : " while trying to fight " + killer + "."));
-                    case VOID -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + (killer.equals("") ? " was thrown into the void by " + killer : " fell into the void"));
+                    case VOID -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + (!killer.equals("") ? " was thrown into the void by " + killer : " fell into the void"));
                     case ENTITY_ATTACK, ENTITY_SWEEP_ATTACK, ENTITY_EXPLOSION, MAGIC -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " was slain by " + killer + ".");
                     case SUFFOCATION -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " suffocated.");
                     case DROWNING -> a.sendMessage(ChatColor.RED + "☠ " + ChatColor.GRAY + p.getDisplayName() + " drowned.");
