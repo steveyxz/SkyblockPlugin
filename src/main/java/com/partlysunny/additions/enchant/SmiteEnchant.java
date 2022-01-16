@@ -15,7 +15,7 @@ import java.util.List;
 
 public class SmiteEnchant extends Enchant {
 
-    public static final EntityType[] undeadCreatures = new EntityType[] {
+    public static final EntityType[] undeadCreatures = new EntityType[]{
             EntityType.ZOMBIE,
             EntityType.ZOMBIE_HORSE,
             EntityType.ZOMBIE_VILLAGER,

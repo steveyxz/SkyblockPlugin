@@ -15,6 +15,7 @@ public class SharpnessEnchant extends Enchant {
     public SharpnessEnchant() {
         this(null, 1);
     }
+
     public SharpnessEnchant(SkyblockItem parent, Integer level) {
         super("sharpness", "Sharpness", 7, level, SharpnessEnchant.class, parent, false, AppliableTypeDefaults.meleeWeapons);
     }

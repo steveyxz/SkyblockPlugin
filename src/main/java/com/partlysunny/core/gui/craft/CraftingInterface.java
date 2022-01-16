@@ -19,15 +19,15 @@ import java.util.List;
 
 public class CraftingInterface implements Listener, SkyblockGui {
 
-    private static boolean registered = false;
-    private static final Integer[] craftingSlots = new Integer[] {10, 11, 12, 19, 20, 21, 28, 29, 30};
+    private static final Integer[] craftingSlots = new Integer[]{10, 11, 12, 19, 20, 21, 28, 29, 30};
     private static final Integer resultSlot = 23;
     private static final Integer backButton = 49;
-    private static final Integer[] quickCraftSlots = new Integer[] {16, 25, 34};
+    private static final Integer[] quickCraftSlots = new Integer[]{16, 25, 34};
     private static final ItemStack resultDefault = new ItemStack(Material.BARRIER);
     private static final ItemStack backDefault = new ItemStack(Material.ARROW);
     private static final ItemStack quickCraft = new ItemStack(Material.RED_STAINED_GLASS_PANE);
     private static final ItemStack emptyDefault = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+    private static boolean registered = false;
 
     @SuppressWarnings("all")
     public CraftingInterface(Player p) {
@@ -77,7 +77,6 @@ public class CraftingInterface implements Listener, SkyblockGui {
 
         }
     }
-
 
 
 }

@@ -183,10 +183,10 @@ public class LoreBuilder {
             StatType type = s.type();
             if (
                     type == StatType.SPEED_CAP ||
-                    type == StatType.HEALTH ||
-                    type == StatType.MANA ||
-                    type == StatType.DAMAGE_REDUCTION ||
-                    type == StatType.DAMAGE_MULTIPLIER
+                            type == StatType.HEALTH ||
+                            type == StatType.MANA ||
+                            type == StatType.DAMAGE_REDUCTION ||
+                            type == StatType.DAMAGE_MULTIPLIER
             ) {
                 continue;
             }

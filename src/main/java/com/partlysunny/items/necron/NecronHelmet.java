@@ -21,7 +21,7 @@ public class NecronHelmet extends SkyblockItem {
     }
 
     public NecronHelmet(@Nullable Player owner) {
-        super("necron_helmet", true, ItemType.HELMET, owner, new String[] {"necron_helmet", "necron_chestplate", "necron_leggings", "necron_boots"});
+        super("necron_helmet", true, ItemType.HELMET, owner, new String[]{"necron_helmet", "necron_chestplate", "necron_leggings", "necron_boots"});
     }
 
     @Override

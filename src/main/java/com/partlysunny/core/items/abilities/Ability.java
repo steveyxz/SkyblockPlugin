@@ -32,6 +32,7 @@ import static com.partlysunny.core.util.AbilityUtils.hasAbility;
 public abstract class Ability implements Listener {
 
     private static final ArrayList<String> registered = new ArrayList<>();
+    private static final Map<String, Map<UUID, Integer>> cooldowns = new HashMap<>();
     protected final String name;
     protected final String description;
     protected final int manaCost;
@@ -43,8 +44,7 @@ public abstract class Ability implements Listener {
     private final SkyblockItem parent;
     protected boolean onCooldown = false;
     private String cooldownMessage = ChatColor.RED + "This ability is on cooldown!";
-    private int cooldownRemaining = -1;
-    private static final Map<String, Map<UUID, Integer>> cooldowns = new HashMap<>();
+    private final int cooldownRemaining = -1;
 
     public Ability(String id, String name, String description, AbilityType type, @Nullable SkyblockItem parent, ItemType... appliableTypes) {
         this.name = name;
