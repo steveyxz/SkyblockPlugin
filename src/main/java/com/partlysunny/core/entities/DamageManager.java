@@ -157,7 +157,6 @@ public class DamageManager implements Listener {
         }
         double defense = stats.getStat(StatType.DEFENSE);
         double reduction = stats.getStat(StatType.DAMAGE_REDUCTION);
-        System.out.println(reduction);
         double reducedDamage = rawDamage - ((reduction / 100) * rawDamage) - ((defense / (defense + 100)) * rawDamage);
         if (reducedDamage < 0) {
             return 0;

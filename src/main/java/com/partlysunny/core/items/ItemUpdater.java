@@ -2,7 +2,9 @@ package com.partlysunny.core.items;
 
 import com.partlysunny.core.ConsoleLogger;
 import com.partlysunny.core.util.DataUtils;
+import com.partlysunny.core.util.ItemUtils;
 import de.tr7zw.nbtapi.NBTItem;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -160,6 +162,9 @@ public class ItemUpdater implements Listener {
 
     @EventHandler(priority = EventPriority.LOW)
     public void onInventoryOpen(InventoryOpenEvent e) {
+        if (e.getView().getTitle().startsWith(String.valueOf(ChatColor.COLOR_CHAR))) {
+            return;
+        }
         updateVanilla(e.getInventory(), (Player) e.getPlayer());
         for (Integer i : idify(e.getInventory(), (Player) e.getPlayer())) {
             e.setCancelled(true);
@@ -176,7 +181,7 @@ public class ItemUpdater implements Listener {
             i = getUpdated(i, (Player) e.getEntity());
             e.setCancelled(true);
             e.getItem().remove();
-            ((Player) e.getEntity()).getInventory().addItem(i);
+            ItemUtils.addItem((Player) e.getEntity(), i);
             e.getEntity().getWorld().playSound(e.getEntity().getLocation(), Sound.ENTITY_ITEM_PICKUP, 1F, 1F);
         }
     }

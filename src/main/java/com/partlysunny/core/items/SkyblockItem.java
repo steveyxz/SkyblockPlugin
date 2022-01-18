@@ -11,6 +11,7 @@ import com.partlysunny.core.items.lore.LoreBuilder;
 import com.partlysunny.core.items.name.NameBuilder;
 import com.partlysunny.core.stats.StatList;
 import com.partlysunny.core.util.DataUtils;
+import com.partlysunny.core.util.classes.Pair;
 import de.tr7zw.nbtapi.NBTCompound;
 import de.tr7zw.nbtapi.NBTItem;
 import de.tr7zw.nbtapi.NBTListCompound;
@@ -331,10 +332,13 @@ public abstract class SkyblockItem implements Listener {
             }
         }
         if (reforge != null && type.reforgable()) {
-            StatList addition = DataUtils.getStatsOfBest(reforge, getRarity());
+            StatList addition = DataUtils.getStatsOfBest(reforge, getFinalRarity());
             if (addition != null) {
                 base = base.merge(addition);
             }
+        }
+        if (fragged) {
+            base = base.merge(getFraggedBonuses().b());
         }
         return base;
     }
@@ -363,9 +367,15 @@ public abstract class SkyblockItem implements Listener {
         for (IRarityAddition a : rarityAdditions.asRarityList()) {
             base = Rarity.add(base, a.getLevelChange());
         }
+        if (fragged) {
+            base = Rarity.add(base, getFraggedBonuses().a());
+        }
         return base;
     }
 
+    public Pair<Integer, StatList> getFraggedBonuses() {
+        return new Pair<>(0, new StatList());
+    }
 
     public ItemStack getSkyblockItem() {
         return asSkyblockItem;
@@ -404,13 +414,13 @@ public abstract class SkyblockItem implements Listener {
                 ((LeatherArmorMeta) m).setColor(getColor());
             }
         }
-        m.setDisplayName(new NameBuilder().setName(getDisplayName()).setRarity(getRarity()).setFragged(fragged).setStars(stars).setReforge(reforge).build());
+        m.setDisplayName(new NameBuilder().setName(getDisplayName()).setRarity(getFinalRarity()).setFragged(fragged).setStars(stars).setReforge(reforge).build());
         m.setLore(new LoreBuilder()
                 .setEnchants(enchants)
                 .setReforge(type.reforgable() ? reforge : null)
                 .setDescription(getDescription() != null ? getDescription() : "")
                 .setRarity(getFinalRarity())
-                .setStats(getCombinedStats(owner, null), statAdditions(), getRarity(), owner)
+                .setStats(getCombinedStats(owner, null), statAdditions(), getFinalRarity(), owner)
                 .addAbilities(getCombinedAbilities())
                 .setType(type)
                 .build()

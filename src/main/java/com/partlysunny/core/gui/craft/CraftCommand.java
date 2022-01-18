@@ -12,7 +12,7 @@ public class CraftCommand implements CommandExecutor, Listener {
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         if (s.equals("craft") && commandSender instanceof Player p) {
-            GuiManager.setInventory(p.getUniqueId(), new CraftingInterface(p));
+            GuiManager.setInventory(p, new CraftingInterface(p));
         }
         return true;
     }

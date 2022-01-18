@@ -8,6 +8,7 @@ import com.partlysunny.core.items.abilities.AbilityList;
 import com.partlysunny.core.stats.Stat;
 import com.partlysunny.core.stats.StatList;
 import com.partlysunny.core.stats.StatType;
+import com.partlysunny.core.util.classes.Pair;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 
@@ -48,6 +49,11 @@ public class UltraKatana extends SkyblockItem {
     @Override
     public boolean isEnchanted() {
         return true;
+    }
+
+    @Override
+    public Pair<Integer, StatList> getFraggedBonuses() {
+        return new Pair<>(1, new StatList(new Stat(StatType.DAMAGE, 120), new Stat(StatType.CRIT_DAMAGE, 200), new Stat(StatType.STRENGTH, 100)));
     }
 
     @Override

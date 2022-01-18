@@ -3,6 +3,7 @@ package com.partlysunny.core.commands;
 import com.partlysunny.core.items.ItemInfo;
 import com.partlysunny.core.items.ItemManager;
 import com.partlysunny.core.items.SkyblockItem;
+import com.partlysunny.core.util.ItemUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -32,7 +33,7 @@ public class SkyblockGive implements CommandExecutor {
                     p.sendMessage(ChatColor.RED + "Invalid number provided. Giving one item instead.");
                 }
             }
-            p.getInventory().addItem(instance.getSkyblockItem());
+            ItemUtils.addItem(p, instance.getSkyblockItem());
             p.sendMessage(ChatColor.GREEN + "Gave you " + instance.stackCount() + " " + instance.getDisplayName());
         } else {
             p.sendMessage(ChatColor.RED + "Invalid item type: " + strings[0]);
